@@ -1,6 +1,6 @@
 // Auto-generated 24h Rolling Stream Timeline
 window.A23_TIMELINE = {
-  "updated_at": "2026-11-22 09:00:38",
+  "updated_at": "2026-11-22 21:27:14",
   "topics": [
     {
       "id": 0,
@@ -224,186 +224,6 @@ window.A23_TIMELINE = {
   "frame_count": 24,
   "frames": [
     {
-      "timestamp": "2026-11-21 10:00",
-      "missing": false,
-      "total": 276,
-      "cluster_counts": [
-        49,
-        7,
-        10,
-        26,
-        52,
-        1,
-        2,
-        129
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 11:00",
-      "missing": false,
-      "total": 277,
-      "cluster_counts": [
-        49,
-        7,
-        11,
-        26,
-        52,
-        3,
-        2,
-        127
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 12:00",
-      "missing": false,
-      "total": 274,
-      "cluster_counts": [
-        48,
-        7,
-        12,
-        28,
-        48,
-        6,
-        3,
-        122
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 13:00",
-      "missing": false,
-      "total": 278,
-      "cluster_counts": [
-        48,
-        7,
-        12,
-        27,
-        53,
-        6,
-        2,
-        123
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 14:00",
-      "missing": false,
-      "total": 261,
-      "cluster_counts": [
-        32,
-        6,
-        11,
-        29,
-        54,
-        5,
-        3,
-        121
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 15:00",
-      "missing": false,
-      "total": 279,
-      "cluster_counts": [
-        46,
-        6,
-        10,
-        27,
-        50,
-        4,
-        5,
-        131
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 16:00",
-      "missing": false,
-      "total": 281,
-      "cluster_counts": [
-        47,
-        6,
-        9,
-        28,
-        46,
-        4,
-        4,
-        137
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 17:00",
-      "missing": false,
-      "total": 283,
-      "cluster_counts": [
-        50,
-        5,
-        7,
-        30,
-        40,
-        4,
-        5,
-        142
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 18:00",
-      "missing": false,
-      "total": 282,
-      "cluster_counts": [
-        50,
-        5,
-        7,
-        30,
-        39,
-        4,
-        5,
-        142
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 19:00",
-      "missing": false,
-      "total": 281,
-      "cluster_counts": [
-        50,
-        6,
-        7,
-        30,
-        39,
-        3,
-        3,
-        143
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 20:00",
-      "missing": false,
-      "total": 281,
-      "cluster_counts": [
-        50,
-        6,
-        6,
-        28,
-        41,
-        5,
-        6,
-        139
-      ]
-    },
-    {
-      "timestamp": "2026-11-21 21:00",
-      "missing": false,
-      "total": 280,
-      "cluster_counts": [
-        50,
-        5,
-        6,
-        29,
-        43,
-        5,
-        4,
-        138
-      ]
-    },
-    {
       "timestamp": "2026-11-21 22:00",
       "missing": false,
       "total": 278,
@@ -581,6 +401,186 @@ window.A23_TIMELINE = {
         2,
         4,
         143
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 10:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 11:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 12:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 13:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 14:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 15:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 16:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 17:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 18:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 19:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 20:00",
+      "missing": true,
+      "total": 0,
+      "cluster_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 21:00",
+      "missing": false,
+      "total": 245,
+      "cluster_counts": [
+        29,
+        10,
+        3,
+        17,
+        37,
+        5,
+        4,
+        140
       ]
     }
   ]

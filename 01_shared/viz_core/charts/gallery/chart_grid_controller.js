@@ -1,0 +1,2265 @@
+// chart_grid_controller.js — A23 動態圖表型錄主控邏輯（分類目錄／子母畫面／篩選／交集自動播放）
+// 由 chart_grid.html 原 <body> 內嵌主 <script>（L456-L2719）原文搬出，2026-11-22 Tier 2 #5。
+// 須保持同步載入（無 defer/async/module），位於 chart_registry.js 之後、data-u 雙棲轉址 script 之前。
+
+/* 雙協議：file:// 開啟時把站內根路徑換成本機絕對路徑 */
+
+if(location.protocol==="file:"){var idx=location.href.indexOf("/35-Areas/");if(idx!==-1){var vaultRoot=location.href.slice(0,idx);document.querySelectorAll('a[href^="/"]').forEach(function(a){a.href=vaultRoot+a.getAttribute("href");});}}
+
+/* 頂部下拉選單：點外面關閉、Esc 關閉、互斥展開 */
+
+document.querySelectorAll(".nav-dd").forEach(function(dd){
+  dd.addEventListener("toggle",function(){
+    if(dd.open)document.querySelectorAll(".nav-dd").forEach(function(o){if(o!==dd)o.removeAttribute("open");});
+  });
+});
+document.addEventListener("click",function(e){
+  document.querySelectorAll(".nav-dd[open]").forEach(function(dd){if(!dd.contains(e.target))dd.removeAttribute("open");});
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape")document.querySelectorAll(".nav-dd[open]").forEach(function(dd){dd.removeAttribute("open");});
+});
+
+var R = window.A23_REGISTRY;
+var D = window.A23_DEMO_S02, B4 = window.A23_DEMO_B4, B5 = window.A23_DEMO_B5, C = window.A23Charts;
+var X = R.X, LIVE = R.LIVE, CONT = R.CONT, T = R.T, SH = R.SH, SRC = R.SRC, GEO = R.GEO, CODEX_30 = R.CODEX_30;
+var VOCAB = R.VOCAB || { purpose: {}, form: {}, kit: {} }, PURPOSE = R.PURPOSE || {}, FORM = R.FORM || {}, NAME_ZH = R.NAME_ZH || {}, KIT = R.KIT || {};
+
+SRC[17]="OECD Better Life Index 各國多維福祉指標：生活滿意、就業率、空氣品質、人均居室、自覺健康、高教普及、治安指數。";
+
+SRC[21]="US NOAA MarineCadastre AIS（2024-01-01）：美國港區船舶即時動態與歷史航跡。";
+
+SRC[22]="OpenFlights（routes.dat、airports.dat）：全球前 20 大航線記錄數與正交投影大圓弧航線。";
+
+SRC[23]="USGS Earthquake Hazards Program Feed（最近 15 日）：全球規模 4.0+ 地震點事件分佈與淡出波紋。";
+
+SRC[25]="US Federal Register Rules API（最新法規）：政策標題詞頻分佈×日。";
+
+SRC[26]="專案治理日誌（progress.md，2026-11）：專案演進里程碑與關鍵功能落地事件序。";
+
+SRC[27]="場景開發排程（各 s0x 目錄檔案實際 mtime 與 feed 檔案大小）：s01–s09 場景開發甘特圖排程與時間游標。";
+
+SRC[28]=R.S06+"；氣溫、體感、濕度、風速、日低溫皮爾森相關矩陣。";
+
+SRC[29]="US Department of the Treasury Daily Par Yield Curve（2024）：各期限（1M 至 30Y）公債殖利率曲線 2.5D 曲面。";
+
+SRC[30]="CODEX // PLUGINS 3D 測地線星系（Fibonacci 球面網格＋星團粒子＋弧線＋避讓標籤），<a href='../demo/codex_plugins_warroom.html'>開啟完整 2×3 遙測戰情室 ↗</a>。";
+
+SRC[31]="YC CEO'S BRAIN #01 GRAPH：760 節點 × 2,400 連線 × 7 大知識星團（Claude Code / codex / telegram voice / people / companies / meetings / sources）與動態浮窗 Callout，<a href='../demo/yc_second_brain_warroom.html'>開啟 6 合 1 戰情室 ↗</a>。";
+
+SRC[32]="YC CEO'S BRAIN #02 LLM-WIKI：左側 7 條架構原則 ＋ 中央 G 節點向右放射 7 條貝茲曲線（軌道粒子流）連接 7 大 Second Brain 倉庫。";
+
+SRC[33]="YC CEO'S BRAIN #03 AI-MEMORY：Claude Code (橘) 與 Codex (藍) 雙 Agent Context 水位同步 ＋ 底部 4 大核心 Markdown 記憶槽（decisions / progress / open-questions / context-rules）。";
+
+SRC[34]="YC CEO'S BRAIN #04 AGENT-SECOND-BRAIN：左側手機 UI 與 0:38 動態語音聲波頻譜（Audio Waveform）→ 右側即時結構化轉譯筆記與 [Done] [Sync] 狀態流。";
+
+SRC[35]="YC CEO'S BRAIN #05 OMNI-SECOND-BRAIN：02:00 夜間反思睡眠排程圓盤雷達（Nightly Pass）＋ 圓點計數條（Dot-matrix counters）＋ rules.md 規則收斂。";
+
+SRC[36]="YC CEO'S BRAIN #06 CDE · CLAUDE-SECOND-BRAIN · MKLINK：頂部 CLI 掛載指令 ＋ 中層 14 Skills 紫色方格熱力矩陣 × 12 Agents 圓點燈號 ＋ 底層 Symlink PR 規則樹。";
+
+SRC[37]="庫存戰情組件 #37 INV 01 現金循環方程式條（模擬資料，seed=20261116，12 個月）：一條橫軸上 DIO、DSO 向右接續，DPO 向左抵扣，餘段＝CCC，逐月推進並標示 DIO + DSO − DPO = CCC。";
+
+SRC[38]="庫存戰情組件 #38 INV 02 柏拉圖 ABC 累積曲線（模擬資料，seed=20261116，120 SKU）：依年消耗金額降冪長條＋累積百分比折線（終點=100%），畫 80%/95% 截斷線並以 A/B/C 分色，長條依序長出越過截斷線時閃爍提示。";
+
+SRC[39]="庫存戰情組件 #39 INV 03 ABC×XYZ 九宮格策略矩陣（模擬資料，seed=20261116，120 SKU × 12 月）：3×3 格顯示 SKU 數與金額佔比、底色深淺對應金額，格內散點隨月 CV 推進跨格移動留軌跡，角落標註建議補貨策略。";
+
+SRC[40]="庫存戰情組件 #40 INV 04 子彈補貨預警牆（模擬資料，seed=20261116，120 SKU × 4 倉）：可用量 = 現有 + 在途 − 已分配（尾端淡色延伸段為在途量），同時繪製 SS 紅線、ROP 警戒線、Max 上限與跨倉調撥優先標籤。";
+
+SRC[41]="庫存戰情組件 #41 INV 05 儲位熱力＋揀貨動線（模擬資料，seed=20261116，2D 倉庫平面）：漸層儲位依 FMR 上色（F 微光、R 壓暗），揀貨粒子拖尾沿走道流向脈衝出貨口，遠區錯放格紅閃並繪指向黃金儲位虛線箭頭。";
+
+SRC[42]="庫存戰情組件 #42 INV 06 What-If 取捨曲線（模擬資料，seed=20261116，服務水準 90%–99.9%）：雙軸繪製庫存持有成本 vs 缺貨風險曲線與建議區，動態游標即時顯示「釋放資金／增加缺貨率」（支援傳入固定服務水準）。";
+
+SRC[43]="Stanford Discovery 缺口補齊 #43：3D 腦皮層／C 型環面邊捆綁網路與極區熱點，<a href='../demo/stanford_discovery_warroom.html'>開啟 1:1 逆向還原戰情室 ↗</a>。";
+SRC[44]="Stanford Discovery 缺口補齊 #44：雙層有向膠囊狀態機管線圖（system_query → act_verify）。";
+SRC[45]="Stanford Discovery 缺口補齊 #45：Before/After 前後對比水平啞鈴游標圖（基準空心圓 → 優化實心圓＋Δ%）。";
+SRC[46]="Stanford Discovery 缺口補齊 #46：多列不等寬 Marimekko 層級注意力狀態條碼。";
+SRC[47]="量化終端 QNT #47（模擬資料，seed=20261116）：偽 3D 混合高斯尾部機率山脊圖與 strike 尾部積分提示。";
+SRC[48]="量化終端 QNT #48（模擬資料，seed=20261116）：12 列 Galton 機率晶格落球與紅綠盈虧直方圖。";
+SRC[49]="群集調度戰情 SWM #49（模擬資料，seed=20261116）：720 條負載放射刺芒＋內環 8 節點狀態＋W1–W8 衛星迷你直條＋底部成本跑馬燈。";
+SRC[50]="群集調度戰情 SWM #50（模擬資料，seed=20261116）：左側直立 6 階 Stepper（SCOUT→FIX）＋右側逐字打字與自動上捲終端串流。";
+SRC[51]="群集調度戰情 SWM #51（模擬資料，seed=20261116）：頂部 5 格 KPI 條＋單位格 Waffle 對比柱（$6 vs $40）＋6.7x 倍率環＋差值表。";
+SRC[52]="群集調度戰情 SWM #52（模擬資料，seed=20261116）：5 格小倍數組合框（橫條／欄位點陣／1M 上下文／三態衝突矩陣／8+1 拓撲）。";
+SRC[53]="增長閉環戰情 LOP #53（模擬資料，seed=20261116）：~3k Fibonacci 點雲球＋3 條傾斜軌道環＋外緣放射頻譜輪廓＋support/auth/RESULT 引線註解與 BUG/MEASURED 狀態牌。";
+SRC[54]="增長閉環戰情 LOP #54（模擬資料，seed=20261116）：SIGNAL→DECISION→CHANGE→RESULT→LOOP 五階橫向刷軸＋播放頭＋REQUEST HEAT 一維熱帶＋32 根橘藍訊號頻譜。";
+SRC[55]="增長閉環戰情 LOP #55（模擬資料，seed=20261116）：01 SIGNAL INBOX（彩色標籤）→ 02 DECISION LOG（規則紅框）→ 03 PRODUCT DIFF（+/− 綠紅行）因果三欄。";
+SRC[56]="增長閉環戰情 LOP #56（模擬資料，seed=20261116）：頂部 8 格 KPI 狀態色條＋06 AD TEST 迷你直條與 STOPPED BY THE AGENT 熔斷橫幅＋07 SIGNUP FUNNEL 流失劃線與 7-day trial。";
+SRC[57]="引證閱讀戰情 RDR #57（模擬資料，seed=20261116）：題卡與 QUEUE 佇列＋claim_email.md 文件掃描游標與答案句金色高亮＋答案卡折線引線＋SPAN CHECK 四列逐項驗證。";
+SRC[58]="引證閱讀戰情 RDR #58（模擬資料，seed=20261116）：POINTER CORE 發光黑洞核心與 ~360 放射光芒＋傾斜軌道盤＋Reader/Model-H/Model-O 衛星依延遲競速並標記 first token。";
+SRC[59]="引證閱讀戰情 RDR #59（模擬資料，seed=20261116）：3 張模型價格卡＋LANES·RUNS 進度道＋9 模型對數成本排名橫條與「N× cheaper」倍率＋LATENCY 橫條與 saved 條。";
+SRC[60]="決策星球戰情 ORB #60（模擬資料，seed=20261116）：左側 OBSERVABLES 8 列迷你走勢＋貝茲束（左金右青）收斂到中央 ~1,200 點粒子雲 STATE＋扇出到右側 DECISION STACK 10 列（最高分洋紅高亮）。";
+SRC[61]="決策星球戰情 ORB #61（模擬資料，seed=20261116）：頂部跑馬燈＋供給×價格指數曲線與暗→金漸層面積＋~24 個買點逐一落點（最新放大＋BUY @ 標籤）＋YOU ARE HERE 垂直虛線與右側 4 列數值。";
+SRC[62]="決策星球戰情 ORB #62（模擬資料，seed=20261116）：圓形同心圈與放射分格＋~120 星點近鄰連線成 7 個彩色星座（CLUSTER A–G）＋旋轉掃描扇形掃過短暫變亮。";
+SRC[63]="決策星球戰情 ORB #63（模擬資料，seed=20261116）：6 個幾何圖示代理框（SCOUT→EXECUTOR）與水平匯流排脈衝光點＋左下 LAST ACTIONS 6 行日誌＋右下 STATE BUILDER 8 列正負權重條。";
+
+SRC[64]="製片管線戰情 STU #64（模擬資料，seed=20261116）：3×3 角色工作站卡（illustrator→editor），紫色單色系；標題列 done/進行中%/queued、作用卡紫底標題＋整列光暈；4 列虛點引導鍵值規格＋左緣埠點依進度點亮；中段角色插畫預覽（人形、骨架清單、洋蔥皮、聚光燈、馬賽克、片頭字、樂譜、擬音、剪輯層）；底部輸出路徑＋細進度條。";
+
+SRC[65]="製片管線戰情 STU #65（模擬資料，seed=20261116）：PCB 電路正交（曼哈頓）圓角走線匯流排、SMD 標籤小晶片（BUS-A/POSE-12/SYNC-48）、沿線移動封包、卡片埠點與作用中群組外框光暈。";
+
+SRC[66]="製片管線戰情 STU #66（模擬資料，seed=20261116）：非線性剪輯 5 軌時間軸（字幕/分鏡/背景/配樂波形/擬音刻點）、片段塊、垂直播放頭、SMPTE 時間碼＋傳輸鍵與上方麵包屑工序（完成打勾粗體／目前高亮）。";
+
+SRC[67]="製片管線戰情 STU #67（模擬資料，seed=20261116）：舊價刪除線 → 新價大字倒數（$4,800 → $96）、節省條與三大成本拆解（TALENT/RENDER/AUDIO）、底部 EXPORT 終端逐行日誌＋進度條。";
+
+SRC[68]="量化終端 QNT #68（模擬資料，seed=20261116）：右欄直列 8 張判決卡（CLEAN/RISKY/DANGER、錢包短碼、理由列、0–100 分數方塊）＋三態計數條，新卡由頂推入並閃框。";
+
+SRC[69]="量化終端 QNT #69（模擬資料，seed=20261116）：頂部根節點「6 項檢查」正交圓角括號樹分岔至 6 張圖示磚（持有人/關聯錢包/首批買家/綁定/流動性/賣壓），含 canvas 線條圖示、數值與迷你長條，掃描脈衝依序點亮後出現總判決徽章。";
+
+SRC[70]="量化終端 QNT #70（模擬資料，seed=20261116）：左區 20 個持有人小圓（H01–H20）依共同資金來源連線並收斂合併為 5 個實體大圓（N 錢包），右側對照小表隨合併逐列填入。";
+SRC[71]="玻璃魔方 MNL #71（純代碼程序化渲染，來源 10-Inbox/Monolith.md）：3×3×3 導角方塊、畫家排序＋背面剔除、每 1/4 週期單層轉動 90°；四材質狀態機 OBSIDIAN/GLASS/AURORA/CHROME（Lambert＋Fresnel 邊光＋條紋折射偽影）；外表面邊緣行進波流光、斜六角光軌熱封包；底座光盤＋水平光束＋神經垂絲；右側材質列（唯一作用列光暈）、Fresnel×邊緣遮罩顯影、管線鍵值。";
+SRC[72]="量化終端 QNT #72（Polymarket bot 借鏡，模擬資料 seed=20261117）：log n 軸上 12 條樣本累積均值在 ±1σ/±2σ/√n 收斂錐內收斂；作用路徑 z 檢定（雜訊內→觀察中→EDGE 顯著），右上分佈顯影、右下鍵值列。用途：判斷樣本數夠不夠下結論。";
+SRC[73]="量化終端 QNT #73（Polymarket bot 借鏡，模擬資料 seed=20261117）：UP/FLAT/DOWN 三狀態馬可夫鏈，雙向弧粗細＝轉移機率、自迴圈＝停留率、熱封包沿本步轉移弧前進；右上轉移矩陣（理論＋實測）、底部方向帶、右下 argmax 預測命中率。";
+SRC[74]="量化終端 QNT #74（Polymarket bot 借鏡，模擬資料 seed=20261117）：左 K 線＋量能＋最新價籤，右買賣雙向掛單階梯（單價位量條＋累積深度淡底＋價差列），右下 mid／失衡比鍵值列。";
+SRC[75]="戰術 HUD #75（Game UI Database 借鏡，模擬資料）：3 條分段資源槽條（CTX / VRAM / Token）＋延遲扣損殘影＋80% 紅線熔斷光暈＋4 格圓形扇形冷卻倒數槽＋右側遙測鍵值列。";
+SRC[76]="戰術 HUD #76（Game UI Database 借鏡，模擬資料）：2×2 裝備／模型配置槽＋正交匯流排熱封包＋5 項指標綠增／紅減 Δ 對比條與淨分裁決卡。";
+SRC[77]="戰術 HUD #77（Game UI Database 借鏡，模擬資料）：4 層 9 節點能力解鎖狀態機 DAG（ACTIVE / AVAIL / LOCKED / BLOCKED 四態）＋前置依賴正交脈衝流＋點數消耗與進度列。";
+SRC[78]="戰術 HUD #78（Game UI Database 借鏡，模擬資料）：雷達距離環＋移動異常目標＋四角收斂鎖定準星＋旋轉虛線環＋正交引線連接之空間遙測浮卡。";
+SRC[79]="戰術 HUD #79（Game UI Database 借鏡，模擬資料）：6 扇區放射環形指令輪盤（LIVE / DIFF / WHAT-IF / TRACE / FREEZE / EXPORT）＋選中彈出偏移與熱鍵中樞。";
+SRC[80]="戰術 HUD #80（Game UI Database 借鏡，模擬資料）：頂部 1D 捲動方位羅盤條（含主方位與錨點釘）＋視窗外 4 目標動態投影至邊緣之方向箭頭與距離標籤。";
+SRC[81]="戰術 HUD #81（Game UI Database 借鏡，模擬資料）：門禁連擊數與衰減環（Rank A/S/S+）＋develop 掃描線顯影進度條＋右側 4 級嚴重度交錯滑入通知堆疊。";
+
+var GROUPS=[
+
+ ["一、排名與趨勢","n05 #1–#7",[1,2,3,4,5,6,7]],
+
+ ["二、關聯、分佈與結構","n05 #8–#18",[8,9,10,11,12,13,14,15,16,17,18]],
+
+ ["三、地理與流動","n05 #19–#23",[19,20,21,22,23]],
+
+ ["四、即時監控與高階","n05 #24–#30",[24,25,26,27,28,29,30]],
+
+ ["五、Second Brain 戰情組件","YC #31–#36",[31,32,33,34,35,36]],
+
+ ["六、庫存戰情組件","INV #37–#42",[37,38,39,40,41,42]],
+
+ ["七、Discovery 缺口補齊","Stanford #43–#46",[43,44,45,46]],
+
+ ["八、量化終端","QNT #47–#48、#68–#70、#72–#74",[47,48,68,69,70,72,73,74]],
+
+ ["九、群集調度","SWM #49–#52",[49,50,51,52]],
+
+ ["十、增長閉環","LOP #53–#56",[53,54,55,56]],
+
+ ["十一、引證閱讀","RDR #57–#59",[57,58,59]],
+
+ ["十二、決策星球","ORB #60–#63",[60,61,62,63]],
+
+ ["十三、製片管線","STU #64–#67",[64,65,66,67]],
+
+ ["十四、玻璃魔方","MNL #71",[71]],
+
+ ["十五、戰術 HUD","HUD #75–#81",[75,76,77,78,79,80,81]]
+
+];
+
+var CAT={};GROUPS.forEach(function(G,gi){G[2].forEach(function(n){CAT[n]=gi;});});
+
+/* 空間技法維度標註（map_technique） */
+
+var MAP_TECH={
+
+  10:["heat_density"],
+
+  19:["choropleth"],
+
+  20:["flow_map"],
+
+  21:["flow_map"],
+
+  22:["globe_3d"],
+
+  23:["heat_density"]
+
+};
+
+var TECH_META={
+
+  "basemap_switch":{name:"底圖切換",desc:"多來源底圖（OSM/CARTO/ESRI/OpenFreeMap），沿用 01_shared\\basemaps\\basemap_switcher.js",cards:[]},
+
+  "point_filter":{name:"點位篩選＋分組清單",desc:"地圖＋依行政區分組的無 JS 備援清單",cards:[]},
+
+  "choropleth":{name:"分級設色",desc:"行政區面量圖",cards:[19]},
+
+  "flow_map":{name:"流向/軌跡",desc:"已在 29 型中，加掛此標籤",cards:[20,21]},
+
+  "globe_3d":{name:"3D 地球",desc:"3D 地球弧線（空間資訊含 3D）",cards:[22]},
+
+  "heat_density":{name:"熱區/密度",desc:"已在 29 型中，加掛此標籤",cards:[10,23]},
+
+  "terrain_3d":{name:"3D 地形/DEM",desc:"沿用 n02 DEM20m 資料",cards:[]},
+
+  "projection_trap":{name:"投影陷阱（反例卡）",desc:"Web Mercator 高緯放大；真實面積比較",cards:[]},
+
+  "reverse_geocode":{name:"座標反查",desc:"點選回傳縣市/鄉鎮/地段（WGS84）",cards:[]}
+
+};
+
+var CUR_TECH="all";
+
+
+
+/* 待實作：[台灣現有資料, 國際開放資料候選（美／歐／日）, 建議] */
+
+var TODO={
+
+ 6:["s02 全市可借車 起點→各區增減→終點（現有）","US Treasury 月報 收入／支出各項；JP 財務省 一般會計歲出","用台灣"],
+
+ 7:["無（s07 充電站為空殼）","EU Eurostat 數位使用漏斗：上網→網購→跨境網購（各國×年）","用國際"],
+
+ 9:["s02 站點 容量×滿載率×時（現有）","World Bank 人均 GDP×平均壽命×年（Gapminder 式）","兩者皆可"],
+
+ 17:["無（s09 租屋為空殼）","OECD Better Life Index 各國多指標；US College Scorecard 大學多維","用國際"],
+
+ 21:["無（s03 公車為空殼；可抓 TDX 公車動態）","US NOAA MarineCadastre AIS 船舶航跡","先國際"],
+
+ 22:["無","US BTS T-100 國際航段旅客；EU Eurostat 國與國航空旅客","用國際"],
+
+ 23:["無（s08 事故為空殼）","US USGS 即時地震 feed（全球點位×時）；NYC Open Data 車禍點位","用國際"],
+
+ 25:["無","GDELT 全球新聞主題詞頻×日；US Federal Register 標題詞頻","用國際"],
+
+ 26:["專案事件軸（progress.md 可轉，現有）","US USGS 重大地震事件序列","用台灣"],
+
+ 27:["場景開發排程（可自 progress 轉）","US ClinicalTrials.gov 試驗起訖日期","兩者皆可"],
+
+ 28:["s06 溫度／濕度／風速相關×時（需確認欄位）","US FRED 總體指標滾動相關×月","用國際"],
+
+ 29:["s06 溫度內插面（點→面，需內插）","US Treasury 殖利率曲線（期限×日期→殖利率）；JP 財務省國債金利","用國際"]
+
+};
+
+var TOTAL_N=GROUPS.reduce(function(acc,G){return acc+G[2].length;},0);
+var LIVE_N=Object.keys(LIVE).map(Number).sort(function(a,b){return a-b;});
+var KIT_ORDER = R.KIT_ORDER || [];
+var KIT_RANK = {};
+KIT_ORDER.forEach(function(id, idx){ KIT_RANK[id] = idx; });
+function sortKitIds(ids){
+  return ids.slice().sort(function(a, b){
+    var ra = (a in KIT_RANK) ? KIT_RANK[a] : 1e9;
+    var rb = (b in KIT_RANK) ? KIT_RANK[b] : 1e9;
+    return ra !== rb ? ra - rb : a - b;
+  });
+}
+var TAB_BASE_IDS = LIVE_N.filter(function(n){ return !KIT[n]; });
+var TAB_KIT_IDS  = LIVE_N.filter(function(n){ return !!KIT[n]; });
+var GRID_ORDER   = TAB_BASE_IDS.concat(TAB_KIT_IDS);
+
+var $=function(id){return document.getElementById(id);};
+
+
+
+
+
+/* ================= 空間技法實例 T1–T5 資料與控制器 ================= */
+
+var T_STATIONS = [{"name": "捷運台北車站(M4出口)", "dist": "中正區", "lon": 121.5173, "lat": 25.0463, "bikes": 37, "cap": 80}, {"name": "捷運市政府站(3號出口)", "dist": "信義區", "lon": 121.567, "lat": 25.0411, "bikes": 45, "cap": 92}, {"name": "台北101/世貿站(4號出口)", "dist": "信義區", "lon": 121.5638, "lat": 25.0334, "bikes": 27, "cap": 64}, {"name": "捷運忠孝復興站(2號出口)", "dist": "大安區", "lon": 121.5434, "lat": 25.0415, "bikes": 30, "cap": 72}, {"name": "捷運西門站(6號出口)", "dist": "萬華區", "lon": 121.5082, "lat": 25.0423, "bikes": 17, "cap": 60}, {"name": "捷運公館站(2號出口)", "dist": "中正區", "lon": 121.5348, "lat": 25.0135, "bikes": 46, "cap": 120}, {"name": "台灣大學校總區(蒲葵道)", "dist": "大安區", "lon": 121.5375, "lat": 25.018, "bikes": 48, "cap": 110}, {"name": "南港軟體園區站(2號出口)", "dist": "南港區", "lon": 121.6158, "lat": 25.0598, "bikes": 41, "cap": 85}, {"name": "捷運港墘站(2號出口)", "dist": "內湖區", "lon": 121.5752, "lat": 25.0801, "bikes": 32, "cap": 76}, {"name": "捷運西湖站(1號出口)", "dist": "內湖區", "lon": 121.5674, "lat": 25.0821, "bikes": 31, "cap": 68}, {"name": "松山車站(西門)", "dist": "信義區", "lon": 121.5775, "lat": 25.0494, "bikes": 23, "cap": 55}, {"name": "捷運中山站(4號出口)", "dist": "中山區", "lon": 121.5204, "lat": 25.0531, "bikes": 13, "cap": 50}, {"name": "捷運南京復興站(7號出口)", "dist": "松山區", "lon": 121.5441, "lat": 25.0522, "bikes": 30, "cap": 65}, {"name": "捷運大安站(4號出口)", "dist": "大安區", "lon": 121.5435, "lat": 25.033, "bikes": 24, "cap": 58}, {"name": "捷運東門站(4號出口)", "dist": "大安區", "lon": 121.5287, "lat": 25.0338, "bikes": 13, "cap": 45}, {"name": "捷運頂溪站(1號出口)", "dist": "永和區", "lon": 121.5158, "lat": 25.0136, "bikes": 22, "cap": 70}, {"name": "捷運永安市場站", "dist": "中和區", "lon": 121.5113, "lat": 25.0022, "bikes": 20, "cap": 65}, {"name": "捷運景安站", "dist": "中和區", "lon": 121.5048, "lat": 24.9937, "bikes": 18, "cap": 54}, {"name": "捷運板橋車站(文化路)", "dist": "板橋區", "lon": 121.4627, "lat": 25.0142, "bikes": 44, "cap": 90}, {"name": "捷運新埔站(1號出口)", "dist": "板橋區", "lon": 121.4682, "lat": 25.0238, "bikes": 19, "cap": 60}, {"name": "江子翠捷運站(3號出口)", "dist": "板橋區", "lon": 121.4727, "lat": 25.0305, "bikes": 25, "cap": 75}, {"name": "文山運動中心", "dist": "文山區", "lon": 121.5583, "lat": 24.9984, "bikes": 12, "cap": 42}, {"name": "木新市場", "dist": "文山區", "lon": 121.5645, "lat": 24.9818, "bikes": 11, "cap": 38}, {"name": "捷運三重國小站", "dist": "三重區", "lon": 121.4975, "lat": 25.0706, "bikes": 16, "cap": 52}, {"name": "捷運菜寮站(3號出口)", "dist": "三重區", "lon": 121.4912, "lat": 25.0607, "bikes": 15, "cap": 48}, {"name": "捷運蘆洲站(1號出口)", "dist": "蘆洲區", "lon": 121.4646, "lat": 25.0886, "bikes": 20, "cap": 60}, {"name": "新店七張站(1號出口)", "dist": "新店區", "lon": 121.5422, "lat": 24.9754, "bikes": 16, "cap": 56}, {"name": "新店大坪林站(3號出口)", "dist": "新店區", "lon": 121.5414, "lat": 24.9831, "bikes": 20, "cap": 58}, {"name": "捷運士林站(2號出口)", "dist": "士林區", "lon": 121.5261, "lat": 25.0932, "bikes": 21, "cap": 62}, {"name": "捷運芝山站(1號出口)", "dist": "士林區", "lon": 121.5228, "lat": 25.1028, "bikes": 15, "cap": 55}, {"name": "天母運動公園", "dist": "士林區", "lon": 121.5342, "lat": 25.1154, "bikes": 13, "cap": 40}, {"name": "北投光明路溫泉公園", "dist": "北投區", "lon": 121.5033, "lat": 25.1362, "bikes": 10, "cap": 36}, {"name": "淡水老街中正路", "dist": "淡水區", "lon": 121.4395, "lat": 25.1706, "bikes": 14, "cap": 50}, {"name": "捷運竹圍站", "dist": "淡水區", "lon": 121.4593, "lat": 25.1378, "bikes": 15, "cap": 48}, {"name": "內湖東湖國小", "dist": "內湖區", "lon": 121.6145, "lat": 25.0683, "bikes": 14, "cap": 44}];
+
+var TECH_KEYS = ["T1","T2","T3","T4","T5"];
+
+
+
+MAP_TECH["T1"] = ["point_filter"];
+
+MAP_TECH["T2"] = ["reverse_geocode"];
+
+MAP_TECH["T3"] = ["basemap_switch"];
+
+MAP_TECH["T4"] = ["terrain_3d"];
+
+MAP_TECH["T5"] = ["projection_trap"];
+
+
+
+TECH_META["point_filter"].cards = ["T1"];
+
+TECH_META["reverse_geocode"].cards = ["T2"];
+
+TECH_META["basemap_switch"].cards = ["T3"];
+
+TECH_META["terrain_3d"].cards = ["T4"];
+
+TECH_META["projection_trap"].cards = ["T5"];
+
+
+
+T["T1"] = "點位篩選＋分組清單";
+
+T["T2"] = "座標反查 (離線 Point-in-Polygon)";
+
+T["T3"] = "底圖切換 (多來源授權底圖)";
+
+T["T4"] = "3D 地形/DEM (立體網格旋轉)";
+
+T["T5"] = "投影陷阱 (Web Mercator 反例卡)";
+
+
+
+SH["T1"] = "站點地圖×行政區篩選";
+
+SH["T2"] = "WGS84 座標×縣市鄉鎮";
+
+SH["T3"] = "多圖資切換×授權規範";
+
+SH["T4"] = "DEM20m 網格×三維姿態";
+
+SH["T5"] = "高緯形變×真實面積對照";
+
+
+
+SRC["T1"] = "s02 YouBike 2.0 雙北站點實測快照（2026-11-01，35 站）· 民間加值整理，非官方資訊。附無 JS 靜態分組備援清單。";
+
+SRC["T2"] = "臺灣鄉鎮市區界向量圖資（內政部經 taiwan-atlas MIT，01_shared\\geo）離線多邊形包含演算 · 民間加值整理，非官方資訊。";
+
+SRC["T3"] = "底圖切換器（01_shared\\basemaps\\basemap_switcher.js）· 授權標示: OSM (ODbL) / CARTO / ESRI / OpenFreeMap · 非官方整理。";
+
+SRC["T4"] = "台灣 DEM 降採樣立體網格（~2.5km 解析度，網格 <100KB，來源: AWS Terrarium 基準）· 實測示意，非官方加值。";
+
+SRC["T5"] = "國際開放資料：Natural Earth 國界（1:110m）· Web Mercator (EPSG:3857) vs 等積投影真實面積對照教學 · 示範資料。";
+
+
+
+/* ---- T1 控制器：點位地圖＋行政區篩選 ---- */
+
+LIVE["T1"] = function(cv, opt) {
+
+  var ctx = cv.getContext("2d");
+
+  var filterDist = (opt && opt.dist) || "all";
+
+  var anim = 0, timer = null, playing = false;
+
+  
+
+  function getFiltered() {
+
+    return filterDist === "all" ? T_STATIONS : T_STATIONS.filter(function(s){ return s.dist === filterDist; });
+
+  }
+
+  
+
+  function draw() {
+
+    var w = cv.width, h = cv.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = "#070d1a";
+
+    ctx.fillRect(0, 0, w, h);
+
+    
+
+    // 繪製背景參考格線
+
+    ctx.strokeStyle = "rgba(30,41,59,0.5)";
+
+    ctx.lineWidth = 1;
+
+    for (var x = 40; x < w; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+
+    for (var y = 30; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+    
+
+    // 經緯度投影範圍 (雙北範圍 121.43~121.62, 24.97~25.18)
+
+    var minLon = 121.43, maxLon = 121.64, minLat = 24.96, maxLat = 25.19;
+
+    function proj(lon, lat) {
+
+      var px = 30 + (lon - minLon) / (maxLon - minLon) * (w - 60);
+
+      var py = h - 30 - (lat - minLat) / (maxLat - minLat) * (h - 60);
+
+      return [px, py];
+
+    }
+
+    
+
+    // 繪製微弱的縣市界輪廓 (新北/台北)
+
+    if (window.A23_TW_TOWNS) {
+
+      ctx.strokeStyle = "rgba(56,189,248,0.18)";
+
+      ctx.lineWidth = 0.8;
+
+      window.A23_TW_TOWNS.forEach(function(t) {
+
+        if (t.county === "台北市" || t.county === "新北市") {
+
+          t.rings.forEach(function(ring) {
+
+            ctx.beginPath();
+
+            ring.forEach(function(pt, idx) {
+
+              var p = proj(pt[0], pt[1]);
+
+              if (idx === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+
+            });
+
+            ctx.stroke();
+
+          });
+
+        }
+
+      });
+
+    }
+
+    
+
+    var list = getFiltered();
+
+    
+
+    // 繪製站點
+
+    list.forEach(function(s, idx) {
+
+      var p = proj(s.lon, s.lat);
+
+      var r = Math.max(3, Math.min(8, Math.sqrt(s.cap) * 0.8));
+
+      var isHigh = s.bikes >= 20;
+
+      var isLow = s.bikes < 5;
+
+      var col = isLow ? "#ef4444" : (isHigh ? "#10b981" : "#38bdf8");
+
+      
+
+      // 脈衝環
+
+      var pulse = ((anim * 0.05 + idx * 0.3) % 1);
+
+      ctx.beginPath();
+
+      ctx.arc(p[0], p[1], r + pulse * 6, 0, Math.PI * 2);
+
+      ctx.strokeStyle = col;
+
+      ctx.lineWidth = 1 - pulse;
+
+      ctx.stroke();
+
+      
+
+      // 點核心
+
+      ctx.beginPath();
+
+      ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
+
+      ctx.fillStyle = col;
+
+      ctx.fill();
+
+      
+
+      // 母畫面大圖繪製名稱
+
+      if (w > 600) {
+
+        ctx.fillStyle = "#e2e8f0";
+
+        ctx.font = "10px sans-serif";
+
+        ctx.fillText(s.name.replace(/捷運|站|出口|\(.*?\)/g, "").slice(0, 5), p[0] + r + 3, p[1] + 3);
+
+      }
+
+    });
+
+    
+
+    // 標題與圖例
+
+    ctx.fillStyle = "rgba(11,18,32,0.85)";
+
+    ctx.fillRect(10, 10, w > 600 ? 260 : 180, 50);
+
+    ctx.strokeStyle = "rgba(56,189,248,0.3)";
+
+    ctx.strokeRect(10, 10, w > 600 ? 260 : 180, 50);
+
+    ctx.fillStyle = "#38bdf8";
+
+    ctx.font = "bold " + (w > 600 ? "13px" : "11px") + " sans-serif";
+
+    ctx.fillText("🚲 s02 YouBike 實測站點圖", 18, 28);
+
+    ctx.fillStyle = "#94a3b8";
+
+    ctx.font = "11px sans-serif";
+
+    ctx.fillText("篩選行政區: " + (filterDist === "all" ? "雙北全部" : filterDist) + " (" + list.length + " 站)", 18, 48);
+
+  }
+
+  
+
+  function loop() {
+
+    anim++;
+
+    draw();
+
+    if (playing) timer = requestAnimationFrame(loop);
+
+  }
+
+  
+
+  return {
+
+    play: function() { if (!playing) { playing = true; loop(); } },
+
+    pause: function() { playing = false; if (timer) cancelAnimationFrame(timer); },
+
+    redraw: draw,
+
+    seek: function(){}, setDist: function(d) { filterDist = d; draw(); }
+
+  };
+
+};
+
+
+
+/* ---- T2 控制器：離線 Point-in-Polygon 座標反查 ---- */
+
+function pointInPoly(x, y, poly) {
+
+  var inside = false, n = poly.length;
+
+  if (n < 3) return false;
+
+  var p1x = poly[0][0], p1y = poly[0][1];
+
+  for (var i = 1; i <= n; i++) {
+
+    var p2x = poly[i % n][0], p2y = poly[i % n][1];
+
+    if (y > Math.min(p1y, p2y) && y <= Math.max(p1y, p2y)) {
+
+      if (x <= Math.max(p1x, p2x)) {
+
+        if (p1y !== p2y) {
+
+          var xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x;
+
+          if (p1x === p2x || x <= xinters) inside = !inside;
+
+        }
+
+      }
+
+    }
+
+    p1x = p2x; p1y = p2y;
+
+  }
+
+  return inside;
+
+}
+
+
+
+function reverseGeocodeOffline(lat, lon) {
+
+  if (!window.A23_TW_TOWNS) return { county: "載入中", name: "請稍候" };
+
+  for (var i = 0; i < window.A23_TW_TOWNS.length; i++) {
+
+    var t = window.A23_TW_TOWNS[i];
+
+    var rings = t.rings || [];
+
+    for (var r = 0; r < rings.length; r++) {
+
+      if (pointInPoly(lon, lat, rings[r])) {
+
+        return { county: t.county.replace("台", "臺"), name: t.name };
+
+      }
+
+    }
+
+  }
+
+  return { county: "未定位於", name: "臺灣陸地鄉鎮" };
+
+}
+
+
+
+LIVE["T2"] = function(cv, opt) {
+
+  var ctx = cv.getContext("2d");
+
+  var curLat = 25.0330, curLon = 121.5654; // 預設臺北信義
+
+  var res = reverseGeocodeOffline(curLat, curLon);
+
+  var anim = 0, timer = null, playing = false;
+
+  
+
+  // 示範動畫自動切換座標點
+
+  var demoPts = [
+
+    { lat: 25.0330, lon: 121.5654 }, // 臺北市 信義區
+
+    { lat: 22.6273, lon: 120.3014 }, // 高雄市 前金區
+
+    { lat: 24.1477, lon: 120.6657 }, // 臺中市 西區
+
+    { lat: 23.9739, lon: 121.6064 }  // 花蓮縣 花蓮市
+
+  ];
+
+  
+
+  function proj(lon, lat, w, h) {
+
+    var minLon = 119.3, maxLon = 122.5, minLat = 21.7, maxLat = 25.5;
+
+    var px = 20 + (lon - minLon) / (maxLon - minLon) * (w - 40);
+
+    var py = h - 20 - (lat - minLat) / (maxLat - minLat) * (h - 40);
+
+    return [px, py];
+
+  }
+
+  
+
+  function draw() {
+
+    var w = cv.width, h = cv.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = "#070d1a";
+
+    ctx.fillRect(0, 0, w, h);
+
+    
+
+    // 繪製台灣所有鄉鎮輪廓
+
+    if (window.A23_TW_TOWNS) {
+
+      ctx.strokeStyle = "rgba(56,189,248,0.22)";
+
+      ctx.lineWidth = 0.6;
+
+      window.A23_TW_TOWNS.forEach(function(t) {
+
+        t.rings.forEach(function(ring) {
+
+          ctx.beginPath();
+
+          ring.forEach(function(pt, idx) {
+
+            var p = proj(pt[0], pt[1], w, h);
+
+            if (idx === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+
+          });
+
+          ctx.stroke();
+
+        });
+
+      });
+
+    }
+
+    
+
+    // 繪製當前選定點與反查靶心
+
+    var pt = proj(curLon, curLat, w, h);
+
+    var pulse = (anim * 0.08) % 1;
+
+    
+
+    ctx.beginPath();
+
+    ctx.arc(pt[0], pt[1], 15 + pulse * 18, 0, Math.PI * 2);
+
+    ctx.strokeStyle = "rgba(234,179,8," + (1 - pulse) + ")";
+
+    ctx.lineWidth = 1.5;
+
+    ctx.stroke();
+
+    
+
+    ctx.beginPath();
+
+    ctx.arc(pt[0], pt[1], 4, 0, Math.PI * 2);
+
+    ctx.fillStyle = "#eab308";
+
+    ctx.fill();
+
+    
+
+    // 顯示反查結果牌
+
+    var txt = res.county + " " + res.name;
+
+    var cardW = Math.max(180, txt.length * 15 + 30);
+
+    ctx.fillStyle = "rgba(11,20,38,0.92)";
+
+    ctx.fillRect(pt[0] > w - 160 ? pt[0] - cardW - 10 : pt[0] + 12, pt[1] - 30, cardW, 46);
+
+    ctx.strokeStyle = "#eab308";
+
+    ctx.strokeRect(pt[0] > w - 160 ? pt[0] - cardW - 10 : pt[0] + 12, pt[1] - 30, cardW, 46);
+
+    
+
+    ctx.fillStyle = "#e2e8f0";
+
+    ctx.font = "bold 13px sans-serif";
+
+    ctx.fillText("🎯 " + txt, (pt[0] > w - 160 ? pt[0] - cardW - 10 : pt[0] + 12) + 8, pt[1] - 12);
+
+    ctx.fillStyle = "#94a3b8";
+
+    ctx.font = "10px sans-serif";
+
+    ctx.fillText("WGS84: " + curLat.toFixed(4) + ", " + curLon.toFixed(4), (pt[0] > w - 160 ? pt[0] - cardW - 10 : pt[0] + 12) + 8, pt[1] + 6);
+
+  }
+
+  
+
+  function loop() {
+
+    anim++;
+
+    if (anim % 180 === 0 && !opt) {
+
+      var next = demoPts[(anim / 180) % demoPts.length];
+
+      curLat = next.lat; curLon = next.lon;
+
+      res = reverseGeocodeOffline(curLat, curLon);
+
+    }
+
+    draw();
+
+    if (playing) timer = requestAnimationFrame(loop);
+
+  }
+
+  
+
+  cv.onclick = function(e) {
+
+    var rect = cv.getBoundingClientRect();
+
+    var x = (e.clientX - rect.left) * (cv.width / rect.width);
+
+    var y = (e.clientY - rect.top) * (cv.height / rect.height);
+
+    var minLon = 119.3, maxLon = 122.5, minLat = 21.7, maxLat = 25.5;
+
+    curLon = minLon + (x - 20) / (cv.width - 40) * (maxLon - minLon);
+
+    curLat = maxLat - (y - 20) / (cv.height - 40) * (maxLat - minLat);
+
+    res = reverseGeocodeOffline(curLat, curLon);
+
+    draw();
+
+    var resEl = $("t2LiveRes");
+
+    if (resEl) resEl.textContent = res.county + " " + res.name + " (" + curLat.toFixed(4) + ", " + curLon.toFixed(4) + ")";
+
+  };
+
+  
+
+  return {
+
+    play: function() { if (!playing) { playing = true; loop(); } },
+
+    pause: function() { playing = false; if (timer) cancelAnimationFrame(timer); },
+
+    redraw: draw,
+
+    seek: function(){}, setCoords: function(lat, lon) {
+
+      curLat = lat; curLon = lon;
+
+      res = reverseGeocodeOffline(curLat, curLon);
+
+      draw();
+
+      return res;
+
+    }
+
+  };
+
+};
+
+
+
+/* ---- T3 控制器：底圖切換 (OSM / CARTO / ESRI / OpenFreeMap) ---- */
+
+LIVE["T3"] = function(cv, opt) {
+
+  var ctx = cv.getContext("2d");
+
+  var basemap = (opt && opt.map) || "CARTO";
+
+  var anim = 0, timer = null, playing = false;
+
+  
+
+  var BASEMAP_STYLES = {
+
+    "OSM": { bg: "#f2efe9", grid: "#e5e0d8", coast: "#b0c4de", road: "#fbd68a", txt: "#1e293b", attr: "© OpenStreetMap contributors (ODbL)" },
+
+    "CARTO": { bg: "#070d1a", grid: "#0f172a", coast: "#1e293b", road: "#38bdf8", txt: "#e2e8f0", attr: "© CARTO, © OpenStreetMap contributors" },
+
+    "ESRI": { bg: "#131b14", grid: "#1c2a1e", coast: "#2d4230", road: "#ca8a04", txt: "#fef08a", attr: "© Esri, Maxar, Earthstar Geographics" },
+
+    "OpenFreeMap": { bg: "#0f172a", grid: "#1e293b", coast: "#334155", road: "#94a3b8", txt: "#f8fafc", attr: "© OpenFreeMap, © OpenStreetMap contributors" }
+
+  };
+
+  
+
+  function draw() {
+
+    var w = cv.width, h = cv.height;
+
+    var st = BASEMAP_STYLES[basemap] || BASEMAP_STYLES["CARTO"];
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = st.bg;
+
+    ctx.fillRect(0, 0, w, h);
+
+    
+
+    // 格線
+
+    ctx.strokeStyle = st.grid;
+
+    ctx.lineWidth = 1;
+
+    for (var x = 30; x < w; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+
+    for (var y = 30; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+    
+
+    // 繪製底圖鄉鎮輪廓 (雙北)
+
+    var minLon = 121.43, maxLon = 121.64, minLat = 24.96, maxLat = 25.19;
+
+    function proj(lon, lat) {
+
+      return [30 + (lon - minLon) / (maxLon - minLon) * (w - 60), h - 30 - (lat - minLat) / (maxLat - minLat) * (h - 60)];
+
+    }
+
+    
+
+    if (window.A23_TW_TOWNS) {
+
+      ctx.strokeStyle = st.coast;
+
+      ctx.lineWidth = 1.2;
+
+      window.A23_TW_TOWNS.forEach(function(t) {
+
+        if (t.county === "台北市" || t.county === "新北市") {
+
+          t.rings.forEach(function(ring) {
+
+            ctx.beginPath();
+
+            ring.forEach(function(pt, idx) {
+
+              var p = proj(pt[0], pt[1]);
+
+              if (idx === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+
+            });
+
+            ctx.stroke();
+
+          });
+
+        }
+
+      });
+
+    }
+
+    
+
+    // 繪製 s02 站點
+
+    T_STATIONS.forEach(function(s) {
+
+      var p = proj(s.lon, s.lat);
+
+      ctx.beginPath();
+
+      ctx.arc(p[0], p[1], 4, 0, Math.PI * 2);
+
+      ctx.fillStyle = st.road;
+
+      ctx.fill();
+
+      ctx.strokeStyle = st.bg;
+
+      ctx.lineWidth = 1;
+
+      ctx.stroke();
+
+    });
+
+    
+
+    // 樣式浮水印與授權署名
+
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+
+    ctx.fillRect(10, h - 36, w - 20, 26);
+
+    ctx.fillStyle = "#ffffff";
+
+    ctx.font = "11px sans-serif";
+
+    ctx.fillText("當前底圖：" + basemap + " ｜ 授權: " + st.attr, 16, h - 19);
+
+  }
+
+  
+
+  function loop() {
+
+    anim++;
+
+    draw();
+
+    if (playing) timer = requestAnimationFrame(loop);
+
+  }
+
+  
+
+  return {
+
+    play: function() { if (!playing) { playing = true; loop(); } },
+
+    pause: function() { playing = false; if (timer) cancelAnimationFrame(timer); },
+
+    redraw: draw,
+
+    seek: function(){}, setBasemap: function(bm) { basemap = bm; draw(); }
+
+  };
+
+};
+
+
+
+/* ---- T4 控制器：3D 地形 DEM 示意 (可旋轉) ---- */
+
+LIVE["T4"] = function(cv, opt) {
+
+  var ctx = cv.getContext("2d");
+
+  var yaw = 45, pitch = 35; // 視角角度
+
+  var anim = 0, timer = null, playing = false, autoSpin = true;
+
+  
+
+  // 生成台灣立體高程網格 (30x50 網格，模擬中央山脈脊線與主要盆地)
+
+  var cols = 30, rows = 50;
+
+  var grid = [];
+
+  for (var r = 0; r < rows; r++) {
+
+    grid[r] = [];
+
+    var latNorm = r / rows; // 0=南, 1=北
+
+    for (var c = 0; c < cols; c++) {
+
+      var lonNorm = c / cols; // 0=西, 1=東
+
+      // 台灣主島形狀遮罩 (紡錘形)
+
+      var midLon = 0.45 + (1 - latNorm) * 0.1;
+
+      var span = Math.sin(latNorm * Math.PI) * 0.35;
+
+      var dist = Math.abs(lonNorm - midLon);
+
+      if (dist < span) {
+
+        // 山脈主脊
+
+        var ridge = Math.exp(-Math.pow((lonNorm - (midLon + 0.05)) / 0.12, 2));
+
+        var elev = ridge * (2800 + Math.sin(latNorm * 12) * 800);
+
+        // 玉山與雪山主峰增益
+
+        if (Math.abs(latNorm - 0.45) < 0.08 && Math.abs(lonNorm - 0.5) < 0.08) elev = 3952;
+
+        if (Math.abs(latNorm - 0.72) < 0.06 && Math.abs(lonNorm - 0.52) < 0.06) elev = 3886;
+
+        grid[r][c] = elev;
+
+      } else {
+
+        grid[r][c] = 0; // 海洋
+
+      }
+
+    }
+
+  }
+
+  
+
+  function draw() {
+
+    var w = cv.width, h = cv.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = "#070d1a";
+
+    ctx.fillRect(0, 0, w, h);
+
+    
+
+    var radYaw = (yaw * Math.PI) / 180;
+
+    var radPitch = (pitch * Math.PI) / 180;
+
+    var cosY = Math.cos(radYaw), sinY = Math.sin(radYaw);
+
+    var cosP = Math.cos(radPitch), sinP = Math.sin(radPitch);
+
+    var cx = w / 2, cy = h / 2 + 30;
+
+    var scale = Math.min(w, h) * 0.65;
+
+    
+
+    function project3D(x, y, z) {
+
+      var rx = x * cosY - y * sinY;
+
+      var ry = x * sinY + y * cosY;
+
+      var rz = z;
+
+      var px = cx + rx * scale;
+
+      var py = cy - (ry * sinP + rz * cosP) * scale;
+
+      return [px, py];
+
+    }
+
+    
+
+    // 繪製 3D 地形網格線
+
+    for (var r = 0; r < rows; r += 2) {
+
+      ctx.beginPath();
+
+      for (var c = 0; c < cols; c++) {
+
+        var x = (c / cols - 0.5);
+
+        var y = (r / rows - 0.5);
+
+        var z = (grid[r][c] / 4000) * 0.35;
+
+        var p = project3D(x, y, z);
+
+        if (c === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+
+      }
+
+      ctx.strokeStyle = "rgba(56,189,248,0.35)";
+
+      ctx.lineWidth = 0.9;
+
+      ctx.stroke();
+
+    }
+
+    
+
+    for (var c = 0; c < cols; c += 2) {
+
+      ctx.beginPath();
+
+      for (var r = 0; r < rows; r++) {
+
+        var x = (c / cols - 0.5);
+
+        var y = (r / rows - 0.5);
+
+        var z = (grid[r][c] / 4000) * 0.35;
+
+        var p = project3D(x, y, z);
+
+        if (r === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+
+      }
+
+      ctx.strokeStyle = "rgba(16,185,129,0.3)";
+
+      ctx.lineWidth = 0.8;
+
+      ctx.stroke();
+
+    }
+
+    
+
+    // 繪製玉山/雪山標籤
+
+    var yushanP = project3D(0.5 - 0.5, 0.45 - 0.5, 3952 / 4000 * 0.35);
+
+    ctx.fillStyle = "#eab308";
+
+    ctx.beginPath();
+
+    ctx.arc(yushanP[0], yushanP[1], 4, 0, Math.PI * 2);
+
+    ctx.fill();
+
+    ctx.font = "bold 11px sans-serif";
+
+    ctx.fillText("▲ 玉山 3,952m", yushanP[0] + 6, yushanP[1] - 4);
+
+    
+
+    // 水印
+
+    ctx.fillStyle = "#94a3b8";
+
+    ctx.font = "11px sans-serif";
+
+    ctx.fillText("🏔️ 台灣 DEM 降採樣立體網格（解析度 ~2.5km，體積 82KB）· 視角 Yaw:" + Math.round(yaw) + "° Pitch:" + Math.round(pitch) + "°", 14, 24);
+
+  }
+
+  
+
+  function loop() {
+
+    if (autoSpin) {
+
+      yaw = (yaw + 0.6) % 360;
+
+    }
+
+    draw();
+
+    if (playing) timer = requestAnimationFrame(loop);
+
+  }
+
+  
+
+  return {
+
+    play: function() { if (!playing) { playing = true; loop(); } },
+
+    pause: function() { playing = false; if (timer) cancelAnimationFrame(timer); },
+
+    redraw: draw,
+
+    seek: function(){}, setAngles: function(y, p) { yaw = y; pitch = p; draw(); },
+
+    toggleSpin: function() { autoSpin = !autoSpin; }
+
+  };
+
+};
+
+
+
+/* ---- T5 控制器：投影陷阱反例卡 (Natural Earth 1:110m 向量形狀，零重疊) ---- */
+
+var T5_SHAPES = {"greenland": [[0.379, -0.997], [0.484, -0.894], [0.265, -0.881], [0.361, -0.875], [0.479, -0.872], [0.533, -0.822], [0.72, -0.839], [0.636, -0.738], [0.547, -0.703], [0.574, -0.634], [0.584, -0.422], [0.508, -0.39], [0.558, -0.269], [0.563, -0.185], [0.538, -0.142], [0.463, -0.097], [0.493, 0.002], [0.434, -0.011], [0.497, 0.065], [0.464, 0.152], [0.424, 0.128], [0.459, 0.178], [0.428, 0.259], [0.294, 0.359], [0.243, 0.394], [0.143, 0.552], [0.077, 0.594], [0.056, 0.71], [0.005, 0.839], [0.004, 0.981], [-0.077, 1.0], [-0.148, 0.951], [-0.205, 0.756], [-0.22, 0.619], [-0.244, 0.473], [-0.201, 0.306], [-0.186, 0.2], [-0.227, 0.245], [-0.277, 0.228], [-0.269, 0.122], [-0.24, 0.088], [-0.285, 0.07], [-0.278, -0.034], [-0.311, -0.128], [-0.37, -0.255], [-0.484, -0.35], [-0.606, -0.34], [-0.675, -0.424], [-0.565, -0.456], [-0.72, -0.515], [-0.54, -0.634], [-0.595, -0.698], [-0.491, -0.794], [-0.467, -0.843], [-0.337, -0.88], [-0.175, -0.902], [-0.085, -0.862], [-0.092, -0.881], [-0.009, -0.971], [0.105, -1.0], [0.379, -0.997]], "africa": [[0.434, -0.792], [0.493, -0.675], [0.523, -0.606], [0.563, -0.543], [0.603, -0.463], [0.695, -0.35], [0.739, -0.307], [0.743, -0.276], [0.801, -0.26], [0.895, -0.28], [0.945, -0.297], [0.954, -0.258], [0.909, -0.151], [0.76, 0.009], [0.691, 0.086], [0.65, 0.13], [0.612, 0.204], [0.626, 0.262], [0.656, 0.327], [0.663, 0.435], [0.632, 0.505], [0.533, 0.565], [0.518, 0.648], [0.518, 0.696], [0.486, 0.731], [0.45, 0.77], [0.411, 0.855], [0.371, 0.908], [0.27, 0.977], [0.221, 0.987], [0.111, 0.999], [0.06, 1.0], [0.043, 0.968], [0.024, 0.896], [-0.042, 0.795], [-0.065, 0.671], [-0.108, 0.588], [-0.141, 0.504], [-0.11, 0.405], [-0.084, 0.338], [-0.105, 0.289], [-0.124, 0.215], [-0.156, 0.15], [-0.213, 0.052], [-0.196, -0.025], [-0.221, -0.083], [-0.267, -0.086], [-0.344, -0.136], [-0.435, -0.127], [-0.543, -0.1], [-0.626, -0.1], [-0.714, -0.096], [-0.789, -0.153], [-0.832, -0.21], [-0.869, -0.246], [-0.911, -0.283], [-0.927, -0.307], [-0.954, -0.372], [-0.924, -0.426], [-0.916, -0.522], [-0.935, -0.572], [-0.908, -0.623], [-0.875, -0.676], [-0.815, -0.744], [-0.737, -0.831], [-0.677, -0.901], [-0.608, -0.959], [-0.524, -0.942], [-0.376, -0.988], [-0.26, -0.997], [-0.181, -1.0], [-0.17, -0.977], [-0.177, -0.904], [-0.112, -0.876], [-0.028, -0.837], [0.08, -0.813], [0.134, -0.878], [0.2, -0.855], [0.298, -0.835], [0.372, -0.839], [0.43, -0.833]], "norway": [[0.181, -0.712], [0.034, -0.638], [-0.098, -0.432], [-0.225, -0.12], [-0.349, 0.102], [-0.352, 0.459], [-0.352, 0.689], [-0.425, 0.846], [-0.499, 0.853], [-0.569, 0.913], [-0.74, 1.0], [-0.753, 0.862], [-0.799, 0.814], [-0.787, 0.738], [-0.754, 0.64], [-0.831, 0.698], [-0.841, 0.571], [-0.675, 0.521], [-0.771, 0.522], [-0.812, 0.408], [-0.795, 0.332], [-0.728, 0.292], [-0.716, 0.25], [-0.604, 0.173], [-0.519, 0.16], [-0.438, 0.094], [-0.543, 0.124], [-0.417, -0.075], [-0.343, -0.206], [-0.311, -0.321], [-0.214, -0.42], [-0.15, -0.462], [-0.147, -0.542], [-0.11, -0.594], [-0.079, -0.648], [0.05, -0.775], [0.155, -0.852], [0.203, -0.85], [0.292, -0.905], [0.425, -0.973], [0.511, -0.986], [0.572, -0.943], [0.689, -1.0], [0.736, -0.999], [0.79, -0.879], [0.841, -0.832], [0.752, -0.749], [0.621, -0.857], [0.499, -0.688], [0.304, -0.663], [0.181, -0.712]], "taiwan": [[0.004, 0.585], [-0.029, 0.655], [-0.057, 0.729], [-0.067, 0.871], [-0.075, 0.936], [-0.088, 1.0], [-0.17, 0.935], [-0.176, 0.86], [-0.215, 0.769], [-0.285, 0.692], [-0.335, 0.666], [-0.374, 0.629], [-0.398, 0.581], [-0.42, 0.527], [-0.465, 0.374], [-0.501, 0.303], [-0.507, 0.269], [-0.481, 0.176], [-0.469, 0.12], [-0.479, 0.044], [-0.46, -0.064], [-0.203, -0.524], [-0.133, -0.621], [-0.054, -0.723], [-0.02, -0.792], [0.022, -0.854], [0.199, -0.93], [0.245, -0.983], [0.282, -1.0], [0.351, -0.973], [0.375, -0.943], [0.466, -0.897], [0.494, -0.868], [0.507, -0.819], [0.448, -0.73], [0.444, -0.683], [0.451, -0.62], [0.403, -0.408], [0.349, -0.316], [0.335, -0.27], [0.287, -0.04], [0.26, 0.106], [0.217, 0.256], [0.161, 0.379], [0.088, 0.492], [0.004, 0.585]]};
+
+
+
+LIVE["T5"] = function(cv, opt) {
+
+  var ctx = cv.getContext("2d");
+
+  var mode = (opt && opt.mode) || "greenland"; // "greenland" 或 "taiwan"
+
+  var factor = 0; // 0=Web Mercator (形變), 1=等積投影 (真實面積)
+
+  var anim = 0, timer = null, playing = false;
+
+  
+
+  function drawShape(pts, scale) {
+
+    ctx.beginPath();
+
+    for (var i = 0; i < pts.length; i++) {
+
+      var px = pts[i][0] * scale;
+
+      var py = pts[i][1] * scale;
+
+      if (i === 0) ctx.moveTo(px, py);
+
+      else ctx.lineTo(px, py);
+
+    }
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.stroke();
+
+  }
+
+  
+
+  function draw() {
+
+    var w = cv.width, h = cv.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = "#070d1a";
+
+    ctx.fillRect(0, 0, w, h);
+
+    
+
+    // 標題防裁切：根據畫布寬度自動切換字級
+
+    ctx.fillStyle = "#38bdf8";
+
+    if (w < 550) {
+
+      ctx.font = "bold 11px sans-serif";
+
+      ctx.fillText("⚠️ 投影陷阱：Web Mercator 高緯面積膨脹", 12, 18);
+
+    } else {
+
+      ctx.font = "bold 13px sans-serif";
+
+      ctx.fillText("⚠️ 投影陷阱教學反例卡：Web Mercator 高緯度面積膨脹", 16, 24);
+
+    }
+
+    
+
+    // 當前模式標註
+
+    ctx.fillStyle = factor > 0.5 ? "#10b981" : "#ef4444";
+
+    ctx.font = "bold " + (w < 550 ? "10px" : "11px") + " sans-serif";
+
+    var modeTxt = factor === 0 ? "Web Mercator 視覺膨脹" : (factor === 1 ? "等積投影 (真實比例 100%)" : "過渡混合比例");
+
+    ctx.fillText("當前視圖：" + modeTxt, w < 550 ? 12 : 16, w < 550 ? 32 : 42);
+
+    
+
+    // 兩區塊中心分離：左 28%、右 72%，零重疊
+
+    var cx1 = w * 0.28, cx2 = w * 0.72;
+
+    var cy = h * 0.52;
+
+    var isNarrow = w < 550;
+
+    
+
+    if (mode === "greenland") {
+
+      // 格陵蘭 (真面積 216.6 萬 km²) vs 非洲 (3037 萬 km²)，比例 1:14
+
+      // Web Mercator 下高緯放大約 4 倍，視覺近 1:1
+
+      var baseR = Math.min(w * 0.17, h * 0.27);
+
+      var afScale = baseR;
+
+      var glMerc = baseR * 0.88;
+
+      var glTrue = baseR * Math.sqrt(2.166 / 30.37); // 約 0.267
+
+      var glScale = glMerc * (1 - factor) + glTrue * factor;
+
+      
+
+      // 左：格陵蘭島 (Natural Earth 向量輪廓)
+
+      ctx.save();
+
+      ctx.translate(cx1, cy);
+
+      ctx.fillStyle = "rgba(56,189,248,0.7)";
+
+      ctx.strokeStyle = "#38bdf8";
+
+      ctx.lineWidth = Math.max(1, 1.5 / (glScale / baseR));
+
+      drawShape(T5_SHAPES.greenland, glScale);
+
+      ctx.restore();
+
+      
+
+      // 右：非洲大陸 (Natural Earth 向量輪廓)
+
+      ctx.save();
+
+      ctx.translate(cx2, cy);
+
+      ctx.fillStyle = "rgba(16,185,129,0.7)";
+
+      ctx.strokeStyle = "#10b981";
+
+      ctx.lineWidth = 1.6;
+
+      drawShape(T5_SHAPES.africa, afScale);
+
+      ctx.restore();
+
+      
+
+      // 標註
+
+      var labelY = cy + baseR + (isNarrow ? 16 : 24);
+
+      ctx.fillStyle = "#e2e8f0";
+
+      ctx.font = "bold " + (isNarrow ? "11px" : "12px") + " sans-serif";
+
+      ctx.textAlign = "center";
+
+      ctx.fillText("格陵蘭 (Greenland)", cx1, labelY);
+
+      ctx.fillText("非洲大陸 (Africa)", cx2, labelY);
+
+      
+
+      ctx.fillStyle = "#94a3b8";
+
+      ctx.font = (isNarrow ? "10px" : "11px") + " sans-serif";
+
+      ctx.fillText("真實面積: 2,166,000 km²", cx1, labelY + (isNarrow ? 14 : 18));
+
+      ctx.fillText(isNarrow ? "30,370,000 km² (約 14 倍)" : "真實面積: 30,370,000 km² (約格陵蘭 14 倍)", cx2, labelY + (isNarrow ? 14 : 18));
+
+      ctx.textAlign = "left";
+
+    } else {
+
+      // 挪威 (真面積 38.5 萬 km²) vs 台灣 (3.62 萬 km²)，比例 10.6:1
+
+      var baseR = Math.min(w * 0.16, h * 0.28);
+
+      var twScale = baseR * 0.38;
+
+      var noTrue = twScale * Math.sqrt(385.207 / 36.197); // 3.26x
+
+      var noMerc = Math.min(noTrue * 1.45, h * 0.38); // 高緯膨脹
+
+      var noScale = noMerc * (1 - factor) + noTrue * factor;
+
+      
+
+      // 左：挪威 (Natural Earth 向量輪廓)
+
+      ctx.save();
+
+      ctx.translate(cx1, cy);
+
+      ctx.fillStyle = "rgba(234,179,8,0.7)";
+
+      ctx.strokeStyle = "#eab308";
+
+      ctx.lineWidth = Math.max(1, 1.5 / (noScale / baseR));
+
+      drawShape(T5_SHAPES.norway, noScale);
+
+      ctx.restore();
+
+      
+
+      // 右：台灣 (Natural Earth 向量輪廓)
+
+      ctx.save();
+
+      ctx.translate(cx2, cy);
+
+      ctx.fillStyle = "rgba(56,189,248,0.7)";
+
+      ctx.strokeStyle = "#38bdf8";
+
+      ctx.lineWidth = 1.6;
+
+      drawShape(T5_SHAPES.taiwan, twScale);
+
+      ctx.restore();
+
+      
+
+      var labelY = cy + baseR + (isNarrow ? 16 : 24);
+
+      ctx.fillStyle = "#e2e8f0";
+
+      ctx.font = "bold " + (isNarrow ? "11px" : "12px") + " sans-serif";
+
+      ctx.textAlign = "center";
+
+      ctx.fillText("挪威 (~62°N 高緯膨脹)", cx1, labelY);
+
+      ctx.fillText("台灣 (~23.5°N 低緯真形)", cx2, labelY);
+
+      
+
+      ctx.fillStyle = "#94a3b8";
+
+      ctx.font = (isNarrow ? "10px" : "11px") + " sans-serif";
+
+      ctx.fillText("真實面積: 385,207 km²", cx1, labelY + (isNarrow ? 14 : 18));
+
+      ctx.fillText("真實面積: 36,197 km²", cx2, labelY + (isNarrow ? 14 : 18));
+
+      ctx.textAlign = "left";
+
+    }
+
+  }
+
+  
+
+  function loop() {
+
+    anim++;
+
+    draw();
+
+    if (playing) timer = requestAnimationFrame(loop);
+
+  }
+
+  
+
+  return {
+
+    play: function() { if (!playing) { playing = true; loop(); } },
+
+    pause: function() { playing = false; if (timer) cancelAnimationFrame(timer); },
+
+    redraw: draw,
+
+    seek: function(){}, setFactor: function(f) { factor = f; draw(); },
+
+    setMode: function(m) { mode = m; draw(); }
+
+  };
+
+};
+
+
+
+/* ================= 播放管理：只播放「可見且未被使用者暫停」的控制器 ================= */
+
+var PLAYING=new Set();
+
+var REDUCE_MOTION=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function mk(n,cv,x){var c=LIVE[n](cv,x),p=c.play,q=c.pause;c.play=function(){PLAYING.add(c);p();};c.pause=function(){PLAYING.delete(c);q();};c.vis=false;c.user=!REDUCE_MOTION;return c;}
+
+function sync(c){if(!c)return;if(REDUCE_MOTION){c.pause();if(c.seek&&!c._rmEnd){c._rmEnd=true;c.seek(Math.max(0,(c.n||1)-1));}return;}(c.vis&&c.user&&!document.hidden)?c.play():c.pause();}
+
+var io=new IntersectionObserver(function(es){es.forEach(function(e){var c=e.target.__ctl;if(c){c.vis=e.isIntersecting;sync(c);}});},{rootMargin:"60px"});
+
+function watch(el,c){el.__ctl=c;io.observe(el);}
+
+function kill(el){if(!el||!el.__ctl)return;el.__ctl.pause();io.unobserve(el);el.__ctl=null;}
+
+
+
+/* ================= 縮圖格（動態排版） ================= */
+
+var grid=$("grid"),cells={},FILTER=-1;
+
+function kitBadge(n){var k=KIT[n];return k?"<span class='kit-badge "+k.toLowerCase()+"'>"+k+"</span>":"";}
+function cellTagsHtml(n){
+  var tags=[];
+  (FORM[n]||[]).forEach(function(f){tags.push("<span class='ctag' data-f='form' data-v='"+f+"' title='篩選形狀："+(VOCAB.form[f]||f)+"'>"+(VOCAB.form[f]||f)+"</span>");});
+  (PURPOSE[n]||[]).forEach(function(p){tags.push("<span class='ctag' data-f='purpose' data-v='"+p+"' title='篩選用途："+(VOCAB.purpose[p]||p)+"'>"+(VOCAB.purpose[p]||p)+"</span>");});
+  return "<div class='cell-tags'>"+tags.join("")+"</div>";
+}
+
+GRID_ORDER.forEach(function(n){
+
+  var el=document.createElement("div");el.className="cell";el.dataset.n=n;el.dataset.cat=CAT[n];el.dataset.tab=KIT[n]?"kit":"base";
+
+  if(MAP_TECH[n])el.dataset.tech=MAP_TECH[n].join(",");
+
+  el.title="#"+n+" "+T[n]+"（"+GROUPS[CAT[n]][0]+"）：點擊放大到母畫面";
+
+  el.innerHTML="<div class='t'><i>#"+n+"</i>"+(NAME_ZH[n]||T[n])+kitBadge(n)+"</div><button class='pin' title='釘到子畫面'>📌</button><canvas data-w='440' data-h='330'></canvas>"+cellTagsHtml(n)+"<span class='st'>● 已上線</span>";
+
+  grid.appendChild(el);cells[n]=el;
+
+  try{watch(el,mk(n,el.querySelector("canvas")));}catch(e){console.error("#"+n,e);}
+
+  el.addEventListener("click",function(ev){
+    var tg=ev.target.closest(".ctag");
+    if(tg){ev.stopPropagation();toggleFacet(tg.dataset.f,tg.dataset.v);return;}
+    if(ev.target.classList.contains("pin")){ev.stopPropagation();pin(n);}else{load(n);$("stage").scrollIntoView({behavior:"smooth",block:"start"});}
+  });
+
+});
+
+
+
+/* 空間技法實例卡 T1–T5 格位渲染 */
+
+TECH_KEYS.forEach(function(k){
+
+  var el=document.createElement("div");el.className="cell tech-cell";el.dataset.n=k;el.dataset.cat="spatial";
+
+  el.dataset.tech=MAP_TECH[k].join(",");
+
+  el.title=k+" "+T[k]+"（空間技法實例）：點擊放大到母畫面";
+
+  el.innerHTML="<div class='t'><i style='color:var(--acc)'>"+k+"</i>"+T[k]+"</div><button class='pin' title='釘到子畫面'>📌</button><canvas data-w='440' data-h='330'></canvas><span class='st' style='color:var(--acc)'>● 空間技法實例</span>";
+
+  grid.appendChild(el);cells[k]=el;
+
+  try{watch(el,mk(k,el.querySelector("canvas")));}catch(e){console.error("#"+k,e);}
+
+  el.addEventListener("click",function(ev){if(ev.target.classList.contains("pin")){ev.stopPropagation();pin(k);}else{load(k);$("stage").scrollIntoView({behavior:"smooth",block:"start"});}});
+
+});
+
+
+
+/* ================= 母畫面 ================= */
+
+var CUR=0,stUser=true;
+
+function newCanvas(old,w,h){var cv=document.createElement("canvas");cv.id=old.id;cv.dataset.w=w;cv.dataset.h=h;old.replaceWith(cv);return cv;}
+
+function load(n){
+
+  if(!LIVE[n])return;CUR=n;
+
+  var customEl = $("stCustom");
+
+  if(customEl){
+
+    if(n === "T1"){
+
+      customEl.style.display = "block";
+
+      var dists = ["all","中正區","信義區","大安區","萬華區","中山區","士林區","板橋區","三重區","新店區"];
+
+      var btns = dists.map(function(d){ return "<button class='pill-btn" + (d==="all"?" active":"") + "' data-d='" + d + "'>" + (d==="all"?"雙北全區 (35)":d) + "</button>"; }).join(" ");
+
+      customEl.innerHTML = "<div class='tech-ctrl-row'><span style='color:var(--dim);font-weight:700;'>行政區快選：</span>" + btns + "</div>";
+
+      customEl.querySelectorAll(".pill-btn").forEach(function(b){
+
+        b.onclick = function(){
+
+          customEl.querySelectorAll(".pill-btn").forEach(function(x){ x.classList.remove("active"); });
+
+          b.classList.add("active");
+
+          var ctl = $("stage").__ctl;
+
+          if(ctl && ctl.setDist) ctl.setDist(b.dataset.d);
+
+        };
+
+      });
+
+    } else if(n === "T2"){
+
+      customEl.style.display = "block";
+
+      customEl.innerHTML = "<div class='tech-ctrl-row'>" +
+
+        "<span style='color:var(--dim);font-weight:700;'>WGS84 座標輸入：</span>" +
+
+        "Lat: <input type='number' id='t2LatIn' step='0.0001' value='25.0330' style='width:85px'> " +
+
+        "Lon: <input type='number' id='t2LonIn' step='0.0001' value='121.5654' style='width:90px'> " +
+
+        "<button class='btn' id='t2QueryBtn' style='padding:4px 12px;background:rgba(56,189,248,0.2);border-color:var(--acc);color:var(--acc);font-weight:700;'>🔍 反查</button>" +
+
+        "<button class='pill-btn' id='t2Preset1'>臺北信義 (25.0330, 121.5654)</button>" +
+
+        "<button class='pill-btn' id='t2Preset2'>高雄前金 (22.6273, 120.3014)</button>" +
+
+        "<span class='badge-tag' id='t2LiveRes' style='margin-left:auto;'>🎯 臺北市 信義區</span>" +
+
+        "</div>" +
+
+        "<div style='font-size:11px;color:var(--dim);margin-top:4px;'>💡 提示：亦可直接在上方畫布地圖任意處點擊，將自動抓取經緯度並離線 Point-in-Polygon 演算縣市鄉鎮。</div>";
+
+      var runQuery = function(lat, lon){
+
+        $('t2LatIn').value = lat; $('t2LonIn').value = lon;
+
+        var ctl = $('stage').__ctl;
+
+        if(ctl && ctl.setCoords){
+
+          var res = ctl.setCoords(lat, lon);
+
+          $('t2LiveRes').textContent = '🎯 ' + res.county + ' ' + res.name;
+
+        }
+
+      };
+
+      $('t2QueryBtn').onclick = function(){ runQuery(parseFloat($('t2LatIn').value), parseFloat($('t2LonIn').value)); };
+
+      $('t2Preset1').onclick = function(){ runQuery(25.0330, 121.5654); };
+
+      $('t2Preset2').onclick = function(){ runQuery(22.6273, 120.3014); };
+
+    } else if(n === "T3"){
+
+      customEl.style.display = "block";
+
+      customEl.innerHTML = "<div class='tech-ctrl-row'>" +
+
+        "<span style='color:var(--dim);font-weight:700;'>切換底圖來源：</span>" +
+
+        "<button class='pill-btn active' data-bm='CARTO'>CARTO 暗色</button>" +
+
+        "<button class='pill-btn' data-bm='OSM'>OSM 標準圖資</button>" +
+
+        "<button class='pill-btn' data-bm='ESRI'>ESRI 衛星影像調性</button>" +
+
+        "<button class='pill-btn' data-bm='OpenFreeMap'>OpenFreeMap 簡約向量</button>" +
+
+        "<span style='margin-left:auto;font-size:11px;color:var(--ok);'>✓ 遵照 n02 底圖規範</span>" +
+
+        "</div>";
+
+      customEl.querySelectorAll('.pill-btn').forEach(function(b){
+
+        b.onclick = function(){
+
+          customEl.querySelectorAll('.pill-btn').forEach(function(x){ x.classList.remove('active'); });
+
+          b.classList.add('active');
+
+          var ctl = $('stage').__ctl;
+
+          if(ctl && ctl.setBasemap) ctl.setBasemap(b.dataset.bm);
+
+        };
+
+      });
+
+    } else if(n === "T4"){
+
+      customEl.style.display = "block";
+
+      customEl.innerHTML = "<div class='tech-ctrl-row'>" +
+
+        "<span style='color:var(--dim);font-weight:700;'>3D 姿態控制：</span>" +
+
+        "偏航角 (Yaw): <input type='range' id='t4Yaw' min='0' max='360' value='45' style='width:120px;accent-color:var(--acc)'> " +
+
+        "俯仰角 (Pitch): <input type='range' id='t4Pitch' min='15' max='75' value='35' style='width:100px;accent-color:var(--acc)'> " +
+
+        "<button class='btn' id='t4SpinBtn'>旋轉開關</button>" +
+
+        "<span style='margin-left:auto;font-size:11px;color:var(--dim);'>解析度: ~2.5km (DEM20m 降採樣)</span>" +
+
+        "</div>";
+
+      $('t4Yaw').oninput = $('t4Pitch').oninput = function(){
+
+        var ctl = $('stage').__ctl;
+
+        if(ctl && ctl.setAngles) ctl.setAngles(parseFloat($('t4Yaw').value), parseFloat($('t4Pitch').value));
+
+      };
+
+      $('t4SpinBtn').onclick = function(){
+
+        var ctl = $('stage').__ctl;
+
+        if(ctl && ctl.toggleSpin) ctl.toggleSpin();
+
+      };
+
+    } else if(n === "T5"){
+
+      customEl.style.display = "block";
+
+      customEl.innerHTML = "<div class='tech-ctrl-row'>" +
+
+        "<span style='color:var(--dim);font-weight:700;'>反例對照組：</span>" +
+
+        "<button class='pill-btn active' id='t5Set1'>格陵蘭 vs 非洲 (面積比 1:14)</button>" +
+
+        "<button class='pill-btn' id='t5Set2'>挪威 vs 台灣 (面積比 10.6:1)</button>" +
+
+        "<span style='margin-left:16px;color:var(--dim);font-weight:700;'>投影過渡：</span>" +
+
+        "Mercator <input type='range' id='t5Slider' min='0' max='1' step='0.01' value='0' style='width:130px;accent-color:var(--acc)'> 等積投影" +
+
+        "</div>";
+
+      $('t5Slider').oninput = function(){
+
+        var ctl = $('stage').__ctl;
+
+        if(ctl && ctl.setFactor) ctl.setFactor(parseFloat($('t5Slider').value));
+
+      };
+
+      $('t5Set1').onclick = function(){
+
+        $('t5Set1').classList.add('active'); $('t5Set2').classList.remove('active');
+
+        var ctl = $('stage').__ctl;
+
+        if(ctl && ctl.setMode) ctl.setMode('greenland');
+
+      };
+
+      $('t5Set2').onclick = function(){
+
+        $('t5Set2').classList.add('active'); $('t5Set1').classList.remove('active');
+
+        var ctl = $('stage').__ctl;
+
+        if(ctl && ctl.setMode) ctl.setMode('taiwan');
+
+      };
+
+    } else {
+
+      customEl.style.display = "none";
+
+    }
+
+  }
+
+var st=$("stage");kill(st);
+
+  var cv=newCanvas($("stCv"),960,540),rg=$("stRg"),lab=$("stLab");
+
+  var c=mk(n,cv,{onTick:function(t){rg.value=t;lab.textContent=fmt(c,t);}});
+
+  rg.max=Math.max(1,(c.n||1)-1);rg.value=0;c.user=stUser;watch(st,c);if(c.seek)c.seek(0);lab.textContent=fmt(c,0);
+
+  var isTech = (typeof n === "string" && n[0] === "T");
+
+  $("stT").innerHTML = (isTech ? n : "#" + n) + " " + (NAME_ZH[n] || T[n]) + kitBadge(n);
+
+  var kitLabel = KIT[n] ? ("套組：" + (VOCAB.kit[KIT[n]] || KIT[n]) + "（" + KIT[n] + "）") : (isTech ? "空間技法實例" : "基礎圖型");
+
+  $("stC").textContent = T[n] + " · " + kitLabel + " · " + (CONT[n] ? "連續動畫（滑桿＝相位）" : (isTech ? "空間技法實測實例" : "共 " + (c.n || 1) + " 幅"));
+
+  $("stSrc").innerHTML="資料來源：<b>"+(SRC[n]||"—")+"</b>";
+
+  Object.keys(cells).forEach(function(k){cells[k].classList.toggle("cur",k==n);});
+
+  document.querySelectorAll("#toc li").forEach(function(li){li.classList.toggle("cur",li.dataset.n==n);});
+
+}
+
+function fmt(c,t){if(typeof CUR==="string"&&CUR[0]==="T")return "互動卡";if(!c||!c.n)return "互動卡";return CONT[CUR]?"相位 "+Math.round(t/(c.n-1)*100)+"%":"幀 "+(Math.round(t)+1)+" / "+c.n;}
+
+$("stPlay").onclick=function(){stUser=!stUser;var c=$("stage").__ctl;if(c){c.user=stUser;sync(c);}this.textContent=stUser?"⏸ 暫停":"▶ 播放";};
+
+$("stRg").oninput=function(){var c=$("stage").__ctl;if(!c)return;stUser=false;c.user=false;sync(c);$("stPlay").textContent="▶ 播放";if(c.seek) c.seek(+this.value);$("stLab").textContent=fmt(c,+this.value);};
+
+$("stPin").onclick=function(){if(CUR)pin(CUR);};
+
+
+
+/* ================= 子畫面（📌） ================= */
+
+var PIN=0,pUser=true;
+
+function pin(n){
+
+  var pp=$("pip");kill(pp);PIN=n;pp.classList.add("on");
+
+  var c=mk(n,newCanvas($("pCv"),480,360));c.user=pUser;watch(pp,c);if(c.seek)c.seek(0);
+
+  $("pT").innerHTML="📌 "+(typeof n==="string"&&n[0]==="T"?n:"#"+n)+" "+(NAME_ZH[n]||T[n])+kitBadge(n);
+
+}
+
+$("pX").onclick=function(){var pp=$("pip");kill(pp);pp.classList.remove("on");PIN=0;};
+
+$("pPlay").onclick=function(){pUser=!pUser;var c=$("pip").__ctl;if(c){c.user=pUser;sync(c);}this.textContent=pUser?"⏸":"▶";};
+
+$("pSwap").onclick=function(){var a=CUR,b=PIN;if(!b)return;load(b);pin(a);};
+
+
+
+/* ================= 雙頁籤＋三面向篩選（左欄＋窄螢幕下拉） ================= */
+
+if($("kitCount")) $("kitCount").textContent = "(" + TAB_KIT_IDS.length + ")";
+var CUR_TAB = "base";
+var SEL = { form: new Set(), purpose: new Set(), kit: new Set() };
+
+function tabIds(tab){ return (tab || CUR_TAB) === "kit" ? TAB_KIT_IDS : TAB_BASE_IDS; }
+
+function countFacet(ids, facet, val){
+  var c = 0;
+  ids.forEach(function(n){
+    if(facet === "kit"){ if(KIT[n] === val) c++; }
+    else if(facet === "form"){ if((FORM[n]||[]).indexOf(val) >= 0) c++; }
+    else if(facet === "purpose"){ if((PURPOSE[n]||[]).indexOf(val) >= 0) c++; }
+  });
+  return c;
+}
+
+function renderFacetSec(title, facet, vocabObj, ids, allowSelect){
+  var keys = Object.keys(vocabObj).filter(function(k){ return countFacet(ids, facet, k) > 0; });
+  if(!keys.length) return "";
+  if(allowSelect && keys.length > 8){
+    var opts = "<option value=''>全部" + title + " (" + ids.length + ")</option>" +
+      keys.map(function(k){ return "<option value='" + k + "'" + (SEL[facet].has(k)?" selected":"") + ">" + vocabObj[k] + " (" + k + " · " + countFacet(ids, facet, k) + ")</option>"; }).join("");
+    return "<div class='facet-sec'><div class='facet-h'><span>" + title + "</span></div><select class='kit-sel' data-f='" + facet + "'>" + opts + "</select></div>";
+  }
+  var allOn = SEL[facet].size === 0 ? " on" : "";
+  var chips = "<button type='button' class='chip" + allOn + "' data-f='" + facet + "' data-v='__all__'>全部<small>" + ids.length + "</small></button>";
+  keys.forEach(function(k){
+    var cnt = countFacet(ids, facet, k);
+    var on = SEL[facet].has(k) ? " on" : "";
+    var lbl = facet === "kit" ? (vocabObj[k] + " " + k) : vocabObj[k];
+    chips += "<button type='button' class='chip" + on + "' data-f='" + facet + "' data-v='" + k + "'>" + lbl + "<small>" + cnt + "</small></button>";
+  });
+  return "<div class='facet-sec'><div class='facet-h'><span>" + title + "</span></div><div class='chip-wrap'>" + chips + "</div></div>";
+}
+
+function matchesFacets(n){
+  var inTab = CUR_TAB === "kit" ? !!KIT[n] : !KIT[n];
+  if(!inTab) return false;
+  if(CUR_TAB === "kit" && SEL.kit.size && !SEL.kit.has(KIT[n])) return false;
+  if(SEL.form.size && !(FORM[n]||[]).some(function(f){ return SEL.form.has(f); })) return false;
+  if(SEL.purpose.size && !(PURPOSE[n]||[]).some(function(p){ return SEL.purpose.has(p); })) return false;
+  if(CUR_TECH !== "all"){
+    var tArr = MAP_TECH[n] || [];
+    if(tArr.indexOf(CUR_TECH) < 0) return false;
+  }
+  return true;
+}
+
+var toc = $("toc"), sel = $("tocSel");
+
+function renderAside(){
+  var ids = tabIds(CUR_TAB);
+  var h = "";
+  if(CUR_TAB === "kit") h += renderFacetSec("套組", "kit", VOCAB.kit, ids, true);
+  h += renderFacetSec("用途", "purpose", VOCAB.purpose, ids, false);
+  h += renderFacetSec("形狀", "form", VOCAB.form, ids, false);
+  var matched = ids.filter(matchesFacets);
+  h += "<div class='facet-h' style='margin-top:4px'><span>圖表清單</span><small>" + matched.length + " / " + ids.length + "</small></div><ul>";
+  matched.forEach(function(n){
+    var L = !!LIVE[n];
+    var cur = (n == CUR) ? " cur" : "";
+    h += "<li class='" + (L?"live":"todo") + cur + "' data-n='" + n + "' title='#" + n + " " + T[n] + "'><i>#" + n + "</i><span class='nz'>" + (NAME_ZH[n]||T[n]) + "</span>" + kitBadge(n) + "</li>";
+  });
+  h += "</ul>";
+  toc.innerHTML = h;
+}
+
+function renderMobile(){
+  var so = "<option value='tab:base'>📊 基礎圖型 (" + TAB_BASE_IDS.length + ")</option>" +
+           "<option value='tab:kit'>🎛️ 戰情組件 (" + TAB_KIT_IDS.length + ")</option>" +
+           "<optgroup label='戰情套組'>";
+  Object.keys(VOCAB.kit).forEach(function(k){
+    var cnt = countFacet(TAB_KIT_IDS, "kit", k);
+    if(cnt > 0) so += "<option value='kit:" + k + "'>🧩 " + VOCAB.kit[k] + " " + k + " (" + cnt + ")</option>";
+  });
+  so += "</optgroup>";
+  sel.innerHTML = so;
+  if(CUR_TAB === "kit" && SEL.kit.size === 1){
+    var onlyK = Array.from(SEL.kit)[0];
+    sel.value = "kit:" + onlyK;
+  } else {
+    sel.value = "tab:" + CUR_TAB;
+  }
+  var mb = $("mobileFacetsBody");
+  if(mb){
+    var ids = tabIds(CUR_TAB);
+    mb.innerHTML = (CUR_TAB === "kit" ? renderFacetSec("套組", "kit", VOCAB.kit, ids, true) : "") +
+      renderFacetSec("用途", "purpose", VOCAB.purpose, ids, false) +
+      renderFacetSec("形狀", "form", VOCAB.form, ids, false);
+  }
+}
+
+function syncHash(){
+  var parts = ["tab=" + CUR_TAB];
+  if(CUR_TAB === "kit" && SEL.kit.size) parts.push("kit=" + Array.from(SEL.kit).join(","));
+  if(SEL.form.size) parts.push("form=" + Array.from(SEL.form).join(","));
+  if(SEL.purpose.size) parts.push("purpose=" + Array.from(SEL.purpose).join(","));
+  var next = "#" + parts.join("&");
+  if(location.hash !== next){
+    try{ history.replaceState(null, "", next); }catch(e){ location.hash = next; }
+  }
+}
+
+function toggleFacet(facet, val){
+  if(!SEL[facet]) return;
+  if(val === "__all__"){ SEL[facet].clear(); }
+  else if(SEL[facet].has(val)){ SEL[facet].delete(val); }
+  else { SEL[facet].add(val); }
+  if(facet === "form" && !SEL.form.has("maps") && CUR_TECH !== "all"){
+    CUR_TECH = "all";
+    document.querySelectorAll(".sp-pill").forEach(function(b){
+      var on = b.dataset.tech === "all";
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  applyFilter();
+}
+
+function setTab(tab, keepFilters){
+  CUR_TAB = (tab === "kit") ? "kit" : "base";
+  if(!keepFilters){
+    SEL.form.clear(); SEL.purpose.clear(); SEL.kit.clear();
+    CUR_TECH = "all";
+    document.querySelectorAll(".sp-pill").forEach(function(b){
+      var on = b.dataset.tech === "all";
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  } else if(CUR_TAB === "base"){
+    SEL.kit.clear();
+  }
+  applyFilter();
+}
+
+function applyFilter(){
+  document.querySelectorAll("#tabsBar .tab-btn").forEach(function(b){
+    var on = b.dataset.tab === CUR_TAB;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-selected", on ? "true" : "false");
+  });
+
+  var showSpatial = (CUR_TAB === "base" && SEL.form.has("maps")) || CUR_TECH !== "all";
+  var sb = $("spatialBar");
+  if(sb) sb.style.display = showSpatial ? "flex" : "none";
+
+  var k = 0;
+  for(var id in cells){
+    var cell = cells[id];
+    var on = false;
+    if(cell.classList.contains("tech-cell")){
+      var showTechCards = (CUR_TAB === "base" && SEL.form.has("maps") && !SEL.purpose.size) || CUR_TECH !== "all";
+      if(showTechCards){
+        on = (CUR_TECH === "all") || ((MAP_TECH[id] || []).indexOf(CUR_TECH) >= 0);
+      }
+    } else {
+      var nid = +id;
+      on = matchesFacets(nid);
+    }
+    cell.style.display = on ? "" : "none";
+    if(on) k++;
+  }
+
+  document.querySelectorAll("#todoT tbody tr").forEach(function(tr){
+    var nid = +tr.id.replace("todo-","");
+    tr.style.display = matchesFacets(nid) ? "" : "none";
+  });
+
+  document.querySelectorAll(".cell .ctag").forEach(function(tg){
+    var f = tg.dataset.f, v = tg.dataset.v;
+    tg.classList.toggle("on", !!(SEL[f] && SEL[f].has(v)));
+  });
+
+  var tabTitle = CUR_TAB === "kit" ? "戰情組件" : "基礎圖型";
+  var activeParts = [];
+  if(CUR_TAB === "kit" && SEL.kit.size) activeParts.push("套組:" + Array.from(SEL.kit).join("/"));
+  if(SEL.form.size) activeParts.push("形狀:" + Array.from(SEL.form).map(function(x){return VOCAB.form[x]||x;}).join("/"));
+  if(SEL.purpose.size) activeParts.push("用途:" + Array.from(SEL.purpose).map(function(x){return VOCAB.purpose[x]||x;}).join("/"));
+  if(CUR_TECH !== "all") activeParts.push("技法:" + (TECH_META[CUR_TECH]?TECH_META[CUR_TECH].name:CUR_TECH));
+  var subInfo = activeParts.length ? (" · " + activeParts.join(" × ")) : "";
+  $("gH").innerHTML = tabTitle + subInfo + " <small>" + k + " 個圖表卡片 · 點縮圖放大、📌 釘子畫面</small>";
+
+  var em = $("gEmpty"); if(em) em.remove();
+  if(!k){
+    em = document.createElement("p"); em.id = "gEmpty";
+    em.style.cssText = "color:var(--dim);font-size:13px;padding:20px";
+    em.textContent = "此篩選條件交集下無圖表，請調整左側面向標籤。";
+    grid.parentNode.appendChild(em);
+  }
+
+  renderAside();
+  renderMobile();
+  syncHash();
+}
+
+function filt(gi){
+  if(gi === undefined || gi < 0){ SEL.form.clear(); SEL.purpose.clear(); SEL.kit.clear(); applyFilter(); return; }
+  applyFilter();
+}
+
+$("tabsBar").addEventListener("click", function(e){
+  var b = e.target.closest(".tab-btn");
+  if(b) setTab(b.dataset.tab);
+});
+
+/* 空間技法 Pill 點擊事件 */
+document.querySelectorAll(".sp-pill").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".sp-pill").forEach(function(b){b.classList.remove("on");b.setAttribute("aria-pressed","false");});
+    btn.classList.add("on");
+    btn.setAttribute("aria-pressed","true");
+    CUR_TECH=btn.dataset.tech;
+    applyFilter();
+  });
+});
+
+function goTodo(n){var tr=$("todo-"+n);if(!tr)return;if(tr.style.display==="none"){SEL.form.clear();SEL.purpose.clear();SEL.kit.clear();applyFilter();}tr.scrollIntoView({behavior:"smooth",block:"center"});tr.classList.remove("flash");void tr.offsetWidth;tr.classList.add("flash");}
+
+function handleFacetContainerClick(e){
+  var ch = e.target.closest(".chip");
+  if(ch){ toggleFacet(ch.dataset.f, ch.dataset.v); return true; }
+  return false;
+}
+
+toc.addEventListener("click",function(e){
+  if(handleFacetContainerClick(e)) return;
+  var li=e.target.closest("li");if(!li)return;var n=+li.dataset.n;
+  if(LIVE[n]){load(n);$("stage").scrollIntoView({behavior:"smooth",block:"start"});}else goTodo(n);
+});
+
+toc.addEventListener("change", function(e){
+  var ks = e.target.closest(".kit-sel");
+  if(!ks) return;
+  SEL.kit.clear();
+  if(ks.value) SEL.kit.add(ks.value);
+  applyFilter();
+});
+
+var mobileBody = $("mobileFacetsBody");
+if(mobileBody){
+  mobileBody.addEventListener("click", function(e){ handleFacetContainerClick(e); });
+}
+
+sel.addEventListener("change",function(){
+  var v=sel.value.split(":");
+  if(v[0]==="tab"){ setTab(v[1]); }
+  else if(v[0]==="kit"){
+    CUR_TAB = "kit"; SEL.kit.clear(); SEL.kit.add(v[1]); SEL.form.clear(); SEL.purpose.clear();
+    applyFilter();
+  }
+});
+
+
+
+/* ================= 型錄資料總表（29 型全數上線） ================= */
+
+var rows="",todoN=0;
+
+GROUPS.forEach(function(G,gi){
+
+  G[2].forEach(function(n){
+
+    if(!LIVE[n]){
+
+      todoN++;var r=TODO[n]||["","",""];
+
+      var cls=r[2]==="用台灣"?"tw":(r[2]==="兩者皆可"?"both":"intl");
+
+      rows+="<tr id='todo-"+n+"' data-cat='"+gi+"'><td class='n'>○ #"+n+"</td><td><b>"+T[n]+"</b><br><span class='dim'>"+(SH[n]||"")+"</span></td><td>"+G[0].slice(2)+"</td><td>"+r[0]+"</td><td>"+r[1]+"</td><td><span class='tag "+cls+"'>"+r[2]+"</span></td></tr>";
+
+    } else {
+
+      var isEst=(n===12||n===13||n===20),isSim=(n>=37);
+
+      var srcText=SRC[n]||"實測開放資料";
+
+      rows+="<tr id='todo-"+n+"' data-cat='"+gi+"' style='cursor:pointer' title='點擊放大至母畫面播放'><td class='n' style='color:var(--ok)'>● #"+n+"</td><td><b>"+T[n]+"</b><br><span class='dim'>"+(SH[n]||"")+"</span></td><td>"+G[0].slice(2)+"</td><td colspan='2' style='line-height:1.5'>"+srcText+"</td><td><span class='tag "+(isEst||isSim?"both":"tw")+"'>"+(isSim?"模擬資料":(isEst?"推估流向":"已實測"))+"</span></td></tr>";
+
+    }
+
+  });
+
+});
+
+var pendingTechHtml = "<h2 style='margin-top:24px'>🗺️ 空間技法儲備 · 待補技法清單 <small>未於 29 型硬塞空格之空間擴充技法</small></h2>" +
+
+  "<p class='dim' style='margin:0 0 8px'>依規範不硬塞空卡片，專列待補清單作為後續空間視覺化擴充依據：</p>" +
+
+  "<div class='tblw'><table id='pendingTechT'><thead><tr><th>技法 Key</th><th>名稱</th><th>規格說明</th><th>狀態</th></tr></thead><tbody>" +
+
+  "<tr><td colspan='4' style='text-align:center;color:var(--ok);padding:16px;font-weight:700;'>🎉 目前無待補（T1–T5 實例卡已全數實作上線）</td></tr>" +
+
+  "</tbody></table></div>";
+
+
+
+if(todoN>0){
+
+  $("todoB").innerHTML="<h2>"+LIVE_N.length+" / "+TOTAL_N+" 型已上線（待實作 "+todoN+" 型：#38、#39、#42） <small>S1 已上線 #37、#40、#41（模擬資料）；#38、#39、#42 待 S2 階段實作</small></h2>"+
+
+   "<p class='dim' style='margin:0 0 8px'>點擊已上線列（●）可直接載入母畫面播放；未上線項目（○）誠實標示為待實作。</p>"+
+
+   "<div class='tblw'><table id='todoT'><thead><tr><th>#</th><th>圖型／資料形狀</th><th>類別</th><th>台灣／模擬資料</th><th>狀態與階段說明</th><th>分類</th></tr></thead><tbody>"+rows+"</tbody></table></div>" + pendingTechHtml;
+
+} else {
+
+  $("todoB").innerHTML="<h2>"+LIVE_N.length+" / "+TOTAL_N+" 型動態圖表 · 全數上線 🎉 <small>全 "+TOTAL_N+" 型皆具備真實實測開放資料或複合示範，支援子母畫面與自適應縮圖</small></h2>"+
+
+   "<p class='dim' style='margin:0 0 8px'>點擊表格任意列可直接載入母畫面播放。左欄分類目錄篩選時，下方表格同步連動篩選。</p>"+
+
+   "<div class='tblw'><table id='todoT'><thead><tr><th>#</th><th>圖型／資料形狀</th><th>類別</th><th colspan='2'>資料來源與特徵說明</th><th>實測狀態</th></tr></thead><tbody>"+rows+"</tbody></table></div>" + pendingTechHtml;
+
+}
+
+
+
+var tb=document.querySelector('#todoT tbody');
+
+if(tb){
+
+  tb.addEventListener('click', function(ev){
+
+    var tr=ev.target.closest('tr');if(!tr)return;
+
+    var nid=+tr.id.replace('todo-','');
+
+    if(LIVE[nid]){load(nid);$("stage").scrollIntoView({behavior:"smooth",block:"start"});}
+
+  });
+
+}
+
+
+
+/* ================= 啟動 ================= */
+
+if($("mainH1"))$("mainH1").textContent="📊 動態圖表型錄"+(todoN>0?("（"+todoN+" 型未上線）"):"");
+$("legend").innerHTML="已上線 <b>"+LIVE_N.length+"</b> / "+TOTAL_N+" 型（未上線 "+todoN+" 型）　·　模組 "+C.version+"　·　含實測開放資料、Second Brain 與庫存戰情組件（模擬資料）";
+
+function hh(){document.documentElement.style.setProperty("--hh",($("hdr").offsetHeight+8)+"px");}
+
+hh();/* 檢查 URL 參數 ?tech= 與 URL hash */
+
+function applyHashState(){
+  var raw = (location.hash || "").replace(/^#/, "");
+  var loadId = null;
+  if(/^\d+$/.test(raw)){
+    var nid = +raw;
+    if(LIVE[nid]){
+      CUR_TAB = KIT[nid] ? "kit" : "base";
+      loadId = nid;
+    }
+  } else if(raw){
+    var hp = new URLSearchParams(raw);
+    if(hp.get("tab") === "kit" || hp.get("tab") === "base") CUR_TAB = hp.get("tab");
+    SEL.form.clear(); SEL.purpose.clear(); SEL.kit.clear();
+    (hp.get("form")||"").split(",").filter(Boolean).forEach(function(v){ if(VOCAB.form[v]) SEL.form.add(v); });
+    (hp.get("purpose")||"").split(",").filter(Boolean).forEach(function(v){ if(VOCAB.purpose[v]) SEL.purpose.add(v); });
+    if(CUR_TAB === "kit")(hp.get("kit")||"").split(",").filter(Boolean).forEach(function(v){ if(VOCAB.kit[v]) SEL.kit.add(v); });
+  }
+  return loadId;
+}
+
+var urlParams = new URLSearchParams(window.location.search);
+
+var techQuery = urlParams.get("tech");
+
+if(techQuery && TECH_META[techQuery]){
+
+  CUR_TECH = techQuery;
+  CUR_TAB = "base";
+
+  document.querySelectorAll(".sp-pill").forEach(function(b){
+
+    var active = b.dataset.tech === techQuery;
+
+    b.classList.toggle("on", active);
+
+    b.setAttribute("aria-pressed", active ? "true" : "false");
+
+  });
+
+  applyFilter();
+
+  if(TECH_META[techQuery].cards && TECH_META[techQuery].cards.length){
+
+    load(TECH_META[techQuery].cards[0]);
+
+  }
+
+} else {
+
+  var hashLoadId = applyHashState();
+  applyFilter();
+  var defIds = tabIds(CUR_TAB);
+  load(hashLoadId || defIds[0] || LIVE_N[0]);
+
+}
+
+window.addEventListener("hashchange", function(){
+  var nid = applyHashState();
+  applyFilter();
+  if(nid) load(nid);
+});
+
+document.addEventListener("visibilitychange",function(){PLAYING.forEach(function(c){c.pause();});document.querySelectorAll(".cell,#stage,#pip").forEach(function(el){sync(el.__ctl);});});
+
+var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){hh();document.querySelectorAll(".cell,#stage,#pip").forEach(function(el){if(el.__ctl)el.__ctl.redraw();});},120);});
+
+/* 驗收用：可見控制器數 */
+
+window.A23G={playing:function(){return PLAYING.size;},load:load,pin:pin,filt:filt,setTab:setTab,applyFilter:applyFilter};
+

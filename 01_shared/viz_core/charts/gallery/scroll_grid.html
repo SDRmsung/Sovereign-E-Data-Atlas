@@ -1,0 +1,1866 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>捲動敘事型錄</title>
+  <link rel="stylesheet" href="../../scroll/scroll_fx.css">
+  <style>
+    :root {
+      --bg: #050912;
+      --card: #0b1220;
+      --line: #1e293b;
+      --ink: #e2e8f0;
+      --dim: #64748b;
+      --acc: #38bdf8;
+      --ok: #10b981;
+      --warn: #eab308;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Microsoft JhengHei', system-ui, sans-serif;
+      line-height: 1.65;
+      overflow-x: clip;
+    }
+
+    /* 主權島頂部導覽列（沿用 chart_grid.html 樣式） */
+    .island-nav-bar {
+      background: #070d1a;
+      border-bottom: 1px solid var(--line);
+      padding: 4px 16px;
+      font-size: 12px;
+    }
+
+    .isn-row1, .isn-row2 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .isn-row2 { margin-top: 4px; }
+
+    .isn-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-size: 11.5px;
+    }
+
+    .isn-btn:hover { border-color: var(--acc); color: var(--acc); }
+    .isn-sep { color: #475569; margin: 0 4px; }
+    .isn-lbl { color: #94a3b8; font-size: 11px; font-weight: 700; }
+
+    .isn-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #0b1220;
+      color: #94a3b8;
+      border: 1px solid #1e293b;
+      text-decoration: none;
+      font-size: 11.5px;
+      transition: all .15s;
+    }
+
+    .isn-pill:hover { border-color: #e879f9; color: #e879f9; }
+    .isn-pill.cur {
+      background: #701a75;
+      border-color: #e879f9;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 0 8px rgba(232, 121, 249, .4);
+    }
+
+    .nav-dd { position: relative; display: inline-block; }
+    .nav-dd > summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 8px;
+      background: var(--card);
+      user-select: none;
+    }
+    .nav-dd > summary::-webkit-details-marker { display: none; }
+    .nav-dd > summary:hover, .nav-dd[open] > summary { border-color: var(--acc); }
+    .nav-dd.muted > summary { color: var(--dim); border-color: transparent; background: transparent; }
+    .nav-dd.muted > summary:hover, .nav-dd.muted[open] > summary { color: var(--ink); border-color: var(--line); }
+
+    .nav-dd-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 220px;
+      z-index: 60;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .55);
+    }
+
+    .nav-dd-menu a {
+      display: block;
+      font-size: 12px;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 4px 8px;
+      white-space: nowrap;
+    }
+    .nav-dd-menu a:hover { border-color: var(--acc); background: rgba(56, 189, 248, .08); }
+    .nav-dd-sep { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
+
+    /* 頁首 */
+    header.page-hdr {
+      background: rgba(5, 9, 18, .94);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    header.page-hdr h1 { font-size: 20px; margin: 0 0 4px; }
+    header.page-hdr .sub { font-size: 12.5px; color: var(--dim); margin: 0; }
+
+    .hdr-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    .btn-link {
+      font-size: 12px;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 12px;
+      background: var(--card);
+    }
+    .btn-link:hover { border-color: var(--acc); color: var(--acc); }
+    .btn-link.primary { border-color: var(--acc); color: var(--acc); font-weight: 700; }
+
+    /* 版面配置：左 Sticky 目錄 + 右側主內容（祖先不使用 overflow:hidden） */
+    .layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 20px;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px 20px 80px;
+    }
+
+    aside.toc {
+      position: sticky;
+      top: 20px;
+      align-self: start;
+      background: #070d1a;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12.5px;
+    }
+
+    .toc-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin: 0 0 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toc-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .toc-list a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: var(--dim);
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+
+    .toc-list a:hover { color: var(--ink); border-color: var(--line); }
+
+    .toc-list a[aria-current="true"] {
+      color: var(--acc);
+      background: rgba(56, 189, 248, .12);
+      border-color: rgba(56, 189, 248, .45);
+      font-weight: 700;
+    }
+
+    .toc-num {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 11px;
+      color: var(--acc);
+      min-width: 34px;
+    }
+
+    .toc-meta {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    main { min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+
+    /* 每個效果章節 */
+    section.fx-sec {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      scroll-margin-top: 20px;
+    }
+
+    .sec-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .sec-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .sec-id {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, .15);
+      color: var(--acc);
+      border: 1px solid rgba(56, 189, 248, .35);
+    }
+
+    .sec-jp { font-size: 13px; color: var(--dim); font-weight: 400; }
+
+    .btn-act {
+      background: #0f172a;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-act:hover { border-color: var(--acc); color: var(--acc); }
+
+    .demo-box {
+      background: #070d1a;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* 01/03 示範卡 */
+    .stagger-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .mini-card b { color: var(--acc); font-size: 13px; display: block; margin-bottom: 4px; }
+    .mini-card span { font-size: 12px; color: var(--dim); }
+
+    /* 08 Count-up KPI */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .kpi-val {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ok);
+      line-height: 1.2;
+    }
+    .kpi-lbl { font-size: 12px; color: var(--dim); margin-top: 4px; }
+
+    /* 09 進度 readout */
+    .prog-mirror {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .prog-track {
+      flex: 1;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      width: 100%;
+      transform-origin: left center;
+      transform: scaleX(0);
+      background: linear-gradient(90deg, var(--acc), var(--ok));
+    }
+    .prog-pct {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 13px;
+      color: var(--acc);
+      min-width: 48px;
+      text-align: right;
+    }
+
+    /* 13 SVG 描線 */
+    .svg-demo { width: 100%; height: auto; display: block; }
+
+    /* 18 Pin + Scrub */
+    .pin-outer {
+      position: relative;
+      height: 300vh;
+      border: 1px dashed rgba(56, 189, 248, .3);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, rgba(56, 189, 248, .03), rgba(16, 185, 129, .03));
+    }
+
+    .pin-stage {
+      position: sticky;
+      top: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 24px 20px;
+    }
+
+    .pin-card {
+      background: #070d1a;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+    }
+
+    .pin-hdr {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pin-step-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+    .pin-pill {
+      font-size: 11.5px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--dim);
+      background: var(--card);
+    }
+    .pin-pill.on { border-color: var(--acc); color: var(--acc); background: rgba(56, 189, 248, .15); font-weight: 700; }
+
+    .bar-list { display: flex; flex-direction: column; gap: 8px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr) 56px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+    }
+    .bar-track {
+      height: 16px;
+      background: #0f172a;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 100%;
+      transform-origin: left center;
+      background: linear-gradient(90deg, #0284c7, var(--acc));
+      will-change: transform;
+    }
+    .bar-num {
+      font-family: ui-monospace, Consolas, monospace;
+      text-align: right;
+      color: var(--ok);
+    }
+    .src-note { font-size: 11px; color: var(--dim); margin-top: 12px; }
+
+    /* 19 Scrollytelling */
+    .scrolly-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+
+    .scrolly-steps { display: flex; flex-direction: column; gap: 16px; }
+    .scrolly-steps .fx-step {
+      background: #070d1a;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      min-height: 220px;
+    }
+    .scrolly-steps .fx-step.is-active {
+      border-color: var(--acc);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, .25);
+    }
+    .scrolly-steps .fx-step h4 { margin: 0 0 8px; color: var(--acc); font-size: 15px; }
+
+    .scrolly-visual {
+      position: sticky;
+      top: 24px;
+      background: #070d1a;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sv-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--acc);
+      color: var(--acc);
+      margin-bottom: 8px;
+    }
+
+    .sv-bars { display: flex; align-items: flex-end; gap: 8px; height: 110px; margin-top: 12px; }
+    .sv-col {
+      flex: 1;
+      background: rgba(56, 189, 248, .25);
+      border: 1px solid rgba(56, 189, 248, .5);
+      border-radius: 4px 4px 0 0;
+      transition: transform .35s var(--fx-ease), background .35s;
+      transform-origin: bottom center;
+      height: 100%;
+    }
+    .sv-col.hi { background: rgba(16, 185, 129, .45); border-color: var(--ok); }
+
+    /* 參數與坑點短表 */
+    table.spec-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.spec-tbl th, table.spec-tbl td {
+      border: 1px solid var(--line);
+      padding: 8px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.spec-tbl th {
+      background: #070d1a;
+      color: var(--acc);
+      width: 140px;
+      font-weight: 700;
+    }
+    table.spec-tbl code {
+      background: #0f172a;
+      padding: 4px 4px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      color: #7dd3fc;
+    }
+
+    .badge-todo {
+      display: inline-block;
+      font-size: 11px;
+      padding: 4px 4px;
+      border-radius: 4px;
+      background: rgba(234, 179, 8, .15);
+      color: var(--warn);
+      border: 1px solid rgba(234, 179, 8, .35);
+    }
+
+    /* 05 Clip-Path 示範 */
+    .clip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .clip-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, .16), rgba(16, 185, 129, .14));
+      border: 1px solid rgba(56, 189, 248, .4);
+      border-radius: 10px;
+      padding: 16px;
+      min-height: 116px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .clip-card b { color: var(--acc); font-size: 13.5px; }
+    .clip-card span { font-size: 12px; color: var(--ink); }
+
+    /* 12 Canvas 影格序列 */
+    .seq-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--dim);
+    }
+    .seq-canvas {
+      width: 100%;
+      height: 260px;
+      display: block;
+      border-radius: 8px;
+      background: #050912;
+      border: 1px solid var(--line);
+    }
+
+    /* 14 文字填色 */
+    .text-fill-lead {
+      font-size: clamp(20px, 2.6vw, 28px);
+      font-weight: 700;
+      line-height: 1.45;
+      margin: 0 0 8px;
+    }
+
+    /* 15 背景色過渡 */
+    .bg-stage {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bg-step {
+      padding: 16px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(226, 232, 240, .18);
+      background: rgba(5, 9, 18, .35);
+      color: #e2e8f0;
+      min-height: 120px;
+    }
+    .bg-step.is-active {
+      border-color: var(--acc);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, .3);
+    }
+    .bg-step h4 { margin: 0 0 4px; font-size: 14.5px; color: #7dd3fc; }
+    .bg-step p { margin: 0; font-size: 12.5px; color: #e2e8f0; }
+
+    /* 22 橫向捲動 */
+    .hscroll-wrap {
+      border: 1px dashed rgba(56, 189, 248, .3);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      background: rgba(7, 13, 26, .6);
+    }
+    .hscroll-sticky {
+      padding: 20px 16px;
+    }
+    .hscroll-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--dim);
+    }
+    .hscroll-card {
+      flex: 0 0 280px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 160px;
+    }
+    .hscroll-card b { color: var(--acc); font-size: 14px; margin-bottom: 4px; display: block; }
+    .hscroll-card p { margin: 0; font-size: 12.5px; color: var(--dim); }
+    .hscroll-tag { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--ok); margin-top: 12px; }
+
+    /* P2 小技法並排卡片網格 */
+    .p2-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+    }
+    .p2-card {
+      background: #070d1a;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+    .p2-card-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .p2-card-title {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+    .p2-num {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 11px;
+      padding: 4px 4px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, .15);
+      color: var(--acc);
+      border: 1px solid rgba(56, 189, 248, .35);
+    }
+    .p2-jp { font-size: 11px; color: var(--dim); font-weight: 400; }
+    .p2-demo {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      height: 148px;
+      max-height: 240px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .p2-demo.is-scroll-y {
+      overflow-y: auto;
+      justify-content: flex-start;
+      display: block;
+    }
+    .p2-meta {
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: var(--dim);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .p2-meta b { color: var(--ink); font-weight: 600; }
+    .p2-meta .p2-pit b { color: var(--warn); }
+    .p2-done-line {
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, .1);
+      border: 1px solid rgba(16, 185, 129, .3);
+      color: var(--ok);
+      font-size: 12.5px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* P2 個別示範微調 */
+    .p2-dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; }
+    .p2-dir-chip {
+      background: #0f172a; border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 8px; font-size: 11.5px; text-align: center; color: var(--ink);
+    }
+    .p2-blur-badge {
+      background: linear-gradient(135deg, rgba(56,189,248,.18), rgba(16,185,129,.16));
+      border: 1px solid rgba(56,189,248,.4); border-radius: 8px;
+      padding: 12px; text-align: center;
+    }
+    .p2-tw-box {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12.5px; color: var(--ok);
+      background: #050912; border: 1px solid var(--line); border-radius: 6px;
+      padding: 8px; min-height: 54px;
+    }
+    .p2-para-stage {
+      height: 126px; overflow-y: auto; position: relative;
+      border-radius: 6px; background: #050912; padding: 8px;
+    }
+    .p2-para-bg {
+      padding: 4px 8px; border-radius: 6px; font-size: 11px; color: var(--dim);
+      background: rgba(56,189,248,.08); border: 1px dashed rgba(56,189,248,.25);
+    }
+    .p2-para-fg {
+      margin-top: 8px; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      background: #0f172a; border: 1px solid var(--acc); color: var(--acc);
+    }
+    .p2-zoom-box {
+      height: 112px; border-radius: 6px; background: #050912;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .p2-zoom-inner {
+      padding: 8px 16px; border-radius: 8px;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      color: #fff; font-weight: 700; font-size: 13px;
+    }
+    .p2-mq-item {
+      padding: 4px 8px; margin-right: 8px; border-radius: 999px;
+      background: #0f172a; border: 1px solid var(--line);
+      font-size: 11.5px; white-space: nowrap; color: var(--ink);
+    }
+    .p2-sticky-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; height: 126px; }
+    .p2-sticky-col {
+      overflow-y: auto; background: #050912; border: 1px solid var(--line);
+      border-radius: 6px; font-size: 11px;
+    }
+    .p2-sticky-col .p2-st-bar {
+      padding: 4px 4px; font-weight: 700; font-size: 11px;
+      background: #0f172a; border-bottom: 1px solid var(--line);
+    }
+    .p2-sticky-bad-wrap { overflow: hidden; }
+    .p2-stack-card {
+      padding: 8px 8px; border-radius: 6px; border: 1px solid var(--line);
+      background: #0f172a; font-size: 11.5px; margin-bottom: 28px;
+    }
+    .p2-snap-item {
+      background: #0f172a; border: 1px solid var(--line); border-radius: 6px;
+      padding: 12px 8px; text-align: center; font-size: 12px;
+    }
+    .p2-autohdr-bar {
+      background: #0f172a; border-bottom: 1px solid var(--acc);
+      padding: 4px 8px; font-size: 11.5px; font-weight: 700; color: var(--acc);
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      aside.toc { position: static; }
+      .scrolly-grid { grid-template-columns: 1fr; }
+      .scrolly-visual { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="fx-progress" id="readBar" aria-hidden="true"></div>
+
+  <nav class="island-nav-bar" id="islandNav" aria-label="主權島導覽">
+    <div class="isn-row1">
+      <a href="#vault-only" data-u class="isn-btn up">↑ 主權指揮艙 Portal</a>
+      <a href="#vault-only" data-u class="isn-btn">🏝️ 回主權島（八島總覽）</a>
+      <span class="isn-sep">|</span>
+      <span class="isn-lbl">八大階段：</span>
+      <a href="#vault-only" data-u class="isn-pill">1 定義需求</a>
+      <a href="#vault-only" data-u class="isn-pill">2 知識擷取</a>
+      <a href="#vault-only" data-u class="isn-pill">3 知識清理</a>
+      <a href="#vault-only" data-u class="isn-pill cur">4 知識表現</a>
+      <a href="#vault-only" data-u class="isn-pill">5 結構儲存</a>
+      <a href="#vault-only" data-u class="isn-pill">6 知識擴散</a>
+      <a href="#vault-only" data-u class="isn-pill">7 知識應用</a>
+      <a href="#vault-only" data-u class="isn-pill">8 評估淘汰</a>
+    </div>
+    <div class="isn-row2">
+      <details class="nav-dd" id="navDdDocs">
+        <summary>📚 文件 ▾</summary>
+        <div class="nav-dd-menu">
+          <a href="#vault-only">📘 使用手冊</a>
+          <a href="#vault-only">📚 n05 型錄</a>
+          <a href="#vault-only">📑 報表設計手冊</a>
+          <a href="#vault-only">📐 設計指引 §6</a>
+        </div>
+      </details>
+      <details class="nav-dd muted" id="navDdSys">
+        <summary>↗ 上層與相關系統 ▾</summary>
+        <div class="nav-dd-menu">
+          <a href="../../../../index.html">🗺 資料圖譜入口</a>
+          <a href="#vault-only">🧭 決策者入口</a>
+          <hr class="nav-dd-sep">
+          <a href="#vault-only">🗄️ 測試資料庫 (db_material)</a>
+        </div>
+      </details>
+    </div>
+  </nav>
+
+  <header class="page-hdr">
+    <div>
+      <h1>📜 捲動敘事型錄</h1>
+      <p class="sub">S1 + S2（12 項）：原生優先、僅動 transform / opacity / clip-path / 背景色、支援 prefers-reduced-motion 與無 JS 備援。</p>
+    </div>
+    <div class="hdr-actions">
+      <a class="btn-link primary" href="chart_grid.html">← 動態圖表型錄</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc" id="scrollNav" aria-label="捲動敘事目錄">
+      <div class="toc-title">
+        <span>24 Scrollspy 目錄</span>
+        <span id="spyStatus" style="color:var(--ok);">監聽中</span>
+      </div>
+      <ul class="toc-list">
+        <li><a href="#fx-01-03"><span class="toc-num">01/03</span><span>淡入與交錯進場</span></a></li>
+        <li><a href="#fx-05"><span class="toc-num">05</span><span>遮罩展開</span></a></li>
+        <li><a href="#fx-08"><span class="toc-num">08</span><span>數字計數動畫</span></a></li>
+        <li><a href="#fx-09"><span class="toc-num">09</span><span>閱讀進度條</span></a></li>
+        <li><a href="#fx-12"><span class="toc-num">12</span><span>影格序列</span></a></li>
+        <li><a href="#fx-13"><span class="toc-num">13</span><span>SVG 路徑描線</span></a></li>
+        <li><a href="#fx-14"><span class="toc-num">14</span><span>文字填色</span></a></li>
+        <li><a href="#fx-15"><span class="toc-num">15</span><span>背景色過渡</span></a></li>
+        <li><a href="#fx-18"><span class="toc-num">18</span><span>釘選與捲動洗刷</span></a></li>
+        <li><a href="#fx-19"><span class="toc-num">19</span><span>捲動敘事</span></a></li>
+        <li><a href="#fx-22"><span class="toc-num">22</span><span>橫向捲動</span></a></li>
+        <li><a href="#fx-24"><span class="toc-num">24</span><span>捲動目錄追蹤</span></a></li>
+        <li><a href="#fx-p2"><span class="toc-num">P2</span><span>P2 小技法</span></a></li>
+      </ul>
+      <div class="toc-meta">
+        模組：<code>scroll_fx.css</code> + <code>scroll_fx.js</code>（零外部依賴 ES Module）
+      </div>
+    </aside>
+
+    <main>
+      <!-- 01 / 03 -->
+      <section class="fx-sec" id="fx-01-03">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">01 / 03</span>
+            <span>淡入與交錯進場</span>
+            <span class="sec-jp">フェードイン・スタッガー</span>
+          </h2>
+          <button type="button" class="btn-act" id="btnReplayFade">↻ 重播進場</button>
+        </div>
+        <div class="demo-box">
+          <div class="stagger-grid fx-stagger" id="fadeDemo">
+            <div class="mini-card"><b>步驟 01 · 擷取</b><span>threshold 0.15 進入視口觸發</span></div>
+            <div class="mini-card"><b>步驟 02 · 清理</b><span>--i: 1 延遲 80ms 交錯</span></div>
+            <div class="mini-card"><b>步驟 03 · 表現</b><span>cubic-bezier(.22,1,.36,1)</span></div>
+            <div class="mini-card"><b>步驟 04 · 歸檔</b><span>觸發一次後即 unobserve</span></div>
+          </div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>IntersectionObserver</code> <code>threshold: 0.15</code>、<code>rootMargin: "0px 0px -10% 0px"</code>；緩動 <code>cubic-bezier(.22,1,.36,1)</code>；交錯 <code>calc(var(--i,0) * 80ms)</code></td></tr>
+          <tr><th>坑點</th><td>觸發一次後須 <code>unobserve</code> 避免反覆閃爍；無 JS 時不可預設 <code>opacity: 0</code>（僅在 <code>.fx-js</code> 存在時隱藏）。</td></tr>
+        </table>
+      </section>
+
+      <!-- 05 -->
+      <section class="fx-sec" id="fx-05">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">05</span>
+            <span>遮罩展開</span>
+            <span class="sec-jp">クリップパス展開</span>
+          </h2>
+          <button type="button" class="btn-act" id="btnReplayClip">↻ 重播展開</button>
+        </div>
+        <div class="demo-box">
+          <div class="clip-grid">
+            <div class="clip-card" id="clipInset">
+              <b>shape: "inset"</b>
+              <span>由左至右矩形裁切展開（<code>inset(0 100% 0 0)</code> → <code>inset(0 0 0 0)</code>），適合圖卡與標題帶。</span>
+            </div>
+            <div class="clip-card" id="clipCircle">
+              <b>shape: "circle"</b>
+              <span>從中心點半徑擴散展開（<code>circle(0%)</code> → <code>circle(75%)</code>），適合焦點 KPI 揭露。</span>
+            </div>
+            <div class="clip-card" id="clipPolygon">
+              <b>shape: "polygon"</b>
+              <span>多邊形斜角推進展開（<code>polygon(0 0, 0 0, 0 100%, 0 100%)</code> → 全幅），適合敘事轉場。</span>
+            </div>
+          </div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>clipReveal(el, { shape: "inset|circle|polygon" })</code>；進場 <code>threshold: 0.15</code> 觸發一次即 <code>unobserve</code>；緩動 <code>640ms cubic-bezier(.22,1,.36,1)</code></td></tr>
+          <tr><th>坑點</th><td><code>prefers-reduced-motion: reduce</code> 須直接展開（<code>clip-path: none</code>）；僅在 <code>.fx-js</code> 存在時初始收合，確保無 JS 時內容完整可讀。</td></tr>
+        </table>
+      </section>
+
+      <!-- 08 -->
+      <section class="fx-sec" id="fx-08">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">08</span>
+            <span>數字計數動畫</span>
+            <span class="sec-jp">カウントアップ</span>
+          </h2>
+          <button type="button" class="btn-act" id="btnReplayCount">↻ 重播計數</button>
+        </div>
+        <div class="demo-box">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-val" data-count-to="1384" data-suffix=" 站">1,384 站</div>
+              <div class="kpi-lbl">雙北觀測站點數</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-val" data-count-to="142850" data-suffix=" 次">142,850 次</div>
+              <div class="kpi-lbl">單日累積借還人次</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-val" data-count-to="98.6" data-suffix="%">98.6%</div>
+              <div class="kpi-lbl">感測器回報可用率</div>
+            </div>
+          </div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>countUp(el, {to, dur: 1200, locale: "zh-TW", suffix})</code>；<code>Intl.NumberFormat</code> 千分位；進入視口才啟動</td></tr>
+          <tr><th>坑點</th><td>HTML 內文預設寫入終值作為無 JS 備援；<code>prefers-reduced-motion: reduce</code> 直接顯示終值不跑動畫。</td></tr>
+        </table>
+      </section>
+
+      <!-- 09 -->
+      <section class="fx-sec" id="fx-09">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">09</span>
+            <span>閱讀進度條</span>
+            <span class="sec-jp">プログレスバー</span>
+          </h2>
+        </div>
+        <div class="demo-box">
+          <div class="prog-mirror">
+            <span style="font-size:12px;color:var(--dim);">本頁捲動進度（同步頁頂藍綠細條）：</span>
+            <div class="prog-track"><div class="prog-fill" id="mirrorFill"></div></div>
+            <span class="prog-pct" id="mirrorPct">0%</span>
+          </div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>readingProgress(bar)</code>；<code>requestAnimationFrame</code> 節流＋<code>{ passive: true }</code>；寫入 <code>transform: scaleX(p)</code></td></tr>
+          <tr><th>坑點</th><td>不可改動 <code>width</code> 觸發重排；僅用 <code>transform: scaleX()</code> 搭配 <code>transform-origin: left center</code>。</td></tr>
+        </table>
+      </section>
+
+      <!-- 12 -->
+      <section class="fx-sec" id="fx-12">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">12</span>
+            <span>影格序列</span>
+            <span class="sec-jp">Canvas 連番アニメーション</span>
+          </h2>
+        </div>
+        <div class="demo-box" id="seqContainer">
+          <div class="seq-hdr">
+            <span>A23_DEMO_S02 六區可借車輛 24 格程序式繪製（亦支援 <code>frames: string[]</code> 圖片預載）</span>
+            <strong id="seqMeta" style="color:var(--acc);font-family:ui-monospace,Consolas,monospace;">影格 1 / 24 · 00:00</strong>
+          </div>
+          <canvas class="seq-canvas" id="seqCanvas" aria-label="雙北六區 24 小時可借車輛 Canvas 影格序列"></canvas>
+          <div class="src-note">無 JS 備援說明：24 小時（00:00–23:00）呈現早高峰信義／大安湧入、晚高峰士林／板橋回補之雙向潮汐。</div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>canvasSequence(canvas, container, { frames|draw, count })</code>；<code>canvas.width = cssW × devicePixelRatio</code>、<code>ctx.setTransform(dpr,0,0,dpr,0,0)</code>；只在影格索引改變時重繪</td></tr>
+          <tr><th>坑點</th><td><code>resize</code> 須重算 DPR 與畫布尺寸；圖片序列模式須預載並呼叫 <code>Image.decode()</code>；<code>prefers-reduced-motion: reduce</code> 直接繪製末格。</td></tr>
+        </table>
+      </section>
+
+      <!-- 13 -->
+      <section class="fx-sec" id="fx-13">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">13</span>
+            <span>SVG 路徑描線</span>
+            <span class="sec-jp">SVGライン描画</span>
+          </h2>
+        </div>
+        <div class="demo-box" id="drawContainer">
+          <svg class="svg-demo" viewBox="0 0 720 180" role="img" aria-label="YouBike 24小時潮汐趨勢描線示意">
+            <line x1="36" y1="150" x2="690" y2="150" stroke="#1e293b" stroke-width="1" />
+            <line x1="36" y1="30" x2="36" y2="150" stroke="#1e293b" stroke-width="1" />
+            <path id="tidePath"
+              d="M36,110 C90,115 130,108 180,102 C220,96 250,42 290,34 C330,28 360,82 410,88 C460,94 500,132 545,134 C595,136 635,105 690,112"
+              fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" />
+            <text x="42" y="24" fill="#94a3b8" font-size="11">大安區 24h 可借比例趨勢（隨容器捲動描線）</text>
+            <text x="275" y="22" fill="#10b981" font-size="11">09:00 早高峰</text>
+            <text x="515" y="122" fill="#eab308" font-size="11">18:00 晚高峰吸納</text>
+          </svg>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>drawLine(svgPath, container)</code>；<code>svgPath.getTotalLength()</code> 算出總長後動態設定 <code>stroke-dasharray</code> / <code>stroke-dashoffset</code></td></tr>
+          <tr><th>坑點</th><td><code>prefers-reduced-motion: reduce</code> 須直接把 <code>stroke-dashoffset</code> 設為 <code>0</code> 顯示完整路徑。</td></tr>
+        </table>
+      </section>
+
+      <!-- 14 -->
+      <section class="fx-sec" id="fx-14">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">14</span>
+            <span>文字填色</span>
+            <span class="sec-jp">テキストフィル</span>
+          </h2>
+        </div>
+        <div class="demo-box" id="textFillBox">
+          <p class="text-fill-lead fx-text-fill" id="textFillEl">
+            雙北單車潮汐在每日 08:00 與 18:00 呈現鏡像反轉，商辦與住宅區庫存隨通勤節奏互為消長。
+          </p>
+          <div class="src-note">進度變數 <code>--p</code>（0%–100%）隨容器捲動更新，不改動任何 DOM 結構。</div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>textFill(el)</code>；<code>background-clip: text</code>＋漸層以 CSS 變數 <code>--p</code> 驅動；rAF 節流</td></tr>
+          <tr><th>坑點</th><td>嚴禁每幀拆字改 DOM 結構；無 JS 時 <code>--p</code> 預設 <code>100%</code> 保持可讀；<code>prefers-reduced-motion: reduce</code> 直接全填滿。</td></tr>
+        </table>
+      </section>
+
+      <!-- 15 -->
+      <section class="fx-sec" id="fx-15">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">15</span>
+            <span>背景色過渡</span>
+            <span class="sec-jp">背景色トランジション</span>
+          </h2>
+          <span style="font-size:12px;color:var(--acc);font-family:ui-monospace,Consolas,monospace;" id="bgCurBadge">目前背景：#0b192e</span>
+        </div>
+        <div class="demo-box bg-stage fx-bg-stage" id="bgStage">
+          <div class="bg-step is-active" data-bg="#0b192e">
+            <h4>章節 A · 清晨低谷（#0b192e 深海藍）</h4>
+            <p>06:00 前各區站點水位平穩，背景維持低飽和深海藍（與 <code>#e2e8f0</code> 文字對比度 &gt; 13:1，遠高於 4.5:1）。</p>
+          </div>
+          <div class="bg-step" data-bg="#13221a">
+            <h4>章節 B · 早高峰湧入（#13221a 森林綠）</h4>
+            <p>08:00 進入視口中線時切換森林綠，僅透過 <code>::before</code> 疊層與 <code>opacity</code> 過渡，避免整頁重繪。</p>
+          </div>
+          <div class="bg-step" data-bg="#231528">
+            <h4>章節 C · 晚高峰反轉（#231528 暮光紫）</h4>
+            <p>18:00 下班車流回補住宅區，切換暮光紫氛圍，依然保持 ≥ 4.5:1 無障礙文字對比。</p>
+          </div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>bgTransition(sections, target)</code>；<code>data-bg</code> 搭配 <code>IntersectionObserver</code> 中線觸發；<code>::before</code> 疊層 <code>opacity</code> 過渡</td></tr>
+          <tr><th>坑點</th><td>文字對比度須 ≥ 4.5:1；只動背景色或疊層透明度；<code>prefers-reduced-motion: reduce</code> 直接切換無過渡。</td></tr>
+        </table>
+      </section>
+
+      <!-- 18 -->
+      <section class="fx-sec" id="fx-18">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">18</span>
+            <span>釘選與捲動洗刷</span>
+            <span class="sec-jp">ピン留めスクラブ</span>
+          </h2>
+        </div>
+
+        <div class="pin-outer" id="pinBox">
+          <div class="pin-stage fx-pin-sticky">
+            <div class="pin-card">
+              <div class="pin-hdr">
+                <div>
+                  <strong style="font-size:15px;">🚲 YouBike 雙北六區可借車輛洗刷（3 步）</strong>
+                  <span id="pinMeta" style="font-size:12px;color:var(--acc);margin-left:8px;">08:00 早高峰 · 進度 0%</span>
+                </div>
+                <div class="pin-step-pills" id="pinPills">
+                  <span class="pin-pill on">1. 08:00 早高峰</span>
+                  <span class="pin-pill">2. 14:00 午後平峰</span>
+                  <span class="pin-pill">3. 18:00 晚高峰</span>
+                </div>
+              </div>
+              <div class="bar-list" id="pinBars">
+                <div class="bar-row"><span>大安區</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(0.75)"></div></div><span class="bar-num">186</span></div>
+                <div class="bar-row"><span>信義區</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(0.83)"></div></div><span class="bar-num">206</span></div>
+                <div class="bar-row"><span>內湖區</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(0.57)"></div></div><span class="bar-num">141</span></div>
+                <div class="bar-row"><span>中正區</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(0.50)"></div></div><span class="bar-num">125</span></div>
+                <div class="bar-row"><span>板橋區</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(0.43)"></div></div><span class="bar-num">107</span></div>
+                <div class="bar-row"><span>士林區</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(0.08)"></div></div><span class="bar-num">19</span></div>
+              </div>
+              <div class="src-note">資料來源：<code>s02_youbike_tide/feed/tide_timeline.json</code>（<code>A23_DEMO_S02.bar</code>，含靜態備援 6 區）</div>
+            </div>
+          </div>
+        </div>
+
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>pinScrub(container, 3, onProgress)</code>；外層高度 = <code>100vh × steps</code>；內層 <code>position: sticky; top: 0</code>；<code>resize</code> 重算高度</td></tr>
+          <tr><th>坑點</th><td><strong>sticky 失效最大元凶</strong>：祖先元素有 <code>overflow: hidden</code> 或 <code>overflow: auto</code>（本頁改用 <code>overflow-x: clip</code>）。</td></tr>
+        </table>
+      </section>
+
+      <!-- 19 -->
+      <section class="fx-sec" id="fx-19">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">19</span>
+            <span>捲動敘事</span>
+            <span class="sec-jp">スクローリーテリング</span>
+          </h2>
+        </div>
+
+        <div class="scrolly-grid">
+          <div class="scrolly-steps" id="scrollySteps">
+            <article class="fx-step is-active" data-step="0">
+              <h4>階段 1 · 早晨通勤吸納（08:00）</h4>
+              <p>住宅區（士林、中和）車輛快速流出，信義與大安核心商辦區可借車輛衝高，呈現單向潮汐湧入。</p>
+            </article>
+            <article class="fx-step" data-step="1">
+              <h4>階段 2 · 商辦飽和預警（10:00）</h4>
+              <p>商辦站點車柱接近滿位，調度車須提前介入空柱釋放，否則外圍通勤族將面臨無法還車。</p>
+            </article>
+            <article class="fx-step" data-step="2">
+              <h4>階段 3 · 傍晚潮汐反轉（18:00）</h4>
+              <p>下班車流反轉，信義區可用車驟減至谷底，士林與板橋住宅站點則迅速回補至 90% 以上。</p>
+            </article>
+            <article class="fx-step" data-step="3">
+              <h4>階段 4 · 夜間再平衡（23:00）</h4>
+              <p>深夜跨區流動趨緩，各行政區回穩至 30%–46% 基準水位，完成單日潮汐閉環。</p>
+            </article>
+          </div>
+
+          <div class="scrolly-visual" id="scrollyVisual">
+            <div>
+              <span class="sv-badge" id="svBadge">階段 1 / 4</span>
+              <h3 id="svTitle" style="margin:0 0 6px;font-size:17px;">早晨通勤吸納（08:00）</h3>
+              <p id="svDesc" style="margin:0;font-size:13px;color:var(--dim);">信義與大安商辦區快速累積可用車輛，住宅外圍呈淨流出。</p>
+            </div>
+            <div class="sv-bars" id="svBars">
+              <div class="sv-col hi" style="transform:scaleY(0.88)"></div>
+              <div class="sv-col hi" style="transform:scaleY(0.95)"></div>
+              <div class="sv-col" style="transform:scaleY(0.55)"></div>
+              <div class="sv-col" style="transform:scaleY(0.22)"></div>
+            </div>
+          </div>
+        </div>
+
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>scrollyStep(stepsEls, onEnter)</code>；<code>IntersectionObserver</code> <code>rootMargin: "-45% 0px -45% 0px"</code> 偵測進入視口中線</td></tr>
+          <tr><th>坑點</th><td>窄螢幕（<code>&lt; 900px</code>）須退回單欄流式排版，避免左右兩欄擠壓文字可讀性。</td></tr>
+        </table>
+      </section>
+
+      <!-- 22 -->
+      <section class="fx-sec" id="fx-22">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">22</span>
+            <span>橫向捲動</span>
+            <span class="sec-jp">横スクロール</span>
+          </h2>
+        </div>
+        <div class="hscroll-wrap fx-hscroll-wrap" id="hscrollWrap">
+          <div class="hscroll-sticky fx-hscroll-sticky">
+            <div class="hscroll-hdr">
+              <span>垂直捲動映射到軌道 <code>translate3d(x, 0, 0)</code>（窄視窗 &lt; 720px 自動降級原生 <code>overflow-x: auto</code> + <code>scroll-snap</code>）</span>
+              <strong id="hscrollPct" style="color:var(--acc);font-family:ui-monospace,Consolas,monospace;">0%</strong>
+            </div>
+            <div class="fx-hscroll-track" id="hscrollTrack">
+              <article class="hscroll-card">
+                <div><b>01 · 06:00 清晨靜態</b><p>雙北各區水位平均分佈於 40%–51%，住宅與商辦站點尚無明顯供需落差。</p></div>
+                <span class="hscroll-tag">FRAME 06:00</span>
+              </article>
+              <article class="hscroll-card">
+                <div><b>02 · 08:00 通勤湧入</b><p>士林、中和車輛大量流出，信義區可用率衝上 97.6% 接近滿柱。</p></div>
+                <span class="hscroll-tag">FRAME 08:00</span>
+              </article>
+              <article class="hscroll-card">
+                <div><b>03 · 14:00 午後平峰</b><p>中正與大安區維持高周轉，外圍住宅區逐步補回至 54%–60%。</p></div>
+                <span class="hscroll-tag">FRAME 14:00</span>
+              </article>
+              <article class="hscroll-card">
+                <div><b>04 · 18:00 晚高峰反轉</b><p>商辦區可借車跌破 15%，士林、新店、三重住宅區回補至 93% 以上。</p></div>
+                <span class="hscroll-tag">FRAME 18:00</span>
+              </article>
+              <article class="hscroll-card">
+                <div><b>05 · 23:00 夜間再平衡</b><p>跨區流動收斂，全網回歸 26%–46% 穩態水準，完成單日潮汐循環。</p></div>
+                <span class="hscroll-tag">FRAME 23:00</span>
+              </article>
+            </div>
+          </div>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>horizontalScroll(wrap, track)</code>；外層高度 = <code>track.scrollWidth − 視口寬 + 視口高</code>；內層 <code>position: sticky; top: 0</code>；<code>resize</code> 重算</td></tr>
+          <tr><th>坑點</th><td>祖先元素不可有 <code>overflow: hidden</code>（改用 <code>overflow: clip</code>）；<code>&lt; 720px</code> 窄螢幕降級為原生橫向 <code>overflow-x: auto</code>＋<code>scroll-snap</code>。</td></tr>
+        </table>
+      </section>
+
+      <!-- 24 -->
+      <section class="fx-sec" id="fx-24">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">24</span>
+            <span>捲動目錄追蹤</span>
+            <span class="sec-jp">スクロールスパイ</span>
+          </h2>
+        </div>
+        <div class="demo-box">
+          <p style="margin:0;font-size:13px;">
+            左側 Sticky 目錄即本頁 <code>scrollspy(nav, sections)</code> 即時示範：目前高亮節點為
+            <strong id="spyCurrent" style="color:var(--acc);">#fx-24</strong>（使用 <code>aria-current="true"</code> 雙重標記語意與樣式）。
+          </p>
+        </div>
+        <table class="spec-tbl">
+          <tr><th>關鍵參數</th><td><code>scrollspy(nav, sections)</code>；設定 <code>aria-current="true"</code> 與 <code>.is-active</code></td></tr>
+          <tr><th>坑點</th><td>多個章節同時相交時，應依 DOM 順序取第一個可見章節，避免快速捲動時高亮跳亂。</td></tr>
+        </table>
+      </section>
+
+      <!-- S3: P2 小技法（11 項並排小示範） -->
+      <section class="fx-sec" id="fx-p2">
+        <div class="sec-head">
+          <h2 class="sec-title">
+            <span class="sec-id">P2</span>
+            <span>P2 小技法</span>
+            <span class="sec-jp">マイクロインタラクション 11 選</span>
+          </h2>
+          <span style="font-size:12px;color:var(--dim);">並排小示範 · 卡內高度 ≤ 240px</span>
+        </div>
+
+        <div class="p2-grid">
+          <!-- 02 四向滑入 -->
+          <article class="p2-card" id="p2-02">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">02</span>
+                <span>四向滑入</span>
+                <span class="p2-jp">スライドイン</span>
+              </div>
+              <button type="button" class="btn-act" id="btnP2Slide">↻ 重播</button>
+            </div>
+            <div class="p2-demo">
+              <div class="p2-dir-grid" id="p2SlideDemo">
+                <div class="p2-dir-chip fx-fade" data-from="left">← left</div>
+                <div class="p2-dir-chip fx-fade" data-from="right">right →</div>
+                <div class="p2-dir-chip fx-fade" data-from="up">↑ up</div>
+                <div class="p2-dir-chip fx-fade" data-from="down">↓ down</div>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b><code>data-from="left|right|up|down"</code> 沿用 <code>observeReveal</code></div>
+              <div class="p2-pit"><b>坑點：</b>水平位移須搭配外層 <code>overflow-x: clip</code> 防橫向捲軸</div>
+            </div>
+          </article>
+
+          <!-- 04 逐行遮罩 -->
+          <article class="p2-card" id="p2-04">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">04</span>
+                <span>逐行遮罩</span>
+                <span class="p2-jp">テキストリビール</span>
+              </div>
+              <button type="button" class="btn-act" id="btnP2Text">↻ 重播</button>
+            </div>
+            <div class="p2-demo">
+              <div class="fx-text-reveal" id="p2TextDemo" style="font-size:13px;font-weight:700;">
+                <span class="fx-line"><span>第 1 行：早高峰借還潮汐</span></span>
+                <span class="fx-line"><span>第 2 行：行延遲 80ms 依序升起</span></span>
+                <span class="fx-line"><span>第 3 行：overflow: hidden 裁切</span></span>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b><code>overflow: hidden</code> ＋ <code>translateY(100% → 0)</code>，延遲 80ms</div>
+              <div class="p2-pit"><b>坑點：</b>換行字數不可固定寫死，每行須為獨立 <code>.fx-line</code></div>
+            </div>
+          </article>
+
+          <!-- 06 模糊淡入 -->
+          <article class="p2-card" id="p2-06">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">06</span>
+                <span>模糊淡入</span>
+                <span class="p2-jp">ブラーイン</span>
+              </div>
+              <button type="button" class="btn-act" id="btnP2Blur">↻ 重播</button>
+            </div>
+            <div class="p2-demo">
+              <div class="p2-blur-badge fx-blur" id="p2BlurDemo">
+                <div style="font-size:15px;font-weight:700;color:var(--acc);">1,428 站點即時同步</div>
+                <div style="font-size:11.5px;color:var(--dim);margin-top:4px;">filter: blur(12px → 0) + opacity</div>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b><code>filter: blur(12px → 0)</code> ＋ <code>opacity</code> 過渡</div>
+              <div class="p2-pit"><b>坑點：</b>blur 區域大時極耗 GPU 效能，只用在小區塊</div>
+            </div>
+          </article>
+
+          <!-- 07 打字機 -->
+          <article class="p2-card" id="p2-07">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">07</span>
+                <span>打字機</span>
+                <span class="p2-jp">タイプライター</span>
+              </div>
+              <button type="button" class="btn-act" id="btnP2Tw">↻ 重播</button>
+            </div>
+            <div class="p2-demo">
+              <div class="p2-tw-box">
+                <span id="p2TwDemo" data-text="$ a23-atlas --sync --stations=1428 ✓"></span>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b>JS 逐字 ＋ 游標閃爍；<code>aria-label</code> 放完整文字</div>
+              <div class="p2-pit"><b>坑點：</b>未設 <code>aria-label</code> 會讓螢幕閱讀器逐字唸出</div>
+            </div>
+          </article>
+
+          <!-- 10 視差捲動 -->
+          <article class="p2-card" id="p2-10">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">10</span>
+                <span>視差捲動</span>
+                <span class="p2-jp">パララックス</span>
+              </div>
+            </div>
+            <div class="p2-demo">
+              <div class="p2-para-stage" id="p2ParaScroller">
+                <div style="height:260px;padding-top:16px;">
+                  <div class="p2-para-bg fx-parallax-layer" data-speed="18">背景層（慢速 18px）· 捲動此框測試</div>
+                  <div class="p2-para-fg fx-parallax-layer" data-speed="52">前景層（快速 52px）· translate3d</div>
+                </div>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b>兩層不同速率 <code>translate3d</code>（rAF 節流 / <code>@supports</code>）</div>
+              <div class="p2-pit"><b>坑點：</b><code>scroll()</code> 時間軸需附 JS 備援，reduced-motion 停用</div>
+            </div>
+          </article>
+
+          <!-- 11 捲動縮放 -->
+          <article class="p2-card" id="p2-11">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">11</span>
+                <span>捲動縮放</span>
+                <span class="p2-jp">スクロールズーム</span>
+              </div>
+            </div>
+            <div class="p2-demo">
+              <div class="p2-zoom-box fx-zoom-wrap" id="p2ZoomWrap">
+                <div class="p2-zoom-inner fx-zoom-target" id="p2ZoomTarget">scale 1.0 → 1.2</div>
+              </div>
+              <input type="range" id="p2ZoomRange" min="0" max="100" value="0" aria-label="模擬捲動縮放進度" style="margin-top:8px;width:100%;">
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b><code>scale</code> 隨進度 1→1.2，<code>transform-origin: center</code></div>
+              <div class="p2-pit"><b>坑點：</b>外層須加 <code>overflow: clip</code> 防放大出界破版</div>
+            </div>
+          </article>
+
+          <!-- 16 無縫跑馬燈 -->
+          <article class="p2-card" id="p2-16">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">16</span>
+                <span>無縫跑馬燈</span>
+                <span class="p2-jp">マーキー</span>
+              </div>
+            </div>
+            <div class="p2-demo">
+              <div class="fx-marquee" id="p2Marquee">
+                <div class="fx-marquee-track">
+                  <span class="p2-mq-item">大安區 94%</span>
+                  <span class="p2-mq-item">信義區 88%</span>
+                  <span class="p2-mq-item">內湖區 72%</span>
+                  <span class="p2-mq-item">板橋區 65%</span>
+                </div>
+              </div>
+              <div style="font-size:11px;color:var(--dim);margin-top:8px;text-align:center;">滑鼠懸停暫停 · 捲動頁面加速</div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b>內容複製一份 <code>0 → -50%</code>；rAF 依 <code>scrollY</code> 差調速</div>
+              <div class="p2-pit"><b>坑點：</b>reduced-motion 須停止並改 <code>overflow-x: auto</code> 手動捲</div>
+            </div>
+          </article>
+
+          <!-- 17 黏性定位與失效對照 -->
+          <article class="p2-card" id="p2-17">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">17</span>
+                <span>黏性定位對照</span>
+                <span class="p2-jp">スティッキー</span>
+              </div>
+            </div>
+            <div class="p2-demo">
+              <div class="p2-sticky-split">
+                <div class="p2-sticky-col">
+                  <div class="p2-st-bar fx-sticky-hdr" style="color:var(--ok);">✓ 正常（無 hidden）</div>
+                  <div style="padding:6px;height:210px;color:var(--dim);">向下捲動測試<br>標題固定頂部<br>line 3<br>line 4<br>line 5<br>line 6</div>
+                </div>
+                <div class="p2-sticky-col">
+                  <div class="p2-sticky-bad-wrap">
+                    <div class="p2-st-bar fx-sticky-hdr" style="color:#f87171;">✕ 失效（祖先 overflow:hidden）</div>
+                    <div style="padding:6px;height:210px;color:var(--dim);">祖先 overflow: hidden<br>導致 sticky 被裁切失效<br>line 3<br>line 4<br>line 5<br>line 6</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b><code>position: sticky; top: 0</code> 釘選標題</div>
+              <div class="p2-pit"><b>坑點：</b>祖先設 <code>overflow: hidden</code> 會失效，應改 <code>overflow: clip</code></div>
+            </div>
+          </article>
+
+          <!-- 20 卡片堆疊 -->
+          <article class="p2-card" id="p2-20">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">20</span>
+                <span>卡片堆疊</span>
+                <span class="p2-jp">カードスタック</span>
+              </div>
+            </div>
+            <div class="p2-demo is-scroll-y">
+              <div style="padding-bottom:80px;">
+                <div class="p2-stack-card fx-stack-card" style="top:4px;transform:scale(0.94);z-index:1;">卡片 01 · 早高峰調度</div>
+                <div class="p2-stack-card fx-stack-card" style="top:14px;transform:scale(0.97);z-index:2;border-color:rgba(56,189,248,.4);">卡片 02 · 商辦飽和預警</div>
+                <div class="p2-stack-card fx-stack-card" style="top:24px;transform:scale(1);z-index:3;border-color:var(--acc);margin-bottom:0;">卡片 03 · 夜間再平衡</div>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b>3 張卡 <code>sticky top</code> 錯開，後方卡 <code>scale</code> 縮小</div>
+              <div class="p2-pit"><b>坑點：</b>父容器不可設 <code>overflow: hidden</code>，且須預留底部捲動高度</div>
+            </div>
+          </article>
+
+          <!-- 21 捲動吸附 -->
+          <article class="p2-card" id="p2-21">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">21</span>
+                <span>捲動吸附</span>
+                <span class="p2-jp">スクロールスナップ</span>
+              </div>
+            </div>
+            <div class="p2-demo">
+              <div class="fx-snap-x" tabindex="0" aria-label="橫向吸附三格示範">
+                <div class="p2-snap-item"><b style="color:var(--acc);">格 1</b><div style="font-size:11px;color:var(--dim);">橫向捲動吸附</div></div>
+                <div class="p2-snap-item"><b style="color:var(--ok);">格 2</b><div style="font-size:11px;color:var(--dim);">scroll-snap-align: center</div></div>
+                <div class="p2-snap-item"><b style="color:var(--warn);">格 3</b><div style="font-size:11px;color:var(--dim);">純 CSS 零依賴</div></div>
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b><code>scroll-snap-type: x mandatory</code> 強制對齊格點</div>
+              <div class="p2-pit"><b>坑點：</b>與 JS 平滑捲動函式庫（如 Lenis）容易互相搶控制權</div>
+            </div>
+          </article>
+
+          <!-- 23 自動隱藏導覽列 -->
+          <article class="p2-card" id="p2-23">
+            <div class="p2-card-hdr">
+              <div class="p2-card-title">
+                <span class="p2-num">23</span>
+                <span>自動隱藏導覽列</span>
+                <span class="p2-jp">隠れるヘッダー</span>
+              </div>
+            </div>
+            <div class="p2-demo is-scroll-y" id="p2AutoHdrScroller" style="padding:0;">
+              <div class="p2-autohdr-bar fx-auto-header" id="p2AutoHdrBar">假導覽列 · 下捲收起 / 上捲出現</div>
+              <div style="padding:10px;height:240px;font-size:11.5px;color:var(--dim);">
+                向下捲動超過 8px 閾值即自動收起<br><br>
+                向上回捲立即重新滑入顯示<br><br>
+                僅使用 transform: translate3d 零重排
+              </div>
+            </div>
+            <div class="p2-meta">
+              <div><b>重點：</b>容器內假導覽列，閾值 8px，以 <code>transform</code> 切換</div>
+              <div class="p2-pit"><b>坑點：</b>未設閾值會在觸控板微震時頻繁閃爍</div>
+            </div>
+          </article>
+        </div>
+
+        <div class="p2-done-line">24 項已全數收錄</div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../demo/data_s02.js"></script>
+  <script>
+    /* 雙協議連結處理 */
+    if (location.protocol === "file:") {
+      var idx = location.href.indexOf("/35-Areas/");
+      if (idx !== -1) {
+        var vaultRoot = location.href.slice(0, idx);
+        document.querySelectorAll('a[href^="/"]').forEach(function (a) {
+          a.href = vaultRoot + a.getAttribute("href");
+        });
+      }
+    }
+    if (/^https?:$/.test(location.protocol)) {
+      document.querySelectorAll("a[data-u]").forEach(function (a) {
+        var u = a.getAttribute("href");
+        if (u.indexOf("../../../../../../") === 0) {
+          a.setAttribute("href", u.replace(/^(\.\.\/)+/, "/"));
+        }
+      });
+    }
+    /* 下拉選單互斥與外點關閉 */
+    document.querySelectorAll(".nav-dd").forEach(function (dd) {
+      dd.addEventListener("toggle", function () {
+        if (dd.open) document.querySelectorAll(".nav-dd").forEach(function (o) { if (o !== dd) o.removeAttribute("open"); });
+      });
+    });
+    document.addEventListener("click", function (e) {
+      document.querySelectorAll(".nav-dd[open]").forEach(function (dd) { if (!dd.contains(e.target)) dd.removeAttribute("open"); });
+    });
+  </script>
+
+  <script type="module">
+    import {
+      observeReveal,
+      countUp,
+      readingProgress,
+      scrollspy,
+      drawLine,
+      pinScrub,
+      scrollyStep,
+      canvasSequence,
+      textFill,
+      bgTransition,
+      horizontalScroll,
+      clipReveal,
+      observeP2Reveals,
+      typewriter,
+      parallax,
+      scrollZoom,
+      marquee,
+      autoHideHeader,
+      isReducedMotion
+    } from "../../scroll/scroll_fx.js";
+
+    // 01 / 03
+    observeReveal(document);
+    const fadeDemo = document.getElementById("fadeDemo");
+    document.getElementById("btnReplayFade").addEventListener("click", () => {
+      if (isReducedMotion()) return;
+      const items = Array.from(fadeDemo.children);
+      items.forEach((el) => el.classList.remove("is-in"));
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => items.forEach((el) => el.classList.add("is-in")));
+      });
+    });
+
+    // 08 Count-up
+    const counters = Array.from(document.querySelectorAll("[data-count-to]")).map((el) =>
+      countUp(el, {
+        to: Number(el.dataset.countTo),
+        dur: 1200,
+        locale: "zh-TW",
+        suffix: el.dataset.suffix || ""
+      })
+    );
+    document.getElementById("btnReplayCount").addEventListener("click", () => {
+      counters.forEach((c) => c.replay());
+    });
+
+    // 09 Reading Progress
+    const readBar = document.getElementById("readBar");
+    const mirrorFill = document.getElementById("mirrorFill");
+    const mirrorPct = document.getElementById("mirrorPct");
+    readingProgress(readBar, (p) => {
+      if (mirrorFill) mirrorFill.style.transform = `scaleX(${p.toFixed(4)})`;
+      if (mirrorPct) mirrorPct.textContent = `${Math.round(p * 100)}%`;
+    });
+
+    // 13 SVG Draw Line
+    drawLine(document.getElementById("tidePath"), document.getElementById("drawContainer"));
+
+    // 18 Pin + Scrub (using A23_DEMO_S02.bar with embedded 6-district fallback)
+    const DISTRICTS = ["大安區", "信義區", "內湖區", "中正區", "板橋區", "士林區"];
+    const FALLBACK_FRAMES = [
+      { label: "08:00", title: "早高峰", values: { 大安區: 186, 信義區: 206, 內湖區: 141, 中正區: 125, 板橋區: 107, 士林區: 19 } },
+      { label: "14:00", title: "午後平峰", values: { 大安區: 217, 信義區: 133, 內湖區: 116, 中正區: 166, 板橋區: 135, 士林區: 85 } },
+      { label: "18:00", title: "晚高峰", values: { 大安區: 80, 信義區: 30, 內湖區: 68, 中正區: 58, 板橋區: 144, 士林區: 150 } }
+    ];
+    const s02 = window.A23_DEMO_S02 && Array.isArray(window.A23_DEMO_S02.bar) ? window.A23_DEMO_S02.bar : null;
+    const stepFrames = s02
+      ? [
+          { ...s02[8], title: "早高峰" },
+          { ...s02[14], title: "午後平峰" },
+          { ...s02[18], title: "晚高峰" }
+        ]
+      : FALLBACK_FRAMES;
+
+    const pinRows = Array.from(document.querySelectorAll("#pinBars .bar-row"));
+    const pinPills = Array.from(document.querySelectorAll("#pinPills .pin-pill"));
+    const pinMeta = document.getElementById("pinMeta");
+
+    pinScrub(document.getElementById("pinBox"), 3, (p, stepIdx) => {
+      const scaled = p * 2;
+      const i0 = Math.min(1, Math.floor(scaled));
+      const i1 = Math.min(2, i0 + 1);
+      const frac = scaled - i0;
+      const f0 = stepFrames[i0].values;
+      const f1 = stepFrames[i1].values;
+
+      pinRows.forEach((row, idx) => {
+        const d = DISTRICTS[idx];
+        const v = Math.round(f0[d] + (f1[d] - f0[d]) * frac);
+        const ratio = Math.min(1, v / 250);
+        row.querySelector(".bar-fill").style.transform = `scaleX(${ratio.toFixed(3)})`;
+        row.querySelector(".bar-num").textContent = String(v);
+      });
+
+      pinPills.forEach((pill, i) => pill.classList.toggle("on", i === stepIdx));
+      if (pinMeta) {
+        const cur = stepFrames[stepIdx];
+        pinMeta.textContent = `${cur.label} ${cur.title} · 進度 ${Math.round(p * 100)}%`;
+      }
+    });
+
+    // 19 Scrollytelling
+    const SV_STATES = [
+      {
+        badge: "階段 1 / 4",
+        title: "早晨通勤吸納（08:00）",
+        desc: "信義與大安商辦區快速累積可用車輛，住宅外圍呈淨流出。",
+        bars: [0.88, 0.95, 0.55, 0.22],
+        hi: [0, 1]
+      },
+      {
+        badge: "階段 2 / 4",
+        title: "商辦飽和預警（10:00）",
+        desc: "大安與信義站點逼近滿柱，需提前調度釋放還車空位。",
+        bars: [0.96, 0.89, 0.72, 0.34],
+        hi: [0]
+      },
+      {
+        badge: "階段 3 / 4",
+        title: "傍晚潮汐反轉（18:00）",
+        desc: "下班車流湧回住宅區，士林與板橋比例衝高，信義進入低谷。",
+        bars: [0.35, 0.16, 0.65, 0.94],
+        hi: [2, 3]
+      },
+      {
+        badge: "階段 4 / 4",
+        title: "夜間再平衡（23:00）",
+        desc: "跨區借還趨緩，各區水位收斂至 30%–46% 基準區間。",
+        bars: [0.42, 0.46, 0.38, 0.34],
+        hi: [0, 1, 2, 3]
+      }
+    ];
+    const svBadge = document.getElementById("svBadge");
+    const svTitle = document.getElementById("svTitle");
+    const svDesc = document.getElementById("svDesc");
+    const svCols = Array.from(document.querySelectorAll("#svBars .sv-col"));
+
+    scrollyStep(document.querySelectorAll("#scrollySteps .fx-step"), (_el, idx) => {
+      const st = SV_STATES[idx] || SV_STATES[0];
+      svBadge.textContent = st.badge;
+      svTitle.textContent = st.title;
+      svDesc.textContent = st.desc;
+      svCols.forEach((col, i) => {
+        col.style.transform = `scaleY(${st.bars[i]})`;
+        col.classList.toggle("hi", st.hi.includes(i));
+      });
+    });
+
+    // 05 Clip-Path Reveal
+    const clipDemos = [
+      clipReveal(document.getElementById("clipInset"), { shape: "inset" }),
+      clipReveal(document.getElementById("clipCircle"), { shape: "circle" }),
+      clipReveal(document.getElementById("clipPolygon"), { shape: "polygon" })
+    ];
+    document.getElementById("btnReplayClip").addEventListener("click", () => {
+      clipDemos.forEach((c) => c.replay());
+    });
+
+    // 12 Canvas Sequence (24 frames of A23_DEMO_S02 6 districts)
+    const seqMeta = document.getElementById("seqMeta");
+    const seqFrames = s02 && s02.length >= 24
+      ? s02.slice(0, 24)
+      : Array.from({ length: 24 }, (_, h) => ({
+          label: `${String(h).padStart(2, "0")}:00`,
+          values: {
+            大安區: Math.round(110 + 120 * Math.sin((h / 23) * Math.PI)),
+            信義區: Math.round(40 + 170 * Math.max(0, Math.sin(((h - 3) / 14) * Math.PI))),
+            內湖區: Math.round(70 + 75 * Math.sin((h / 23) * Math.PI)),
+            中正區: Math.round(80 + 95 * Math.sin((h / 23) * Math.PI)),
+            板橋區: Math.round(90 + 70 * Math.sin(((h - 6) / 17) * Math.PI)),
+            士林區: Math.round(20 + 130 * Math.max(0, Math.sin(((h - 11) / 12) * Math.PI)))
+          }
+        }));
+
+    canvasSequence(document.getElementById("seqCanvas"), document.getElementById("seqContainer"), {
+      count: seqFrames.length,
+      draw(ctx, i, n, cssW, cssH) {
+        const frame = seqFrames[i] || seqFrames[0];
+        const padL = 78;
+        const padR = 48;
+        const padT = 36;
+        const padB = 18;
+        const plotW = Math.max(40, cssW - padL - padR);
+        const rowH = (cssH - padT - padB) / DISTRICTS.length;
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "600 12px 'Microsoft JhengHei', system-ui, sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`時間軸：${frame.label}（第 ${i + 1} / ${n} 格）`, 14, 18);
+
+        DISTRICTS.forEach((d, idx) => {
+          const val = Number(frame.values[d] ?? 0);
+          const y = padT + idx * rowH + rowH * 0.2;
+          const h = Math.max(10, rowH * 0.56);
+          const w = Math.max(2, (Math.min(250, val) / 250) * plotW);
+
+          ctx.fillStyle = "#e2e8f0";
+          ctx.textAlign = "right";
+          ctx.fillText(d, padL - 10, y + h / 2);
+
+          ctx.fillStyle = "#0f172a";
+          ctx.fillRect(padL, y, plotW, h);
+
+          const grad = ctx.createLinearGradient(padL, y, padL + w, y);
+          grad.addColorStop(0, "#0284c7");
+          grad.addColorStop(1, val >= 160 ? "#10b981" : "#38bdf8");
+          ctx.fillStyle = grad;
+          ctx.fillRect(padL, y, w, h);
+
+          ctx.fillStyle = "#10b981";
+          ctx.textAlign = "left";
+          ctx.font = "700 12px ui-monospace, Consolas, monospace";
+          ctx.fillText(String(val), padL + w + 8, y + h / 2);
+          ctx.font = "600 12px 'Microsoft JhengHei', system-ui, sans-serif";
+        });
+
+        if (seqMeta) seqMeta.textContent = `影格 ${i + 1} / ${n} · ${frame.label}`;
+      }
+    });
+
+    // 14 Text Fill
+    textFill(document.getElementById("textFillEl"), {
+      container: document.getElementById("textFillBox")
+    });
+
+    // 15 Background Color Transition
+    const bgCurBadge = document.getElementById("bgCurBadge");
+    bgTransition(
+      document.querySelectorAll("#bgStage .bg-step"),
+      document.getElementById("bgStage"),
+      {
+        onChange(bg) {
+          if (bgCurBadge) bgCurBadge.textContent = `目前背景：${bg}`;
+        }
+      }
+    );
+
+    // 22 Horizontal Scroll
+    const hscrollPct = document.getElementById("hscrollPct");
+    horizontalScroll(
+      document.getElementById("hscrollWrap"),
+      document.getElementById("hscrollTrack"),
+      {
+        onProgress(p) {
+          if (hscrollPct) hscrollPct.textContent = `${Math.round(p * 100)}%`;
+        }
+      }
+    );
+
+    // S3 P2 小技法
+    observeP2Reveals(document);
+
+    const replayClass = (el) => {
+      if (!el || isReducedMotion()) return;
+      el.classList.remove("is-in");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => el.classList.add("is-in"));
+      });
+    };
+
+    const p2SlideDemo = document.getElementById("p2SlideDemo");
+    document.getElementById("btnP2Slide")?.addEventListener("click", () => {
+      if (isReducedMotion() || !p2SlideDemo) return;
+      Array.from(p2SlideDemo.children).forEach((el) => replayClass(el));
+    });
+
+    const p2TextDemo = document.getElementById("p2TextDemo");
+    document.getElementById("btnP2Text")?.addEventListener("click", () => replayClass(p2TextDemo));
+
+    const p2BlurDemo = document.getElementById("p2BlurDemo");
+    document.getElementById("btnP2Blur")?.addEventListener("click", () => replayClass(p2BlurDemo));
+
+    const twCtl = typewriter(document.getElementById("p2TwDemo"), { speed: 42 });
+    document.getElementById("btnP2Tw")?.addEventListener("click", () => twCtl.replay());
+
+    const p2ParaScroller = document.getElementById("p2ParaScroller");
+    parallax(document.querySelectorAll("#p2ParaScroller .fx-parallax-layer"), {
+      scroller: p2ParaScroller
+    });
+
+    const p2ZoomCtl = scrollZoom(document.getElementById("p2ZoomTarget"), {
+      min: 1,
+      max: 1.2,
+      container: document.getElementById("p2ZoomWrap")
+    });
+    document.getElementById("p2ZoomRange")?.addEventListener("input", (e) => {
+      p2ZoomCtl.setProgress(Number(e.target.value) / 100);
+    });
+
+    marquee(document.getElementById("p2Marquee"));
+
+    autoHideHeader(document.getElementById("p2AutoHdrBar"), {
+      scroller: document.getElementById("p2AutoHdrScroller"),
+      threshold: 8
+    });
+
+    // 24 Scrollspy
+    const spyCurrent = document.getElementById("spyCurrent");
+    scrollspy(
+      document.getElementById("scrollNav"),
+      document.querySelectorAll("main > section.fx-sec"),
+      {
+        onChange(id) {
+          if (spyCurrent) spyCurrent.textContent = `#${id}`;
+        }
+      }
+    );
+  </script>
+</body>
+</html>

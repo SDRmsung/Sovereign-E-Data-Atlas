@@ -1,0 +1,3815 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>新聞脈動河流 | A23 #z01 News Pulse</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>">
+
+  <style>
+
+    :root {
+
+      --bg-deep: #030712;
+
+      --bg-card: rgba(15, 23, 42, 0.75);
+
+      --border-subtle: rgba(148, 163, 184, 0.15);
+
+      --accent-sky: #38bdf8;
+
+      --ink: #f8fafc;
+
+      --ink-sec: #94a3b8;
+
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+
+      background: #030712;
+
+      color: var(--ink);
+
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+
+      height: 100vh;
+
+      overflow: hidden;
+
+      display: flex;
+
+      flex-direction: column;
+
+    }
+
+    header {
+
+      background: rgba(3, 7, 18, 0.92);
+
+      backdrop-filter: blur(8px);
+
+      border-bottom: 1px solid var(--border-subtle);
+
+      padding: 8px 20px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      z-index: 10;
+
+    }
+
+    .badge.stale { color:#fbbf24; border-color:rgba(251,191,36,.5); background:rgba(251,191,36,.12); }
+
+    .badge.offline { color:#f87171; border-color:rgba(248,113,113,.5); background:rgba(248,113,113,.12); }
+
+    #freezeChip { position:absolute; right:12px; top:8px; font-size:11px; font-weight:700; color:#fbbf24; background:rgba(3,7,18,.85); border:1px solid rgba(251,191,36,.5); border-radius:6px; padding:4px 8px; display:none; pointer-events:none; z-index:5; }
+
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.05rem; }
+
+    .badge {
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      padding: 4px 8px;
+
+      border-radius: 999px;
+
+      background: rgba(56, 189, 248, 0.15);
+
+      color: var(--accent-sky);
+
+      border: 1px solid rgba(56, 189, 248, 0.3);
+
+    }
+
+    .hud-stats { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--ink-sec); }
+
+    .hud-val { color: var(--ink); font-weight: 700; font-family: ui-monospace, Consolas, monospace; }
+
+
+
+    /* Stream Graph Area */
+
+    .stream-panel {
+
+      padding: 8px 20px 4px;
+
+      background: rgba(15, 23, 42, 0.4);
+
+      border-bottom: 1px solid var(--border-subtle);
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+    }
+
+    .stream-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+
+    #streamCanvas { width: 100%; height: 80px; display: block; border-radius: 6px; background: rgba(0, 0, 0, 0.3); }
+
+
+
+    /* Topic Legend & Filter */
+
+    .topic-bar {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 4px 20px;
+
+      background: rgba(3, 7, 18, 0.7);
+
+      border-bottom: 1px solid var(--border-subtle);
+
+      font-size: 11.5px;
+
+      user-select: none;
+
+    }
+
+    .topic-tools {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      margin-right: 4px;
+
+      padding-right: 8px;
+
+      border-right: 1px solid var(--border-subtle);
+
+    }
+
+    .btn-topic-action {
+
+      background: rgba(255, 255, 255, 0.06);
+
+      border: 1px solid var(--border-subtle);
+
+      color: var(--ink-sec);
+
+      font-size: 11px;
+
+      padding: 4px 8px;
+
+      border-radius: 4px;
+
+      cursor: pointer;
+
+      transition: all 0.15s ease;
+
+    }
+
+    .btn-topic-action:hover {
+
+      background: rgba(56, 189, 248, 0.2);
+
+      color: #fff;
+
+      border-color: rgba(56, 189, 248, 0.4);
+
+    }
+
+    .topic-pill {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      padding: 4px 8px;
+
+      border-radius: 12px;
+
+      background: rgba(255, 255, 255, 0.05);
+
+      border: 1px solid var(--border-subtle);
+
+      cursor: pointer;
+
+      transition: all 0.18s ease;
+
+      color: var(--ink);
+
+    }
+
+    .topic-pill:hover {
+
+      background: rgba(255, 255, 255, 0.12);
+
+      border-color: rgba(255, 255, 255, 0.25);
+
+    }
+
+    .topic-pill.active {
+
+      background: rgba(56, 189, 248, 0.12);
+
+      border-color: rgba(56, 189, 248, 0.4);
+
+    }
+
+    .topic-pill.inactive {
+
+      opacity: 0.35;
+
+      background: transparent;
+
+      border-color: rgba(148, 163, 184, 0.15);
+
+      filter: grayscale(80%);
+
+    }
+
+    .topic-checkbox {
+
+      width: 13px;
+
+      height: 13px;
+
+      border-radius: 3px;
+
+      border: 1.5px solid var(--ink-sec);
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 9px;
+
+      line-height: 1;
+
+      font-weight: 800;
+
+      transition: all 0.15s ease;
+
+    }
+
+    .topic-pill.active .topic-checkbox {
+
+      background: var(--topic-color, var(--accent-sky));
+
+      border-color: var(--topic-color, var(--accent-sky));
+
+      color: #030712;
+
+    }
+
+    .topic-pill.inactive .topic-checkbox {
+
+      background: transparent;
+
+      border-color: rgba(148, 163, 184, 0.3);
+
+      color: transparent;
+
+    }
+
+    .topic-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+
+
+    /* River Canvas */
+
+    .river-container {
+
+      flex: 1;
+
+      position: relative;
+
+      overflow: hidden;
+
+      min-height: 0;
+
+    }
+
+    #riverCanvas {
+
+      width: 100%;
+
+      height: 100%;
+
+      display: block;
+
+      cursor: pointer;
+
+    }
+
+
+
+    /* Hover Card */
+
+    /* P1-8 灰格圖例 */
+
+    .legend-gap { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-sec); font-size: 11px; }
+
+    .legend-gap i { display: inline-block; width: 6px; height: 16px; border-radius: 2px; background: rgba(100, 116, 139, 0.55); }
+
+    .legend-gap b { color: var(--ink); font-weight: 600; }
+
+    /* P1-10 側欄詳情 */
+
+    #detailPanel {
+
+      position: fixed; top: 0; right: 0; width: 360px; max-width: 90vw; height: 100vh; z-index: 50;
+
+      background: rgba(2, 6, 23, 0.97); border-left: 1px solid var(--accent-sky);
+
+      padding: 24px 24px 24px 24px; overflow-y: auto; transform: translateX(100%);
+
+      transition: transform 0.2s ease; box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+
+    }
+
+    #detailPanel.open { transform: none; }
+
+    #dpEvent { display: none; }
+
+    .wc-bar { margin: 0 0 16px; padding: 16px; border: 1px solid #1e293b; border-radius: 8px; background: rgba(15, 23, 42, 0.6); }
+
+    .wc-cloud { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+
+    .wc-w { background: none; border: 0; padding: 4px; cursor: pointer; font-weight: 700; line-height: 1.2; font-family: inherit; border-radius: 4px; display: inline-flex; align-items: center; transition: all 0.2s ease; }
+
+    .wc-w:hover, .wc-w.on { background: rgba(56, 189, 248, 0.16); }
+
+    .wc-m { font-size: 12px; font-weight: 400; margin-left: 2px; }
+
+    .wc-spark { display: inline-block; vertical-align: middle; margin-left: 4px; }
+
+    .wc-w sup { font-size: 10px; font-weight: 400; color: #94a3b8; margin-left: 4px; }
+
+    .wc-timeline { display: flex; align-items: center; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #1e293b; flex-wrap: wrap; }
+
+    .wc-play-btn { background: #1e293b; border: 1px solid #334155; color: #f8fafc; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; line-height: 1.5; }
+
+    .wc-play-btn:hover { background: #334155; }
+
+    .wc-slider { flex: 1; min-width: 160px; accent-color: #38bdf8; cursor: pointer; }
+
+    .wc-time-info { font-size: 12px; color: #e2e8f0; font-family: ui-monospace, Consolas, monospace; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+
+    .wc-tag-few { color: #f59e0b; font-size: 11px; font-weight: 600; }
+
+    @keyframes wc-pulse {
+
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+
+      70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+
+    }
+
+    .wc-w.wc-surge {
+
+      animation: wc-pulse 1.6s infinite;
+
+      outline: 1px solid rgba(239, 68, 68, 0.6);
+
+      border-radius: 4px;
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .wc-w.wc-surge { animation: none; box-shadow: 0 0 4px rgba(239, 68, 68, 0.8); }
+
+    }
+
+    .wc-note { margin-top: 12px; font-size: 11px; line-height: 1.6; color: #94a3b8; }
+
+    .wc-detail { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+
+    .wc-g { padding: 12px; border: 1px solid #1e293b; border-radius: 8px; font-size: 12px; line-height: 1.6; }
+
+    .wc-g h4 { margin: 0 0 8px; font-size: 12px; color: #e2e8f0; }
+
+    .wc-g ul { list-style: none; margin: 0; padding: 0; }
+
+    .wc-g li { margin: 4px 0; }
+
+    .wc-g a { color: #cbd5e1; text-decoration: none; }
+
+    .wc-g a:hover { text-decoration: underline; }
+
+    .wc-g small { color: #94a3b8; margin-left: 4px; }
+
+    .rp-hit { cursor: pointer; }
+
+    .rp-hit:hover { stroke: #e2e8f0; stroke-width: 1; }
+
+    .rp-row { display: grid; grid-template-columns: 16px 1fr 32px; gap: 8px; align-items: center; padding: 8px 0; cursor: pointer; font-size: 12px; border-bottom: 1px solid #1e293b; }
+
+    .rp-row i { width: 8px; height: 8px; border-radius: 8px; display: inline-block; }
+
+    .rp-row b { text-align: right; font-family: ui-monospace, Consolas, monospace; }
+
+    .rp-row em { grid-column: 2 / 4; height: 8px; border-radius: 4px; opacity: 0.7; display: block; }
+
+    .rp-row.on { background: rgba(56, 189, 248, 0.12); }
+
+    .rp-list { margin: 8px 0; }
+
+    .rp-list ul { list-style: none; padding: 0; margin: 8px 0; }
+
+    .rp-list li { margin: 8px 0; font-size: 12px; line-height: 1.6; }
+
+    .rp-list li a { color: #e2e8f0; margin-left: 8px; }
+
+    .rp-list small { display: block; color: var(--ink-sec); font-size: 11px; }
+
+    #detailPanel.ev-mode > :not(#detailClose):not(#dpEvent) { display: none !important; }
+
+    #detailPanel.ev-mode #dpEvent { display: block; }
+
+    .ev-badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+
+    .ev-badge.ok { background: rgba(34, 197, 94, 0.18); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.5); }
+
+    .ev-badge.pd { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px dashed rgba(148, 163, 184, 0.6); }
+
+    .ev-e0 { font-size: 11.5px; color: var(--ink-sec); margin-bottom: 8px; }
+
+    .ev-h { font-size: 12px; color: var(--ink-sec); margin: 16px 0 8px 0; }
+
+    #dpEvent h3 { margin: 8px 0; font-size: 16px; line-height: 1.5; }
+
+    #dpEvent h3.ev-struck { text-decoration: line-through; color: var(--ink-sec); }
+
+    #dpEvent ul { list-style: none; padding: 0; margin: 0; }
+
+    #dpEvent li { padding: 8px 0; border-bottom: 1px solid rgba(148, 163, 184, 0.15); font-size: 13px; line-height: 1.5; }
+
+    #dpEvent li a { color: var(--ink); text-decoration: none; display: block; margin-top: 4px; }
+
+    #dpEvent li a:hover { color: var(--accent-sky); }
+
+    #dpEvent small { display: block; color: var(--ink-sec); font-size: 11.5px; }
+
+    .ev-src { display: inline-block; padding: 0 8px; border: 1px solid; border-radius: 4px; font-size: 11.5px; }
+
+    .ev-new { font-style: normal; font-size: 11px; color: #86efac; margin-left: 8px; }
+
+    .ev-upd { font-size: 11.5px; color: #fbbf24; margin-top: 4px; }
+
+    .ev-note { font-size: 11.5px; color: var(--ink-sec); margin: 8px 0; }
+
+    .ev-retract { padding: 8px; border: 1px solid #ef4444; border-radius: 8px; color: #fca5a5; font-size: 12px; margin: 8px 0; }
+
+    #dpEvent code { display: block; padding: 8px; background: rgba(0, 0, 0, 0.4); border-radius: 8px; font-size: 11px; word-break: break-all; user-select: all; color: #e2e8f0; }
+
+    #dpEvent p { font-size: 13px; line-height: 1.6; margin: 8px 0; }
+
+    .ev-link { display: block; margin: 8px 0; padding: 8px; border-radius: 8px; border: 1px solid #fbbf24; background: rgba(251, 191, 36, 0.1); color: #fde68a; font-size: 12px; cursor: pointer; text-align: left; }
+
+    #detailClose { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 8px;
+
+      border: 1px solid rgba(148, 163, 184, 0.3); background: transparent; color: var(--ink); cursor: pointer; font-size: 14px; }
+
+    .dp-topic { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-sec); margin-bottom: 16px; }
+
+    .dp-topic i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    #dpTitle { font-size: 16px; line-height: 1.5; color: #fff; margin: 0 40px 16px 0; font-weight: 700; }
+
+    .dp-orig { font-size:12px; color:var(--ink-sec); margin:-4px 0 12px; line-height:1.5; word-break:break-word; }
+
+    .dp-orig:empty { display:none; }
+
+    .dp-meta { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--ink-sec); margin-bottom: 16px; }
+
+    #dpLink { display: inline-block; padding: 8px 16px; border-radius: 8px; background: var(--accent-sky); color: #020617;
+
+      font-weight: 700; font-size: 13px; text-decoration: none; margin-bottom: 24px; }
+
+    .dp-sub { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+
+    #dpRelated { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+
+    #dpRelated li { padding: 8px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2); font-size: 12px;
+
+      line-height: 1.5; color: #e2e8f0; cursor: pointer; }
+
+    #dpRelated li:hover { border-color: var(--accent-sky); }
+
+    #dpRelated li small { display: block; color: var(--ink-sec); margin-top: 4px; }
+
+    /* P1-11 收合提示 / P1-12 速度 */
+
+    .topic-pill { line-height: 1.15; }
+
+    .topic-pill.band-main { font-weight: 700; border-color: rgba(250, 204, 21, 0.55); }
+
+    .topic-pill .band-tag { font-size: 10px; font-weight: 400; color: var(--ink-sec); }
+
+    .topic-note { font-size: 11px; color: var(--ink-sec); align-self: center; }
+
+    .speed-box { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--ink-sec); }
+
+    .btn-speed { padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(148, 163, 184, 0.3); background: transparent;
+
+      color: var(--ink-sec); cursor: pointer; font-size: 12px; }
+
+    .btn-speed.active { border-color: var(--accent-sky); color: var(--accent-sky); font-weight: 700; }
+
+    .kbd { border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 4px; padding: 0 4px; font-size: 10.5px; }
+
+    #hoverCard {
+
+      position: absolute;
+
+      display: none;
+
+      background: rgba(15, 23, 42, 0.95);
+
+      border: 1px solid var(--accent-sky);
+
+      border-radius: 8px;
+
+      padding: 8px 12px;
+
+      max-width: 380px;
+
+      pointer-events: none;
+
+      z-index: 100;
+
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+
+      backdrop-filter: blur(6px);
+
+    }
+
+    #hoverCard h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; line-height: 1.4; }
+
+    #hoverCard p { font-size: 11px; color: var(--ink-sec); display: flex; justify-content: space-between; }
+
+
+
+    /* Timeline Footer Controls */
+
+    footer {
+
+      background: rgba(3, 7, 18, 0.95);
+
+      border-top: 1px solid var(--border-subtle);
+
+      padding: 8px 20px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 16px;
+
+      z-index: 10;
+
+    }
+
+    .btn-ctrl {
+
+      background: rgba(56, 189, 248, 0.15);
+
+      border: 1px solid rgba(56, 189, 248, 0.4);
+
+      color: #fff;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      padding: 4px 12px;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+    .btn-ctrl:hover { background: rgba(56, 189, 248, 0.3); }
+
+    .slider-box { flex: 1; display: flex; align-items: center; gap: 8px; }
+
+    #timeSlider { flex: 1; accent-color: var(--accent-sky); cursor: pointer; }
+
+    .time-label { font-size: 12px; font-family: ui-monospace, Consolas, monospace; min-width: 140px; }
+
+
+
+    /* ===== P1 頁籤（河流／趨勢／來源／主題）===== */
+
+    .tabbar { display:flex; align-items:center; gap:4px; padding:4px 16px 0; border-bottom:1px solid var(--border-subtle); background:rgba(3,7,18,.92); }
+
+    .tabbar .tab { font:inherit; font-size:13px; color:var(--ink-sec); background:none; border:1px solid transparent; border-bottom:none; border-radius:8px 8px 0 0; padding:4px 12px; cursor:pointer; }
+
+    .tabbar .tab:hover { color:var(--ink); }
+
+    .tabbar .tab.on { color:var(--accent-sky); background:#0b1220; border-color:var(--border-subtle); font-weight:700; }
+
+    .tabbar .tab-note { margin-left:auto; font-size:11px; color:var(--ink-sec); }
+
+    .settings-dropdown { position: relative; margin-left: 8px; }
+
+    .tab-settings-btn {
+
+      font: inherit;
+
+      font-size: 12.5px;
+
+      color: var(--ink-sec);
+
+      background: rgba(255, 255, 255, 0.04);
+
+      border: 1px solid var(--border-subtle);
+
+      border-radius: 6px;
+
+      padding: 4px 12px;
+
+      cursor: pointer;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      transition: all 0.15s ease;
+
+    }
+
+    .tab-settings-btn:hover, .tab-settings-btn.on {
+
+      color: var(--accent-sky);
+
+      border-color: rgba(56, 189, 248, 0.4);
+
+      background: rgba(56, 189, 248, 0.12);
+
+    }
+
+    .settings-menu {
+
+      position: absolute;
+
+      right: 0;
+
+      top: calc(100% + 4px);
+
+      background: #0b1220;
+
+      border: 1px solid rgba(56, 189, 248, 0.25);
+
+      border-radius: 8px;
+
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+
+      display: flex;
+
+      flex-direction: column;
+
+      min-width: 170px;
+
+      padding: 4px;
+
+      z-index: 100;
+
+    }
+
+    .settings-menu[hidden] { display: none; }
+
+    .settings-menu .tab-item {
+
+      font: inherit;
+
+      font-size: 12.5px;
+
+      color: var(--ink);
+
+      background: transparent;
+
+      border: none;
+
+      border-radius: 6px;
+
+      padding: 8px 12px;
+
+      text-align: left;
+
+      cursor: pointer;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      transition: background 0.15s;
+
+    }
+
+    .settings-menu .tab-item:hover {
+
+      background: rgba(56, 189, 248, 0.15);
+
+      color: var(--accent-sky);
+
+    }
+
+    .settings-menu .tab-item.on {
+
+      color: var(--accent-sky);
+
+      font-weight: 700;
+
+      background: rgba(56, 189, 248, 0.1);
+
+    }
+
+    .tab-panel { position:fixed; left:0; right:0; bottom:0; top:var(--tab-top,96px); overflow:auto; background:#050912; z-index:60; padding:16px 24px 40px; }
+
+    .tab-panel[hidden] { display:none; }
+
+    .tp-h { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+
+    .tp-h h2 { font-size:16px; } .tp-h small { color:var(--ink-sec); font-size:12px; }
+
+    .tp-btn { font:inherit; font-size:12px; color:var(--ink); background:#0b1220; border:1px solid #1e293b; border-radius:6px; padding:4px 8px; cursor:pointer; }
+
+    .tp-btn:hover { border-color:var(--accent-sky); color:var(--accent-sky); }
+
+    .tp-btn.pri { border-color:var(--accent-sky); color:var(--accent-sky); font-weight:700; }
+
+    .tr-stage { border:1px solid #1e3a8a; border-radius:10px; background:#070d1a; padding:8px 12px; }
+
+    .tr-legend { display:flex; flex-wrap:wrap; gap:4px; margin:4px 0; }
+
+    .tr-chip { font-size:12px; border:1px solid #1e293b; border-radius:12px; padding:4px 8px; cursor:pointer; background:#0b1220; color:var(--ink); display:flex; align-items:center; gap:4px; }
+
+    .tr-chip i { width:10px; height:3px; border-radius:2px; display:inline-block; }
+
+    .tr-chip.off { opacity:.35; }
+
+    #trSvg { width:100%; height:300px; display:block; }
+
+    #trTip { position:fixed; pointer-events:none; background:#0f172a; border:1px solid #334155; border-radius:6px; padding:4px 8px; font-size:12px; display:none; z-index:80; line-height:1.6; }
+
+    .tr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; margin-top:12px; }
+
+    .tr-card { border:1px solid #1e293b; border-radius:10px; background:#0b1220; padding:8px 12px; border-top:3px solid var(--c); }
+
+    .tr-card.off { opacity:.7; border-style:dashed; }
+
+    .tr-card .nm { font-size:13px; font-weight:700; display:flex; justify-content:space-between; gap:4px; }
+
+    .tr-card .v { font-size:22px; font-weight:800; color:var(--c); margin-top:4px; }
+
+    .tr-card .d { font-size:11px; color:var(--ink-sec); }
+
+    .tr-card svg { width:100%; height:44px; display:block; margin:4px 0; }
+
+    .tr-card { cursor:pointer; position:relative; transition:border-color .15s; }
+
+    .tr-card:hover { border-color:var(--accent-sky); }
+
+    .tr-card .hot { font-size:11px; font-weight:700; color:#fff; background:#dc2626; border-radius:10px; padding:2px 8px; margin-left:4px; }
+
+    .tr-card .hid { font-size:11px; color:#fbbf24; border:1px solid #92400e; border-radius:10px; padding:2px 8px; }
+
+    .tr-card .v small { font-size:11px; font-weight:400; color:var(--ink-sec); margin-left:4px; }
+
+    .tr-card .lt { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .tr-quiet { margin-top:12px; font-size:12px; color:var(--ink-sec); }
+
+    .tr-card .go { font-size:11px; color:var(--accent-sky); background:none; border:none; cursor:pointer; padding:0; }
+
+    table.mx { border-collapse:collapse; font-size:12px; margin-top:8px; min-width:1100px; }
+
+    table.mx th, table.mx td { border:1px solid #1e293b; padding:4px 8px; text-align:center; }
+
+    table.mx th { background:#0b1220; color:var(--ink-sec); font-weight:600; }
+
+    table.mx td.sn { text-align:left; white-space:nowrap; }
+
+    table.mx td.sn small { display:block; color:#64748b; }
+
+    table.mx tr.off td:not(.en) { opacity:.35; }
+
+    table.mx .col-all { cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; }
+
+    table.mx tr.grp td { text-align:left; background:#0f172a; font-weight:700; font-size:13px; padding:8px 12px; border-top:2px solid #334155; }
+
+    table.mx tr.grp small { font-weight:400; color:var(--ink-sec); margin-left:8px; }
+
+    table.mx tr.grp.free td { color:#34d399; } table.mx tr.grp.partial td { color:#fbbf24; } table.mx tr.grp.paid td { color:#f472b6; }
+
+    table.mx .st-paid { color:#f472b6; font-weight:700; white-space:nowrap; }
+
+    table.mx td.sn .tg { font-size:11px; border-radius:8px; padding:0 6px; margin-left:6px; font-style:normal; }
+
+    table.mx td.sn .tg.free { color:#34d399; border:1px solid #065f46; } table.mx td.sn .tg.partial { color:#fbbf24; border:1px solid #92400e; } table.mx td.sn .tg.paid { color:#f472b6; border:1px solid #9d174d; }
+
+    table.mx tr.extra td.sn { color:#cbd5e1; font-style:italic; }
+
+    .mx-cell { display:inline-flex; align-items:center; gap:4px; cursor:pointer; }
+
+    .mx-cell .s { font-size:11px; color:#64748b; }
+
+    .mx-cell .s.p { color:var(--accent-sky); }
+
+    .st-on { color:#10b981; font-weight:700; } .st-off { color:#64748b; }
+
+    .tp-legend { font-size:12px; color:var(--ink-sec); margin:4px 0; line-height:1.7; }
+
+    .tp-dirty { color:#eab308; font-size:12px; font-weight:700; }
+
+    .tc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:12px; margin-top:8px; }
+
+    .tc { border:1px solid #1e293b; border-left:4px solid var(--c); border-radius:10px; background:#0b1220; padding:8px 12px; cursor:pointer; }
+
+    .tc.off { opacity:.5; }
+
+    .tc .hd { display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; }
+
+    .tc .hd input { width:16px; height:16px; accent-color:var(--c); }
+
+    .tc .hd .n { margin-left:auto; font-size:12px; color:var(--ink-sec); font-weight:400; }
+
+    .tc ul { list-style:none; margin-top:4px; font-size:12px; color:#cbd5e1; }
+
+    .tc li { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:4px 0; }
+
+    .tc .srcs { font-size:11px; color:#64748b; margin-top:4px; }
+
+    .ns-list { padding:16px 24px; overflow:auto; } .ns-list h2 { font-size:16px; margin-bottom:8px; }
+
+    .ns-list h3 { font-size:14px; margin:12px 0 4px; } .ns-list li { font-size:13px; margin:4px 0 4px 16px; } .ns-list a { color:#cbd5e1; }
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- NOSCRIPT_V2:BEGIN -->
+<noscript><div class="ns-list"><h2>新聞脈動河流 · 無 JavaScript 靜態清單（2026-11-22 09:51:20，共 247 則）</h2>
+<h3 style="color:#f59e0b">總經、匯率與利率（46）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210191.aspx">美媒：軟銀曾探詢1兆美元收購SK海力士　但不再考慮</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210177.aspx">費半重挫逾10%，金管會強化禁空令，法人：台股靜待打底</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210139.aspx">經濟部：電子業對前景仍具信心　明年出口有望破兆美元</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210132.aspx">國安基金：已進場護盤　籲投資人保持信心理性看台股</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210127.aspx">台股崩跌　金管會11/23起祭全面平盤下禁空令5措施</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836745">台股一週跌逾7600點 第3波限空令11/23起上路</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649194">幕後》固票、催票！賴蔡選前夜坐鎮雙北 綠營緊盯「死貓」與股市</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/c6808ym10vzgo?at_medium=RSS&amp;at_campaign=rss">科技股下挫拖累市場 下滑</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/c9zr5nyv5dj2o?at_medium=RSS&amp;at_campaign=rss">《 GTA 6 》單日銷售突破 38 億美元，創下歷史最高…</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/cmx278n2genyo?at_medium=RSS&amp;at_campaign=rss">Airbnb的新房屋規則引起爭議</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/anthropic-ipo-tech-selloff.html">Anthropic的記錄IPO撞上科技界自2020年以來最…</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/emergency-prep-spending-tech-outages.html">科技斷線正催生新末日經濟</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/us-airlines-first-class-business-class.html">美航空班級升級：商務艙迎頭赶上</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/warren-buffett-quadruples-thanksgiving-gifts.html">巴菲特感恩節禮物翻倍：解構他如何散發財富</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/make-it/2026/11/21/california-mining-modern-gold-rush.html">加州現代黃金 Rush：礦工可賺上數百萬</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/20/a24-box-office-hbo-max.html">A24在電影院表現亮眼，可能給HBO Max帶來流媒体優勢</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/my-husband-is-happily-retired-at-64-and-thinks-i-should-keep-working-is-he-being-fair-325c5f38?mod=mw_rss_topstories">我丈夫64歲高齡已退休，認為我應該繼續工作，他有道理嗎？</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/my-wife-pays-thousands-of-dollars-for-her-family-to-visit-from-argentina-how-can-i-convince-her-to-stop-9381351c?mod=mw_rss_topstories">我妻子為家庭紐約旅行借錢，快抽空我們的儲蓄了，我該要求她停…</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/im-in-my-40s-should-i-accept-a-lower-pension-in-exchange-for-naming-my-husband-or-child-as-a-beneficiary-b2352059?mod=mw_rss_topstories">我40歲了，應該接受較低的退休金以換取命名丈夫或孩子為受益…</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/ive-been-a-stay-at-home-mom-im-50-and-have-a-chronic-illness-my-husband-lost-his-job-should-he-raid-his-401-k-63e59123?mod=mw_rss_topstories">我一直是家庭主婦」：我50歲，有慢性病。丈夫失業了，他應該…</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/america-is-definitely-rich-enough-to-fix-social-security-and-medicare-heres-how-30678aa5?mod=mw_rss_topstories">美國肯定有足夠的財力修復社保和醫保，這裡是如何做到的</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/the-thought-of-living-to-100-terrifies-me-is-social-security-a-giant-ponzi-scheme-84a64e7e?mod=mw_rss_topstories">社保是庞氏骗局嗎？不，不要被1930年代的末日預言迷惑。</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/im-sick-of-flying-i-paid-for-priority-boarding-but-the-overhead-bins-were-full-was-i-duped-0badcc80?mod=mw_rss_topstories">我受不了飛機了：我付了优先登機費，但行李架全滿了。我被愚弄…</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-11-20-2026?mod=rss_markets_main">科技股暴跌，Nvidia、Anthropic 跌幅加大</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/finance/stocks/nasdaq-turns-red-for-the-year-46ad8118?mod=rss_markets_main">納斯達克年度收紅</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/finance/banking/citi-undercounted-35-billion-in-assets-at-u-k-subsidiary-f8328559?mod=rss_markets_main">花旗在英国子公司低估資產 350 億美元</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/finance/investing/grabbing-inflation-protection-now-is-a-no-brainer-45a6364e?mod=rss_markets_main">現在購買通脹保護是明智之举</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/americas/mexico-captures-top-drug-boss-in-fierce-gunfight-b16709ce?mod=rss_worldnews">墨西哥在激烈槍戰中捕獲了頭號毒品大頭目</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/americas/where-in-the-world-is-mark-carney-five-continents-and-32-countries-in-113-days-65e5bde0?mod=rss_worldnews">全球找卡尼：五洲三十二國一百一十三天</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/europe/france-riots-race-colorblind-1a87e24d?mod=rss_worldnews">政治禁忌撕裂法國</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/asia/new-satellite-photos-show-expansion-of-north-korean-uranium-enrichment-plant-f23c5512?mod=rss_worldnews">新衛星照片顯示 북한uranium濃縮廠擴大</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/politics/the-u-s-is-auctioning-off-a-slice-of-the-pacific-ocean-floor-in-push-for-minerals-e6c1ecff?mod=rss_worldnews">美國將拍卖太平洋海底的一塊地，以尋求礦物資源</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/pointed-bloomberg-s-weekly-news-quiz-for-risk-takers-video">尖銳！彭博每周新聞測驗，為冒險家們準備</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/goldman-s-spacex-pitch-helps-solve-ai-debt-puzzle-credit-weekly">高盛、Apollo以320億美元的SpaceX債券為AI芯…</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/thanksgiving-dinner-is-moving-to-restaurants-video">感恩節晚餐將移師餐廳</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/shenzhen-wants-to-become-a-cultural-capital-video">深圳欲成為文化首都</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/just-ice-tea-builds-on-honest-tea-s-legacy-video">Just Ice Tea 繼承 Honest Tea 的傳承</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/us-consumers-are-holding-up-against-inflation-going-into-holiday-season">通脹季節，美國消費者抗議</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/eu-proposes-new-cuts-to-long-term-budget-to-bridge-policy-divide">歐盟提出削減長期預算以彌補政策分歧</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/de-cos-awaits-europe-s-call-as-a-nemesis-to-the-bond-vigilantes">德科斯等待歐洲的呼籲成為債券守護者的眼中钉</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/s-p-upgrades-zambia-as-robust-growth-narrower-fiscal-gaps-seen">S&amp;P 上調赞比亚，看好增長及財政赤字收窄</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/vietnam-amends-laws-to-speed-land-clearance-development-of-new-projects">越南修訂法律加速土地清理及新項目開發</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-22/ice-arrest-at-airport-prompts-outcry-from-officials-politicians">機場逮捕ICE人員　官員及政治人物表驚怒</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/mexico-arrests-sinaloa-drug-kingpin-on-fbi-s-most-wanted-list">墨西哥逮捕大麻老大，通缉名單上</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/brazil-s-jair-bolsonaro-admitted-to-icu-with-obstruction">巴西博索納羅入院，疑似阻塞</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/venezuela-s-new-leader-walks-a-political-tightrope-video">委內瑞拉新領袖走鋼絲路</a></li>
+</ul>
+<h3 style="color:#ef4444">關稅、地緣與貿易管制（32）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220005.aspx">巴林稱民用工業設施遭伊朗襲擊起火　暫未傳傷亡</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220009.aspx">民主黨重掌美會　前白宫官員提5大建議籲保留美中委員會</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220004.aspx">加拿大防長：美加軍事合作依舊密切　未見關係生變</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/acn/202611210201.aspx">亞投行與中國政府簽署協議　確立在香港設置辦事處</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836753">俄2飛彈墜落訓練場附近 蓄意挑釁「志願者聯盟」軍演</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836737">歐洲多國青年串聯上街示威 反對戰爭、抗議生活費高漲</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611220003.aspx">加拿大深化對中貿易關係　陳明祺示警北京經濟脅迫風險</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649074">T開頭國家」影響美中？林佳龍點名馬斯克：台灣不是大國交易籌碼</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/cmde1lw9y54ko?at_medium=RSS&amp;at_campaign=rss">川普威脅對外投資人工智能數據中心的美企祭出禁售令</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/trump-fbi-database-hack.html">特朗普表示，最新FBI數據庫竊取案可能會有「正面轉折</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/china-xi-trump-putin-global-diplomacy-shenzhen.html">中國如何利用峰會擴大全球影響力</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/20/trump-lutnick-commerce-china-ai.html">川普表示仍對盧特尼克有信心</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/news/liveblog/2026/11/21/iran-war-live-iran-targets-us-military-in-bahrain-houthi-strikes-continue?traffic_source=rss">伊朗戰事實況：伊朗 targeting 美軍基地在巴林；胡…</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/news/2026/11/21/lebanese-president-demands-israel-withdrawal-decries-irans-interference?traffic_source=rss">黎巴嫩總統要求以色列撤軍，譴責伊朗干預</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/video/newsfeed/2026/11/21/iran-faces-a-silent-economic-war-says-iranian-president?traffic_source=rss">伊朗面臨「沉默的經濟戰」，伊朗總統表示</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/video/newsfeed/2026/11/21/bahrain-says-iranian-attack-hits-industrial-facility?traffic_source=rss">巴林表示伊朗攻擊打中工業設施</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/news/2026/11/21/bahrain-says-iranian-attack-causes-fire-at-industrial-facility?traffic_source=rss">巴林表示伊朗攻擊造成工業設施火災</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/video/newsfeed/2026/11/21/21-11-sv-us-sikh-separatist-pannun-assassination-plot?traffic_source=rss">印度男子因密謀殺死美國锡克分离主义者而入獄</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/news/2026/11/21/brazils-jair-bolsonaro-in-intensive-care-with-bowel-obstruction?traffic_source=rss">巴西總統博索纳羅因腸梗阻住院</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/news/2026/11/21/iran-says-held-talks-with-qatari-mediators-urges-us-to-accept-conditions?traffic_source=rss">伊朗表示與卡塔爾調停者會談，吁美國接受條件</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/middle-east/the-u-a-e-is-shuttling-oil-past-iran-in-risky-hormuz-operation-9150693e?mod=rss_worldnews">阿聯酋在高風險霍爾木兹運油作中運送石油通過伊朗</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/europe/the-russian-pow-camp-where-sex-abuse-became-part-of-the-system-465d59ef?mod=rss_worldnews">俄羅斯俘虜營：性虐待成為體制的一部分</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/europe/denmark-accuses-russia-of-trying-to-kill-ukrainian-rapper-a3a5e34c?mod=rss_worldnews">丹麥指控俄羅斯試圖暗殺烏克蘭歌手</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/world/middle-east/how-the-myanmar-genocide-ruling-raises-the-stakes-for-israel-476feb2f?mod=rss_worldnews">缅甸 genocide 裁決提升以色列風險</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-22/china-s-1-7-trillion-ai-rout-turns-hot-trade-into-losing-bet">中國1.7兆美元的人工智慧產業熱門轉冷門</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/russia-says-cargo-ship-attacked-by-drones-in-gulf-of-finland">俄羅斯貨輪在芬蘭灣被无人机攻擊</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/the-1982-war-still-haunts-the-middle-east-video">1982年戰爭仍懸念中东</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/trump-s-putin-outreach-tests-ukraine-talks-video">特朗普的普京聯繫試驗烏克蘭談判</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/trump-orders-contractors-to-get-approval-for-congress-queries">特朗普下令承包商為國會查詢獲簽名</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/ukraine-s-zelenskyy-teases-short-list-for-new-us-ambassador">澤倫斯基提名潛在候選人擔任烏克蘭駐美大使</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/clean-up-of-downed-crimea-bridge-to-take-russia-months-ukraine-says">俄羅斯承認修復克里米亞橋需要幾個月</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/burnham-s-big-worry-isn-t-brexit-or-welfare-it-s-trump-and-iran">布倫南大懸念不在Brexit或福利，而在特朗普和伊朗</a></li>
+</ul>
+<h3 style="color:#ec4899">半導體與關鍵零組件（3）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611223001.aspx">美財長：輝達調查將釐清是否有不當銷售情況</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/20/nvidias-7-week-losing-streak-is-longest-since-2008-financial-crisis.html">輝達股價暴跌 14%，創下 2008 年金融危機以來最长連…</a></li>
+<li><b>[HackerNews]</b> <a href="https://github.com/ShinMegamiBoson/lookatmyquant">Inkling-2-Mini 記憶體容量 5.4 GB</a></li>
+</ul>
+<h3 style="color:#10b981">社會民生、司法與環境工安（10）</h3><ul>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836757">徐欣瑩靜坐抗議批司法介入選舉</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836754">中壢毒駕車禍釀1死6傷 肇事駕駛遭聲押</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836751">歷屆最糟氣候峰會 國際環團批COP31草案未列化石燃料退場</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836749">北市政見發表蔣萬安打政績牌 沈伯洋提兒虐、食安問題</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836746">新北石碇清晨最低溫11.1℃ 氣象署：白天氣溫逐漸回升</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836738">彰化甘澍宮火警部分建築遭燒毀 廟方估修復需逾2年</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/video/newsfeed/2026/11/22/moviegoers-head-for-the-exits-as-quake-strikes-peru?traffic_source=rss">電影院觀眾因地震逃出秘魯</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/video/newsfeed/2026/11/22/clashes-erupt-across-france-in-another-night-of-protest?traffic_source=rss">法國又一晚示威爆發</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/news/2026/11/21/thousands-protest-across-europe-over-living-costs-and-housing?traffic_source=rss">歐洲各地因生活費和住房問題示威</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/world-economy-latest-japan-s-economy-slips-as-weather-dents-spending">全球經濟最新：日本經濟下滑，天氣影響消費</a></li>
+</ul>
+<h3 style="color:#38bdf8">智慧製造、AI與自動化（55）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611220015.aspx">亞馬遜對抗輝達　傳砸2470億收購AI新銳Decart</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210188.aspx">比特幣跌至2年新低　AI股估值疑慮引發風險資產賣壓</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210053.aspx">那斯達克重挫5.3%逼近熊市　美股AI震盪重點一次看</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210047.aspx">AI股賣壓擴散美股重挫　標普500與道瓊陷入修正</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210042.aspx">智慧製造研發計畫促投資逾154億　經部助攻高階工具機自主化</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210031.aspx">Anthropic上市難挽跌勢　AI股單週市值蒸發逾4兆美元</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220010.aspx">日本防衛預算恐縮水　擬大砍武器採購保AI無人機</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210182.aspx">美議員稱多次警告中國走私AI晶片　批盧特尼克無視警告</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/acn/202611210137.aspx">中國發展AI雄心正遭遇資金困境</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836750">調查：4成中小學生每週用AI 協助解題、理解內容</a></li>
+<li><b>[GitHub]</b> <a href="https://github.com/public-apis/public-apis">公開API清單：免費API的集體清單</a></li>
+<li><b>[GitHub]</b> <a href="https://github.com/morluto/rea">反向工程應用程式行為至本地二進位</a></li>
+<li><b>[GitHub]</b> <a href="https://github.com/EbookFoundation/free-programming-books">免費程式設計書：:books: 免費可獲取的程式設計書</a></li>
+<li><b>[GitHub]</b> <a href="https://github.com/openclaw/openclaw">openclaw: AI真正做事，跨平台跨系統，lobst…</a></li>
+<li><b>[GitHub]</b> <a href="https://github.com/nilbuild/developer-roadmap">開發者路徑：互動式路徑、指南及其他學習內容</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/thinkingmachines/Inkling-2-Mini">熱門模型：thinkingmachines/Inkling…</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/unsloth/Inkling-2-Mini-GGUF">熱門模型：unsloth/Inkling-2-Mini-G…</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/tencent/Hy4-flash">熱門模型：騰訊/Hy4-flash</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/inworld/voice-isolator">熱門模型：inworld/voice-isolator</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/Lightricks/LTX-2.5">熱門模型：Lightricks/LTX-2.5</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/apple/FastFrames-L">熱門模型：apple/FastFrames-L</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/harness-hub/Qwen3.8-27B-pi-adapted">熱門模型：harness-hub/Qwen3.8-27B-…</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/higurashi-ai/Haru-4B">人氣模型：higurashi-ai/Haru-4B</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/Qwen/Qwen3.8-27B">熱門模型：Qwen/Qwen3.8-27B</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/sensenova/SenseNova-Loop-9B">熱門模型：sensenova/SenseNova-Loop…</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/apple/DepthPro2">熱門模型：apple/DepthPro2</a></li>
+<li><b>[HuggingFace]</b> <a href="https://huggingface.co/MiniMaxAI/MiniMax-H3-Image">熱門模型：MiniMaxAI/MiniMax-H3-Ima…</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/c6d94pzk9vleo?at_medium=RSS&amp;at_campaign=rss">人工智能該 shouldn&#x27;t 判斷我們的信用嗎？</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/finance/stocks/the-blame-game-has-begun-over-anthropics-turbulent-trading-debut-280a34b1?mod=rss_markets_main">安普朗的波動交易首秀引責備</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/finance/stocks/anthropics-ipo-bust-punctuates-4-trillion-ai-wipeout-on-wall-street-f1f1ec90?mod=rss_markets_main">Anthropic IPO 混亂收尾，全球 AI 市場損失…</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/finance/investing/anthropic-lives-up-to-wall-street-hype-but-ai-doubts-linger-d6a4519b?mod=rss_markets_main">Anthropic 誠實履行华尔街的 hype，但 AI …</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/tech/ai/anthropic-shares-are-a-rational-bet-on-the-next-phase-of-ai-a748dba3?mod=rss_markets_main">Anthropic股價是對接下來AI階段的理性投資</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/bloomberg-this-weekend-11-21-2026-video">Anthropic未能打消對AI的焦慮，感恩節時放棄廚房</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/is-ai-a-bubble-history-offers-some-clues-video">AI泡沫？歷史給些線索</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/videos/2026-11-21/anthropic-ipo-fails-to-calm-ai-jitters-video">Anthropic IPO 未能平息 AI 担憂</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/newsletters/2026-11-21/new-us-ai-chip-rules-against-china-threaten-pain-for-southeast-asia">新美人工智慧芯片規則反對中國威脅，威脅南東亞</a></li>
+<li><b>[HackerNews]</b> <a href="https://math216.wordpress.com/2026/11/20/hurried-announcement-alessandro-masullo-grh/">急促公告：Alessandro Masullo GRH</a></li>
+<li><b>[HackerNews]</b> <a href="https://thinkingmachines.ai/news/inkling-2-mini/">Inkling 2 Mini</a></li>
+<li><b>[HackerNews]</b> <a href="https://leanprover-community.github.io/blog/posts/riemann-hypothesis/">驗證黎曼假設的簡化方法</a></li>
+<li><b>[HackerNews]</b> <a href="https://www.theguardian.com/society/2026/nov/20/pill-pancreatic-cancer-breakthrough-daraxonrasib">治療胰臟癌的藥物 hailed as &#x27;biggest b…</a></li>
+<li><b>[HackerNews]</b> <a href="https://news.ycombinator.com/item?id=50583761">問HN：我失業兩年，有15年經驗，美國。該怎麼做？</a></li>
+<li><b>[HackerNews]</b> <a href="https://manidoraisamy.com/developer-to-architect.html">我們把開發者當成建築師，但未告知</a></li>
+<li><b>[HackerNews]</b> <a href="https://www.science.org/content/blog-post/detonating-huge-pile-lead-azide-really">引爆一堆鉛硝酸</a></li>
+<li><b>[HackerNews]</b> <a href="https://blog.tymscar.com/posts/studiodisplayethernet/">我的監視器將下載速度降低 75%</a></li>
+<li><b>[HackerNews]</b> <a href="https://blog.mozilla.org/en/mozilla/internet-policy/apple-ios-browser-engine-rules/">iOS 上仍無非 WebKit 瀏覽器</a></li>
+<li><b>[HackerNews]</b> <a href="https://lists.gnupg.org/pipermail/gnupg-announce/2026q4/000517.html">RCE在Gnupg</a></li>
+<li><b>[HackerNews]</b> <a href="https://notnottalmud.substack.com/p/getting-the-mind-to-steer-the-body">讓心智引導身體引導你</a></li>
+<li><b>[HackerNews]</b> <a href="https://klauria.tech/klauria-art/">我對我的藝術網站的技術架構感到滿意</a></li>
+<li><b>[HackerNews]</b> <a href="https://onurgumus.github.io/zero-csharp/index.html">Show HN: Zero C# – C# 沒有運行時或垃…</a></li>
+<li><b>[HackerNews]</b> <a href="https://jespino.github.io/gopgext/">Go 語言中的 PostgreSQL 扩展</a></li>
+<li><b>[HackerNews]</b> <a href="https://math.mit.edu/~drew/grh/">Riemann 超越假設的精益證明驗證文件</a></li>
+<li><b>[HackerNews]</b> <a href="https://linebender.org/blog/next-100-guis/">給下一個 100 個 Rust GUI 的建議</a></li>
+<li><b>[HackerNews]</b> <a href="https://pwn.ai/upload2shell">Upload2Shell (CVE-2026-125396)</a></li>
+<li><b>[HackerNews]</b> <a href="https://github.com/sebaandrada-cell/PcapAnalyzer">PcapAnalyzer – 自主主機的 27 個問題檢測…</a></li>
+<li><b>[HackerNews]</b> <a href="https://www.pandex.io">Pandex – 官方歐洲法規適用於 AI 代理人，超越 …</a></li>
+</ul>
+<h3 style="color:#a855f7">銀行金融、房產與資產理財（10）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210179.aspx">公股銀行支持中小微企業，前10月放款餘額達6.27兆元</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/ck053mzy2qqeo?at_medium=RSS&amp;at_campaign=rss">罐頭食品及長效牛奶在「準備好」活動啟動後提振零售銷售</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/c6evre8j12vno?at_medium=RSS&amp;at_campaign=rss">賣出有霉菌、蟲害的住宅作為海外道德投資</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/20/jensen-huang-nvidia-senate-testimony.html">黃濱將在參議院銀行委員會公開作證，主席史考特表示</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/20/clothing-prices-polyester-cotton-quality.html">拒絕便宜布料，提高價格：消費者為更好衣服叫好</a></li>
+<li><b>[半島電視台]</b> <a href="https://www.aljazeera.com/video/newsfeed/2026/11/21/impunity-fuels-surge-in-settler-violence-across-occupied-west-bank?traffic_source=rss">無辜激化西岸被佔領地區定居者暴力衝突</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/it-is-heartbreaking-exhausting-and-downright-dirty-my-brother-took-over-our-ailing-mothers-life-and-finances-what-can-i-do-b4d48817?mod=mw_rss_topstories">這真是太脏了」：我哥哥搬進我們生病的母親家並關閉了她的銀行…</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/buyers-are-out-for-blood-as-housing-market-finally-hits-rock-bottom-fa5093a6?mod=mw_rss_topstories">買家出拳了」：房地產銷售創歷史新低，買家掌握主導权</a></li>
+<li><b>[MarketWatch]</b> <a href="https://www.marketwatch.com/story/never-too-late-to-start-practical-investing-advice-from-some-of-the-top-women-in-finance-e01f0755?mod=mw_rss_topstories">永不嫌晚開始」：金融界頂尖女性的實用投資建議</a></li>
+<li><b>[WSJ]</b> <a href="https://www.wsj.com/economy/central-banking/oaknorth-secures-u-s-federal-reserve-clearance-to-buy-community-unity-bank-58718919?mod=rss_markets_main">由庫什内爾支持的英國銀行獲得美國許可</a></li>
+</ul>
+<h3 style="color:#6366f1">政治（51）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/ait/202611210071.aspx">NGINX釋重大安全更新　資安署籲儘速升級防範入侵</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220016.aspx">北美台商齊聚田納西州　新任州長候選人：台美往來更緊密</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836774">新北選戰藍綠陣營三重造勢 李四川、蘇巧慧拚場較勁</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836758">高雄選戰賴瑞隆邀卓揆助講 柯志恩找韓國瑜站台</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836748">金管會祭第3波限空令 23日起全面禁止平盤以下放空</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210227.aspx">宜蘭縣長選舉政見會　藍綠互質疑對方投資有爭議</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210223.aspx">周佳琪造勢鄭麗文力挺　喊屏東縣市長都過關</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210217.aspx">民眾黨大造勢　柯文哲勉勵蔣萬安「穩紮穩打就會贏」</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210200.aspx">出席彰化藍營造勢　鄭麗文籲集中選票讓魏平政當選</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649246">選戰倒數6天！ 蔣萬安拜會宋楚瑜 盧秀燕陪同請益獲鼓勵</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649242">造勢淚崩網瘋傳 名間鄉長陳翰立「歹勢」：會堅持下去</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649214">造勢炒麵+貢丸湯憂超過30元賄選   台中里長改送25元料…</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649236">LIVE - 沈伯洋、莊競程合體  「洋流程鳳」造勢大會</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649059">民眾黨造勢大會與柯文哲同台  蔣萬安喊2026一定要贏</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649207">蔣萬安與柯文哲台 葉耀元：天真以為還有票？</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649183">秦慧珠「反共不反中」遭党内切割 矢板明夫：她的話讓我很有感觸</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649175">11/27選前之夜台中藍綠再尬場！綠營蕭美琴站台 藍營韓國…</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649129">曝邀請蔣萬安被「不讀不回」 秦慧珠淚灑感恩餐會</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649114">高虹安黃金週末造勢 市議員陳慶齡「致詞違選罷法」直播放送</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5648987">白營合體車掃沿途冷清  直播小編竟拋「這句話」挨轟</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649167">藍營要讓危機變轉機！拚14縣市「平盤」 認雙北可「驚險過關</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649176">台中也有國旗飄帶！國民黨市黨部：每人限領2條</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/breakingnews/5649124">沈伯洋暖喊她像星星「媽媽離開那天接住他」 何欣純回應也有洋蔥</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/paper/1779440">吳淑瑾催票 宣布聘陳其邁當首席顧問</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/paper/1779421">蕭美琴輔選 籲挺温世政、黃莠馨、葉仁創</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/paper/1779373">沈提公務員「四大承諾」》蔣嗆報復性索資 作賊喊抓賊 沈：污…</a></li>
+<li><b>[自由時報]</b> <a href="https://news.ltn.com.tw/news/politics/paper/1779468">蔡英文、蕭美琴力挺蘇巧慧 管中閔陪李四川拜票</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-22/1072480">力挺秦慧珠 羅淑蕾批民眾黨「啃國民黨的骨」：沒有什麼藍白合…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-22/1072466">蔣萬安合體柯文哲 詹凌瑀：為了選票市長的手可以牽給一審貪污…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-22/1072479">秦慧珠遭鍘 矢板明夫：認同中華民國的國民黨人同樣可以反對中…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072473">兩萬人「洋流慧聚」三重！賴清德：讓蘇巧慧、沈伯洋扛起雙北新…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072472">六千人力挺！蘇巧慧樹林、鶯歌大造勢  蔡英文、蕭美琴同台大…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072470">蘇巧慧車掃再訪雙和板橋 民眾高舉「我的市長」手板</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072469">洋流慧聚」破兩萬人！蘇巧慧：雙北迎向世界現是最好的契機</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072465">台北跟新北才是雙城！沈伯洋籲出門投票：洋流能衝破謊言、高牆</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072463">洋流慧聚」有3意義 賴清德：蘇巧慧、沈伯洋引領台灣選舉文化…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072461">柯文哲放話「小草不挺沈伯洋」藏弦外之音？柯昱安爆：黃珊珊恐…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072457">斗六市長政見會提六大願景 黃尤美：28年深耕、上任就能無縫…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072455">直播》洋流慧聚、雙北雙贏！蘇巧慧新北場造勢大會</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072447">柯P：小草絕對不投沈伯洋  黃珊珊：你是自由的</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072448">沈伯洋獲贈3本黃珊珊簽名書！背後寓意曝光：讓台北觀光順起來</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072446">夏莉絲兒虐案家長怒了！轟北市府拿「求來的進度」當政績：真噁心</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072438">沈伯洋手語「台北順起來」遭藍白嘲諷　障權會發聲：身障權益不…</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072442">勿再給貪凟家族機會！藍營基層籲高市第八選區集中選票支持黃裕庭</a></li>
+<li><b>[Newtalk]</b> <a href="https://newtalk.tw/news/view/2026-11-21/1072445">蔣萬安嗆給公務員的信「做賊喊捉賊」 沈伯洋：一直故意污名化…</a></li>
+<li><b>[Google新聞]</b> <a href="https://news.google.com/rss/articles/CBMiakFVX3lxTE9HLXhWd3REVEZmbzQzRWlwcnIxOTRNNS0xNlVJdGxkTlhhalBsZGdLUWZ0Q1RtZGgxREhBS190U0ZHazRQRk5nLWhaZUFjZFo5UDAtZXBOR0tHVDV3ZV9nUEJDbHl6NGNSU0HSAW9BVV95cUxNQzAxOXMzNWV0OGxfOS1wSU5MZUpvRmhPWDc0UGtueldCZzNLb3BXNFFSSXJydXE1R3JndDZYcURBeGUycHF1V044UkFCakFPazdJU0I0dXk3S3B6bGx0NXlvT2s0U3daVUxGWG4wZmM?oc=5">總統選綠、縣市長選藍」耳語流竄 戒慎恐懼會長林俊憲：國安與…</a></li>
+<li><b>[Google新聞]</b> <a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE1TR1lnYzVJOS1GZHZLVmdvZWpSZ3hGVGRZVGFNVk52Q085VEtWSEJ0X3FSUnEtNmpodkQ1cXNEWUdyM0pQeVE1ZmNRcGJvZ0VlLTBFVnFaZ3k?oc=5">台中市長選戰／綠營6+1縣市長候選人齊聚 總统：台中好、台…</a></li>
+<li><b>[Google新聞]</b> <a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTFBFMlUwYi0za1JkNUIxZFo5QTRzNFNnMEtjQ0Q2WHJMS0x2cnNUUUF4Tk12RzAwQTNzX013dFE3OVhvYmw5N1NlMFMybkt0bUViVFRZSXgxTmw?oc=5">13綠委缺席普發2萬通過 莊瑞雄：候選人豁免黨團動員</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/prediction-market-regulation-kalshi-cftc.html">州府間就預測市場規管展開激烈爭奪</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/21/rmd-deadline-penalty-2026.html">退休族面臨 deadline：未提領會計罰款</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/republicans-midterm-defeat-corners-vance-as-2028-field-widens">共和黨中期選舉失利，溫斯頓邊緣化</a></li>
+</ul>
+<h3 style="color:#06b6d4">競爭者與產業動態（9）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210216.aspx">菲律賓台商組織整合　共享資源提升競爭力</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210032.aspx">雷虎科技董事長陳冠如：無人機非藝術品　消耗戰須具大量生產能…</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210220.aspx">歐盟提案擬課稅科技巨擘　鎖定境內年營收至少5000萬歐元業者</a></li>
+<li><b>[GitHub]</b> <a href="https://github.com/freeCodeCamp/freeCodeCamp">freeCodeCamp: 開源課程庫，學習數學、編程及計…</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/c6jreyqgw4e9o?at_medium=RSS&amp;at_campaign=rss">英國同意協議後 將探索更緊密的歐盟聯繫</a></li>
+<li><b>[BBC]</b> <a href="https://www.bbc.co.uk/news/articles/cm1wr029evnqo?at_medium=RSS&amp;at_campaign=rss">Faisal Islam：這項削減開支的英歐協議 不意味著…</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/20/gm-ceo-succession-mary-barra-dan-akerson.html">前GM CEO談Mary Barra接班計劃：「這 gon…</a></li>
+<li><b>[CNBC]</b> <a href="https://www.cnbc.com/2026/11/19/gap-gap-q3-2026-earnings.html">GAP任命新Athleta CEO，表示Old Navy轉…</a></li>
+<li><b>[Bloomberg]</b> <a href="https://www.bloomberg.com/news/articles/2026-11-21/fda-leadership-search-includes-cancer-care-ceo-rfk-jr-adviser">FDA首長搜尋包括癌症照護CEO及RFK Jr.顧問</a></li>
+</ul>
+<h3>未分類（31）</h3><ul>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/ahel/202611210221.aspx">今彩539第115282期　頭獎1注中獎</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/ahel/202611210203.aspx">今彩539第115282期開獎</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/ahel/202611210162.aspx">中油：23日起汽柴油價格維持不調整</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/afe/202611210038.aspx">沙拉油每月需求2.41萬噸　經部協調增產進口、媒合供貨補缺口</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210025.aspx">印度航空2026財年虧損逾781億</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220012.aspx">瑞士青年反戰遊行　專家憂鼓吹暴力團體滲透</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220008.aspx">旅美台籍醫生義診第一線觀察　宏國官員正面看待與台復交</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220006.aspx">烏無人機襲俄貨輪引發火災　俄直升機疑侵入芬蘭領空</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611220002.aspx">墨西哥逮捕FBI十大通緝毒梟　當地爆槍戰與暴力事件</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210199.aspx">菲律賓參與矽盛世倡議　新克拉克市定位先進製造據點</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/acn/202611210212.aspx">中星總理會談　李強：願加快推進兩國自貿協定4.0版談判</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210214.aspx">英海事機構通報阿曼外海兩起油輪遇襲事件　未傳傷亡</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210215.aspx">德Z世代青年再上街反徵兵　柏林中學生與極左翼匯流</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aopl/202611210202.aspx">傳美農業部及FBI遭駭客入侵　幕後黑手身分待查</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836755">台中榮總醫師涉收廠商回扣 遭羈押禁見、停職</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836747">台南政見發表／謝龍介推科技執法 陳亭妃提水庫光電板4主張</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836744">夏莉絲虐童案業者拒出席調解會 北市府：尊重家長、如期召開</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836742">蔡英文、蕭美琴站台蘇巧慧 管中閔陪同李四川掃街拜票</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836740">高雄有白馬在馬路奔跑近6公里 警方：將開罰飼主最高600元</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836739">台南新市區連3起毒狗事件 警方：掌握倒灑農藥男子身分</a></li>
+<li><b>[公視]</b> <a href="https://news.pts.org.tw/article/836730">蔣萬安發「光榮台北」明信片 沈伯洋赴台中合體何欣純造勢</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210226.aspx">張善政黃金週造勢　朱立倫：執政4年讓桃園快速發展</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210224.aspx">賴清德：洋流慧聚3意義　區域共榮帶領台灣進步發展</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210222.aspx">柯志恩合體韓國瑜鳳山造勢　承諾當選拆光電板</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aloc/202611210219.aspx">高虹安竹市黃金之夜造勢　細數施政成果拚連任</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210218.aspx">三重「洋流慧聚」破2萬人　沈伯洋籲用選票決定時代</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210210.aspx">蕭美琴贈工程帽力挺　盼何欣純帶動台中建設加速</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210207.aspx">李文良受邀造勢晚會共喊當選　陳玉珍續走基層拜票</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210206.aspx">蕭副總統挺陳素月　籲戒慎恐懼催出每一票</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210205.aspx">沈伯洋出席觀光政策座談會　盼打造台北成登山城</a></li>
+<li><b>[中央社]</b> <a href="https://www.cna.com.tw/news/aipl/202611210197.aspx">陳瑩承諾當全民縣長　吳秀華:用人唯才</a></li>
+</ul>
+</div></noscript>
+<!-- NOSCRIPT_V2:END -->
+
+  <!-- 心跳警示橫幅 (heartbeat alert banner) -->
+  <div id="crawlerHeartbeatBanner" class="heartbeat-banner" style="display:none; background:#fef08a; color:#854d0e; padding:10px 16px; font-weight:600; text-align:center; font-size:14px; border-bottom:1px solid #facc15; z-index:9999; position:relative;">
+    ⚠️ 雲端爬蟲疑似停擺：檢查 GitHub Actions
+    <a href="https://github.com/SDRmsung/Sovereign-E-Data-Atlas/actions" target="_blank" rel="noopener noreferrer" style="margin-left:12px; color:#1d4ed8; text-decoration:underline;">前往 GitHub Actions 檢視</a>
+  </div>
+
+
+  <header>
+
+    <div class="brand">
+
+      <span>🌊 新聞脈動河流</span>
+
+      <span class="badge" id="sourceBadge">連線中…</span>
+
+    </div>
+
+    <div class="hud-stats">
+
+      <a href="../01_shared/viz_core/charts/gallery/scroll_grid.html" style="color:#38bdf8;text-decoration:none;border:1px solid rgba(56,189,248,.4);padding:4px 10px;border-radius:6px;font-weight:600;">📜 捲動敘事型錄 →</a>
+
+      <div>時效: <span class="hud-val" id="hudCaptured">--</span></div>
+
+      <!-- 隱藏但保留 DOM ID，供後台資料更新維持相容 -->
+
+      <span id="hudAccumulated" hidden></span>
+
+      <span id="hudTotal" hidden></span>
+
+      <span id="hudSources" hidden></span>
+
+      <span id="hudFreq" hidden></span>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- P1 頁籤 -->
+
+  <nav class="tabbar" id="tabbar" role="tablist">
+
+    <button class="tab on" data-tab="river" role="tab">🌊 新聞河流</button>
+
+    <button class="tab" data-tab="trend" role="tab">🔥 主題熱度</button>
+
+    <button class="tab" id="quotaBtn" type="button" title="切換：國內新聞 3成／國外新聞 7成 配額（只影響新聞河流）"></button>
+
+    <button class="tab" id="evChip" type="button" style="display:none" title="已確認的突發事件（≥2 個獨立來源，自動判定・待驗證）。點擊開啟最新一筆"></button>
+
+    <span class="tab-note" id="tabNote"></span>
+
+    <div class="settings-dropdown">
+
+      <button class="tab-settings-btn" id="btnSettings" type="button" aria-expanded="false" title="開啟偏好設定">
+
+        ⚙️ 設定 ▾
+
+      </button>
+
+      <div class="settings-menu" id="settingsMenu" hidden>
+
+        <button class="tab-item" data-tab="source" type="button">📡 資訊來源設定</button>
+
+        <button class="tab-item" data-tab="topic" type="button">🏷️ 主題勾選設定</button>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+  <section class="tab-panel" id="panel-trend" hidden>
+
+    <div class="wc-bar" id="wcBar"><noscript><div style="font-size:12px;color:#94a3b8;padding:8px 0;">熱門關鍵字時間軸需要 JavaScript 支援。</div></noscript></div>
+
+    <div class="tp-h"><h2>🔥 主題熱度</h2><small id="trSub"></small></div>
+
+    <div class="tr-stage">
+
+      <div class="tr-legend" id="trLegend"></div>
+
+      <svg id="trSvg"></svg>
+
+    </div>
+
+    <div class="tr-grid" id="trGrid"></div>
+
+    <div id="trTip"></div>
+
+  </section>
+
+  <section class="tab-panel" id="panel-source" hidden>
+
+    <div class="tp-h"><h2>📡 資訊來源 × 主題 勾選設定</h2><small id="srcSub"></small>
+
+      <span class="tp-dirty" id="srcDirty"></span>
+
+      <button class="tp-btn pri" id="srcApply">套用並重新整理</button>
+
+      <button class="tp-btn" id="srcReset">還原預設</button>
+
+      <button class="tp-btn" id="srcClose" style="margin-left:auto;">✕ 關閉設定（返回河流）</button></div>
+
+    <div class="tp-legend">預設值：<b style="color:var(--accent-sky)">●</b> 主要涵蓋＝預設勾選；○ 次要涵蓋＝可勾選、預設不勾；— 不適用。左欄「啟用」關掉整個來源；欄位標題的方框＝整欄一次全選／全不選（半選＝部分已勾）。
+
+      「🔒 付費」列只是佔位：不會抓取，日後要付費串接再接；「未接入」的來源設定會先存著，collector 接上後（P2-19）才有資料。斜體列為表外的現有來源，預設比照同性質來源。</div>
+
+    <div style="overflow:auto"><table class="mx" id="srcTable"></table></div>
+
+  </section>
+
+  <section class="tab-panel" id="panel-topic" hidden>
+
+    <div class="tp-h"><h2>🏷️ 主題勾選設定</h2><small id="tpSub"></small>
+
+      <button class="tp-btn" id="tpAll">全選</button>
+
+      <button class="tp-btn" id="tpNone">清空</button>
+
+      <button class="tp-btn" id="tpData">只看有資料</button>
+
+      <button class="tp-btn" id="tpClose" style="margin-left:auto;">✕ 關閉設定（返回河流）</button></div>
+
+    <div class="tc-grid" id="tcGrid"></div>
+
+  </section>
+
+
+
+  <!-- Upper Stream Graph -->
+
+  <div class="stream-panel">
+
+    <div class="stream-header">
+
+      <span style="font-weight:600; color:var(--ink);">📊 主題消長（<span id="streamAccumulatedStatus">已累積 -- 小時資料，完整趨勢需 24 小時</span>）</span>
+
+      <span class="legend-gap"><i></i><span><b>灰色細條</b>＝那個小時還沒收到資料（collector 沒跑），不是新聞量為 0</span></span>
+
+    </div>
+
+    <canvas id="streamCanvas"></canvas>
+
+  </div>
+
+
+
+  <!-- Topic Legend -->
+
+  <div class="topic-bar" id="topicBar"></div>
+
+
+
+  <!-- River Flowing Animation Canvas -->
+
+  <div class="river-container">
+
+    <canvas id="riverCanvas"></canvas>
+
+    <div id="freezeChip">⏸ 定格中（移開滑鼠繼續流動）</div>
+
+    <div id="hoverCard">
+
+      <h4 id="cardTitle">標題</h4>
+
+      <p>
+
+        <span id="cardSource">來源</span>
+
+        <span id="cardTopic">主題</span>
+
+      </p>
+
+      <small style="display:block;margin-top:4px;color:var(--accent-sky);">點一下看詳情</small>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- P1-10 Detail Side Panel -->
+
+  <aside id="detailPanel" aria-hidden="true">
+
+    <button id="detailClose" title="關閉（Esc）">✕</button>
+
+    <div id="dpEvent"></div>
+
+    <div class="dp-topic"><i id="dpDot"></i><span id="dpTopic"></span></div>
+
+    <h3 id="dpTitle"></h3>
+
+    <div class="dp-orig" id="dpOrig"></div>
+
+    <div class="dp-meta"><span id="dpSource"></span><span id="dpTime"></span></div>
+
+    <a id="dpLink" target="_blank" rel="noopener">開啟原文 ↗</a>
+
+    <div class="dp-sub">同主題其他新聞</div>
+
+    <ul id="dpRelated"></ul>
+
+  </aside>
+
+
+
+  <!-- Footer Controls -->
+
+  <footer>
+
+    <button class="btn-ctrl" id="playBtn">⏸ 暫停</button>
+
+    <div class="speed-box" role="group" aria-label="流動速度">
+
+      <span>速度:</span>
+
+      <button class="btn-speed" data-speed="0.5">慢</button>
+
+      <button class="btn-speed active" data-speed="1">中</button>
+
+      <button class="btn-speed" data-speed="1.8">快</button>
+
+      <span><span class="kbd">空白鍵</span> 暫停／播放</span>
+
+    </div>
+
+    <div class="slider-box">
+
+      <span style="font-size:11.5px; color:var(--ink-sec);">時序回放:</span>
+
+      <input type="range" id="timeSlider" min="0" max="23" value="23" step="1">
+
+      <span class="time-label" id="timeLabel">載入中...</span>
+
+    </div>
+
+  </footer>
+
+
+
+  <!-- Zero-CORS Data Ingestion -->
+
+  <script src="feed/latest_frame.js"></script>
+
+  <script src="feed/timeline.js"></script>
+
+  <script src="feed/trend_v2.js"></script>
+
+  <script src="feed/events_v2.js" onerror="void 0"></script>
+
+  <script src="feed/wordcloud_v2.js" onerror="void 0"></script>
+
+  <script>
+
+    // P1 主題 v2 轉接：依 taxonomy_v2 分類＋來源×主題矩陣過濾，改寫 feed/timeline 給主程式用
+
+    (function () {
+
+      const V = window.A23_TREND_V2, feed = window.A23_FEED, tl = window.A23_TIMELINE;
+
+      if (!V || !feed) return;
+
+      const def = V.sources.map(s => s.matrix.map(v => v === 2));
+
+      let mat = null, srcOn = null;
+
+      try { mat = JSON.parse(localStorage.getItem("z01_v2_matrix")); srcOn = JSON.parse(localStorage.getItem("z01_v2_src")); } catch (e) {}
+
+      if (!Array.isArray(mat) || mat.length !== V.sources.length) mat = def.map(r => r.slice());
+
+      if (!Array.isArray(srcOn) || srcOn.length !== V.sources.length) srcOn = V.sources.map(() => true);
+
+      const rowOf = {};
+
+      V.sources.forEach((s, r) => { if (s.feed_source) rowOf[s.feed_source] = r; });
+
+      const allow = (src, t) => { const r = rowOf[src]; return r != null && srcOn[r] && mat[r][t] && V.sources[r].matrix[t] !== 0; };
+
+      const all = feed.articles || [];
+
+      const aligned = V.latest_class.length === all.length;
+
+      let kept = []; let unc = 0, filt = 0, untrans = 0;
+
+      const isZh = t => { const L = (t || "").match(/[A-Za-z0-9\u4e00-\u9fff]/g) || []; return L.length > 0 && L.filter(ch => /[\u4e00-\u9fff]/.test(ch)).length / L.length >= 0.5; };
+
+      all.forEach((a, i) => {
+
+        const c = aligned ? V.latest_class[i] : -1;
+
+        if (c == null || c < 0) { unc++; return; }
+
+        if (!allow(a.source, c)) { filt++; return; }
+
+        // 第 15 項：河流標題一律中文 15~25 字；沒有譯文(Ollama 未啟動)就顯示截短原文並標記
+
+        let shown = a.title_zh, tr = true;
+
+        if (!shown) {
+
+          tr = isZh(a.title);
+
+          shown = a.title.length > 46 ? a.title.slice(0, 45) + "…" : a.title;
+
+          if (!tr) untrans++;
+
+        }
+
+        kept.push(Object.assign({}, a, { cluster_id: c, title_orig: a.title, title: shown, untranslated: !tr }));
+
+      });
+
+      // 第 16 項：台灣 30%／國外 70%（只計新聞源；arXiv/GitHub/HF 屬技術源不計）
+
+      const TW_SHARE = 0.3, NEWS_CAP = 80;
+
+      const regionOf = a => a.region || ((V.sources[rowOf[a.source]] || {}).region) || "tech";
+
+      let quotaOn = true; try { quotaOn = localStorage.getItem("z01_quota") !== "0"; } catch (e) {}
+
+      const newsTw = kept.filter(a => regionOf(a) === "tw"), newsIn = kept.filter(a => regionOf(a) === "intl");
+
+      const quota = { on: quotaOn, active: false, tw: newsTw.length, intl: newsIn.length, shownTw: newsTw.length, shownIntl: newsIn.length };
+
+      if (quotaOn && newsTw.length && newsIn.length) {
+
+        const pick = (list, n) => {
+
+          const g = {}; list.forEach(a => (g[a.source] = g[a.source] || []).push(a));
+
+          Object.values(g).forEach(arr => arr.sort((x, y) => (y.ts || "").localeCompare(x.ts || "")));
+
+          const out = [], keys = Object.keys(g);
+
+          for (let k = 0; out.length < n && keys.some(s => g[s].length); k++) { const arr = g[keys[k % keys.length]]; if (arr.length) out.push(arr.shift()); }
+
+          return out;
+
+        };
+
+        const N = Math.min(NEWS_CAP, Math.floor(newsTw.length / TW_SHARE), Math.floor(newsIn.length / (1 - TW_SHARE)));
+
+        const nTw = Math.round(N * TW_SHARE), nIn = N - nTw;
+
+        const keep = new Set([...pick(newsTw, nTw), ...pick(newsIn, nIn)]);
+
+        kept = kept.filter(a => regionOf(a) === "tech" || keep.has(a));
+
+        quota.active = true; quota.shownTw = nTw; quota.shownIntl = nIn;
+
+      }
+
+      feed.articles = kept;
+
+      feed.topics = V.topics;
+
+      if (tl) {
+
+        tl.topics = V.topics;
+
+        tl.frames = V.frames.map(f => f.missing ? { timestamp: f.timestamp, missing: true } : {
+
+          timestamp: f.timestamp, missing: false,
+
+          cluster_counts: V.topics.map((_, t) => f.counts[t].reduce((s, v, j) => s + (allow(V.feed_sources[j], t) ? v : 0), 0))
+
+        });
+
+        tl.frame_count = tl.frames.length;
+
+      }
+
+      window.Z01_V2 = { V, def, mat, srcOn, allow, rowOf, allArticles: all, quota, stats: { total: all.length, unc, filt, kept: kept.length, aligned, untrans } };
+
+    })();
+
+  </script>
+
+
+
+  <script>
+
+    (function() {
+
+      // 1. Data Initialization & Safety
+
+      const feed = window.A23_FEED || { total_articles: 0, articles: [], topics: [] };
+
+      const timeline = window.A23_TIMELINE || { frames: [], topics: [] };
+
+      const topics = (feed.topics && feed.topics.length) ? feed.topics : (timeline.topics || []);
+
+
+
+      const hudCaptured = document.getElementById("hudCaptured");
+
+      const hudTotal = document.getElementById("hudTotal");
+
+      const topicBar = document.getElementById("topicBar");
+
+      const riverCanvas = document.getElementById("riverCanvas");
+
+      const riverCtx = riverCanvas.getContext("2d");
+
+      const streamCanvas = document.getElementById("streamCanvas");
+
+      const streamCtx = streamCanvas.getContext("2d");
+
+      const hoverCard = document.getElementById("hoverCard");
+
+      const cardTitle = document.getElementById("cardTitle");
+
+      const cardSource = document.getElementById("cardSource");
+
+      const cardTopic = document.getElementById("cardTopic");
+
+      const playBtn = document.getElementById("playBtn");
+
+      const timeSlider = document.getElementById("timeSlider");
+
+      const timeLabel = document.getElementById("timeLabel");
+
+
+
+      hudCaptured.textContent = feed.captured_at || new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+      hudTotal.textContent = (feed.articles && feed.articles.length) ? feed.articles.length : "--（資料缺失）";
+
+
+
+      // P0-7: LIVE / STALE / OFFLINE 由 captured_at 推算；來源與頻率來自 feed
+
+      const SRC_SHORT = { "中央社": "中央社", "公視": "公視", "自由時報": "自由", "Newtalk": "新頭殼", "Google新聞": "GNews", "arXiv": "arXiv", "GitHub": "GitHub", "HuggingFace": "HF", "BBC": "BBC", "CNBC": "CNBC", "半島電視台": "半島", "MarketWatch": "MktWatch", "WSJ": "WSJ🔒", "Bloomberg": "彭博🔒" };
+
+      const SRC_COLOR = { "中央社": "#f472b6", "公視": "#fb923c", "自由時報": "#4ade80", "Newtalk": "#38bdf8", "Google新聞": "#a78bfa", "arXiv": "#facc15", "GitHub": "#a3e635", "HuggingFace": "#fcd34d", "HackerNews": "#ff6600", "BBC": "#f87171", "CNBC": "#60a5fa", "半島電視台": "#2dd4bf", "MarketWatch": "#34d399", "WSJ": "#c4b5fd", "Bloomberg": "#e879f9" };
+
+      const srcList = (feed.sources && feed.sources.length) ? feed.sources : Array.from(new Set((feed.articles || []).map(a => a.source)));
+
+      document.getElementById("hudSources").textContent = srcList.length ? srcList.map(x => SRC_SHORT[x] || x).join(" / ") : "--";
+
+      const intervalMin = feed.update_interval_min || null;
+
+      document.getElementById("hudFreq").textContent = intervalMin ? intervalMin + " 分鐘" : "--";
+
+      function refreshBadge() {
+
+        const badge = document.getElementById("sourceBadge");
+
+        const cap = feed.captured_at ? new Date(feed.captured_at.replace(" ", "T")) : null;
+
+        if (!cap || isNaN(cap) || !(feed.articles && feed.articles.length)) {
+
+          badge.textContent = "OFFLINE（無資料）"; badge.className = "badge offline"; return;
+
+        }
+
+        const ageMin = Math.round((Date.now() - cap.getTime()) / 60000);
+
+        if (ageMin <= 45) { badge.textContent = "LIVE · " + ageMin + " 分鐘前更新"; badge.className = "badge"; }
+
+        else { badge.textContent = "STALE · 已 " + ageMin + " 分鐘未更新"; badge.className = "badge stale"; }
+
+      }
+
+      refreshBadge(); setInterval(refreshBadge, 30000);
+
+
+
+      // 1b. Topic Filter State & Renderer
+
+      // P1-11 密度分層：預設只開佔比前 3 名主題
+
+      const DEFAULT_TOP = 8;  // v2：來源×主題矩陣已控密度，預設開所有有資料的主題
+
+      const topicCount = topics.map((_, i) => (feed.articles || []).filter(a => a.cluster_id % (topics.length || 8) === i).length);
+
+      const topRank = topics.map((_, i) => i).filter(i => topicCount[i] > 0).sort((a, b) => topicCount[b] - topicCount[a]).slice(0, DEFAULT_TOP);
+
+      let savedTopics = null; try { savedTopics = JSON.parse(localStorage.getItem("z01_v2_topics")); } catch (e) {}
+
+      let activeTopicIndices = new Set(Array.isArray(savedTopics) ? savedTopics.filter(i => i < topics.length) : (topRank.length ? topRank : topics.map((_, i) => i)));
+
+      let topicsReady = false;
+
+      // P1-19 文字雲：字級＝正規化佔比（每則權重 1/該來源則數）
+
+      const _ca = feed.articles || [], _cn = {};
+
+      _ca.forEach(a => { _cn[a.source] = (_cn[a.source] || 0) + 1; });
+
+      const cloudShare = topics.map((_, i) => _ca.filter(a => a.cluster_id % (topics.length || 8) === i).reduce((s, a) => s + 1 / _cn[a.source], 0));
+
+      const cloudMax = Math.max(1e-9, ...cloudShare);
+
+      // P1-17 動態分帶：1 條主帶＋3～4 條次要帶，其餘併「其他」（依當下資料與勾選即時決定）
+
+      function computeBands() {
+
+        const act = topics.map((_, i) => i).filter(i => activeTopicIndices.has(i) && cloudShare[i] > 0).sort((a, b) => cloudShare[b] - cloudShare[a]);  // 0 則的類別不佔帶
+
+        const sum = act.reduce((s, i) => s + cloudShare[i], 0) || 1;
+
+        let nSec = Math.min(3, Math.max(0, act.length - 1));
+
+        if (act.length >= 5 && cloudShare[act[4]] / sum >= 0.08) nSec = 4;  // 第 5 名佔比 ≥ 8% 才開第 4 條次要帶
+
+        if (act.length === 5) nSec = 4;  // 只多 1 類時直接獨立，不必併「其他」
+
+        const rows = [];
+
+        act.slice(0, 1).forEach(i => rows.push({ role: "main", nTrack: topicCount[i] >= 18 ? 3 : 2, topics: [i], share: cloudShare[i] / sum, name: topics[i].name, color: topics[i].color }));
+
+        act.slice(1, 1 + nSec).forEach(i => rows.push({ role: "sec", topics: [i], share: cloudShare[i] / sum, name: topics[i].name, color: topics[i].color }));
+
+        const rest = act.slice(1 + nSec);
+
+        if (rest.length) rows.push({ role: "other", topics: rest, share: rest.reduce((s, i) => s + cloudShare[i], 0) / sum,
+
+          name: "其他（" + rest.map(i => topics[i].name.split("、")[0].split("：")[0]).join("／") + "）", color: "#94a3b8" });
+
+        rows.forEach(r => { if (!r.nTrack) r.nTrack = 1; });
+
+        const roleOf = {}; topics.forEach((_, i) => { if (activeTopicIndices.has(i) && !(cloudShare[i] > 0)) roleOf[i] = "empty"; }); rows.forEach(r => r.topics.forEach(i => roleOf[i] = r.role));
+
+        return { rows, roleOf };
+
+      }
+
+      let bands = { rows: [], roleOf: {} };
+
+
+
+      function updateActiveArticlesCount() {
+
+        if (!hudTotal) return;
+
+        const total = (feed.articles && feed.articles.length) ? feed.articles.length : "--";
+
+        const numLanes = topics.length || 8;
+
+        const activeCount = articles.filter(a => activeTopicIndices.has(a.cluster_id % numLanes)).length;
+
+        hudTotal.textContent = (activeTopicIndices.size === topics.length) ? total : (activeCount + " / " + total);
+
+      }
+
+
+
+      function renderTopicBar() {
+
+        topicBar.innerHTML = "";
+
+        bands = computeBands();
+
+
+
+        const tools = document.createElement("div");
+
+        tools.className = "topic-tools";
+
+        tools.innerHTML = `
+
+          <button class="btn-topic-action" id="btnSelectAll" title="全部選取">全選</button>
+
+          <button class="btn-topic-action" id="btnDeselectAll" title="全部清空">清空</button>
+
+        `;
+
+        topicBar.appendChild(tools);
+
+
+
+        tools.querySelector("#btnSelectAll").addEventListener("click", () => {
+
+          topics.forEach((_, i) => activeTopicIndices.add(i));
+
+          renderTopicBar();
+
+          updateActiveArticlesCount();
+
+          drawStreamGraph();
+
+        });
+
+
+
+        tools.querySelector("#btnDeselectAll").addEventListener("click", () => {
+
+          activeTopicIndices.clear();
+
+          renderTopicBar();
+
+          updateActiveArticlesCount();
+
+          drawStreamGraph();
+
+        });
+
+
+
+        topics.forEach((t, idx) => {
+
+          const isActive = activeTopicIndices.has(idx);
+
+          const pill = document.createElement("div");
+
+          const role = isActive ? bands.roleOf[idx] : "";
+
+          pill.className = "topic-pill " + (isActive ? "active" : "inactive") + (role === "main" ? " band-main" : "");
+
+          pill.style.fontSize = (11 + 7 * Math.sqrt(cloudShare[idx] / cloudMax)).toFixed(1) + "px";
+
+          pill.style.setProperty("--topic-color", t.color);
+
+          pill.title = "點擊切換勾選；Shift+點擊單獨選取此類";
+
+          pill.innerHTML = `
+
+            <span class="topic-checkbox">${isActive ? "✓" : ""}</span>
+
+            <span class="topic-dot" style="background:${t.color}"></span>
+
+            <span>${t.name}${topicCount[idx] ? " " + topicCount[idx] : ""}</span>
+
+            ${role === "main" ? '<span class="band-tag">★主帶</span>' : role === "other" ? '<span class="band-tag">→其他</span>' : role === "empty" ? '<span class="band-tag">無資料</span>' : ""}
+
+          `;
+
+
+
+          pill.addEventListener("click", (e) => {
+
+            if (e.shiftKey) {
+
+              activeTopicIndices.clear();
+
+              activeTopicIndices.add(idx);
+
+            } else {
+
+              if (activeTopicIndices.has(idx)) {
+
+                activeTopicIndices.delete(idx);
+
+              } else {
+
+                activeTopicIndices.add(idx);
+
+              }
+
+            }
+
+            renderTopicBar();
+
+            updateActiveArticlesCount();
+
+            drawStreamGraph();
+
+          });
+
+
+
+          topicBar.appendChild(pill);
+
+        });
+
+        const hidden = topics.length - activeTopicIndices.size;
+
+        if (hidden > 0) {
+
+          const note = document.createElement("span");
+
+          note.className = "topic-note";
+
+          note.textContent = "另有 " + hidden + " 類已收合，點標籤或「全選」展開";
+
+          topicBar.appendChild(note);
+
+        }
+
+        if (topicsReady) { try { localStorage.setItem("z01_v2_topics", JSON.stringify([...activeTopicIndices])); } catch (e) {} }
+
+        if (window.Z01_API && window.Z01_API.onChange) window.Z01_API.onChange();
+
+        if (window.__z01RiverReady) initRiverItems();
+
+      }
+
+
+
+      renderTopicBar();
+
+      topicsReady = true;
+
+
+
+      // 2. Setup River Particles / Title Items
+
+      let articles = feed.articles || [];
+
+      if (articles.length === 0) {
+
+        // Fallback placeholder articles if zero
+
+        for (let i = 0; i < 30; i++) {
+
+          articles.push({
+
+            title: "即時新聞脈動聚合資料流 " + (i + 1),
+
+            source: "A23",
+
+            url: "https://example.com",
+
+            cluster_id: i % topics.length
+
+          });
+
+        }
+
+      }
+
+
+
+      // Channels / Lanes for river flow
+
+      const NUM_LANES = topics.length || 8;
+
+      // P1-14：每個來源先正規化（每則權重 = 1 / 該來源則數），避免「新聞事件量」與「新增 repo/論文量」單位不同
+
+      const srcN = {};
+
+      articles.forEach(a => { srcN[a.source] = (srcN[a.source] || 0) + 1; });
+
+      const nSrc = Math.max(1, Object.keys(srcN).length);
+
+      const laneShare = topics.map((_, i) => articles.filter(a => a.cluster_id % NUM_LANES === i).reduce((s, a) => s + 1 / srcN[a.source], 0) / nSrc);
+
+      const LANE_MIN_H = 34;
+
+      window.Z01_API = {
+
+        topics, laneShare, getArticles: () => articles,
+
+        isActive: i => activeTopicIndices.has(i),
+
+        setActive(list) { activeTopicIndices = new Set(list); renderTopicBar(); updateActiveArticlesCount(); drawStreamGraph(); },
+
+        onChange: null
+
+      };
+
+      let riverItems = [];
+
+
+
+      const RIVER_FONT = "12px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif";
+
+      const CARD_GAP = 28, BADGE_W = 52;
+
+      let laneLoop = [];   // 每條河的循環長度
+
+      let laneSpeed = [];  // 每條河固定速度（同河卡片同速，間距不變，不會重疊）
+
+      function initRiverItems() {
+
+        riverItems = [];
+
+        const w = riverCanvas.getBoundingClientRect().width || window.innerWidth;
+
+        riverCtx.font = RIVER_FONT;
+
+        laneLoop = {}; laneSpeed = {};
+
+        bands.rows.forEach((row, ri) => {
+
+          const nTrack = row.nTrack;   // 主帶 2～3 軌，容納更多則
+
+          const xs = [];
+
+          for (let k = 0; k < nTrack; k++) xs[k] = ((ri * 2 + k) * 97 + k * 160) % Math.max(200, w * 0.5);
+
+          articles.filter(a => row.topics.includes(a.cluster_id % NUM_LANES)).forEach((art, j) => {
+
+            const k = j % nTrack, track = ri + ":" + k;
+
+            const width = riverCtx.measureText(art.title).width + BADGE_W + 24;
+
+            riverItems.push({ art: art, lane: art.cluster_id % NUM_LANES, row: ri, sub: k, track: track, x: xs[k], width: width, height: 28, y: 0 });
+
+            xs[k] += width + CARD_GAP;
+
+          });
+
+          for (let k = 0; k < nTrack; k++) {
+
+            const t = ri + ":" + k;
+
+            laneLoop[t] = Math.max(xs[k], w + CARD_GAP);
+
+            laneSpeed[t] = row.role === "main" ? 0.55 + k * 0.08 : 0.42 + (ri % 3) * 0.1;
+
+          }
+
+        });
+
+      }
+
+
+
+      // Resize Canvas Handler
+
+      function resizeCanvases() {
+
+        const dpr = window.devicePixelRatio || 1;
+
+        const rectR = riverCanvas.parentElement.getBoundingClientRect();
+
+        riverCanvas.width = rectR.width * dpr;
+
+        riverCanvas.height = rectR.height * dpr;
+
+        riverCtx.scale(dpr, dpr);
+
+
+
+        const rectS = streamCanvas.getBoundingClientRect();
+
+        streamCanvas.width = rectS.width * dpr;
+
+        streamCanvas.height = rectS.height * dpr;
+
+        streamCtx.scale(dpr, dpr);
+
+
+
+        drawStreamGraph();
+
+      }
+
+      window.addEventListener("resize", () => { resizeCanvases(); initRiverItems(); });
+
+
+
+      // 3. Draw Stream Graph
+
+      function streamLayout(w) {
+
+        const frames = timeline.frames || [];
+
+        const nMiss = frames.filter(f => f.missing).length;
+
+        const nValid = frames.length - nMiss;
+
+        const missW = nValid ? Math.min(6, w / frames.length) : w / Math.max(1, frames.length);
+
+        const validW = nValid ? (w - missW * nMiss) / nValid : 0;
+
+        let x = 0;
+
+        return frames.map(f => { const cw = f.missing ? missW : validW; const r = { x0: x, w: cw }; x += cw; return r; });
+
+      }
+
+
+
+      // ---- 突發事件（斷點）：自動判定＝E0 待驗證；>=2 獨立來源才標已確認 ----
+
+      const EVD = window.A23_EVENTS_V2 || { events: [], rule: "" };
+
+      const evAll = EVD.events || [];
+
+      const evHour = {};
+
+      (timeline.frames || []).forEach((f, p) => { evHour[(f.timestamp || "").slice(0, 13)] = p; });
+
+      const evOk = e => !e.stale && !e.late && evHour[e.hour] != null;
+
+      const evFlags = evAll.filter(e => e.status === "confirmed" && evOk(e));
+
+      const evPend = evAll.filter(e => e.status !== "confirmed" && evOk(e));
+
+      const evByUrl = {};
+
+      evFlags.forEach(e => { if (!e.retracted) e.sources.forEach(s => { evByUrl[s.url] = e; }); });
+
+      let evHits = [];
+
+      const evEsc = x => String(x == null ? "" : x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+
+
+      function drawStreamGraph() {
+
+        const dpr = window.devicePixelRatio || 1;
+
+        const w = streamCanvas.width / dpr;
+
+        const h = streamCanvas.height / dpr;
+
+        streamCtx.clearRect(0, 0, w, h);
+
+
+
+        const frames = timeline.frames || [];
+
+        if (!frames.length) return;
+
+
+
+        // P1-9 灰格壓成細條，有資料的幀撐滿寬度；>=6 幀畫真 streamgraph
+
+        const L = streamLayout(w);
+
+        const valid = frames.map((f, i) => i).filter(i => !frames[i].missing);
+
+        const totals = frames.map(f => (f.cluster_counts || []).reduce((a, b) => a + b, 0));
+
+        const maxTotal = Math.max(1, ...valid.map(i => totals[i]));
+
+        const usableH = h - 12;
+
+        if (valid.length >= 6) {
+
+          const pts = valid.map(i => {
+
+            const c = frames[i].cluster_counts || [];
+
+            const sc = usableH / maxTotal;
+
+            let y = h / 2 + (totals[i] * sc) / 2;   // silhouette：以中線對稱
+
+            return { x: L[i].x0 + L[i].w / 2, segs: topics.map((_, t) => { const hh = (c[t] || 0) * sc; const r = [y, y - hh]; y -= hh; return r; }) };
+
+          });
+
+          if (pts.length) { pts[0].x = L[valid[0]].x0; pts[pts.length - 1].x = L[valid[valid.length - 1]].x0 + L[valid[valid.length - 1]].w; }
+
+          topics.forEach((t, tIdx) => {
+
+            streamCtx.fillStyle = activeTopicIndices.has(tIdx) ? t.color : "rgba(100, 116, 139, 0.4)";
+
+            streamCtx.beginPath();
+
+            pts.forEach((p, k) => k ? streamCtx.lineTo(p.x, p.segs[tIdx][1]) : streamCtx.moveTo(p.x, p.segs[tIdx][1]));
+
+            for (let k = pts.length - 1; k >= 0; k--) streamCtx.lineTo(pts[k].x, pts[k].segs[tIdx][0]);
+
+            streamCtx.closePath();
+
+            streamCtx.fill();
+
+          });
+
+        } else {
+
+          valid.forEach(p => {
+
+            const counts = frames[p].cluster_counts || [];
+
+            const total = totals[p] || 1;
+
+            let currentY = h - 6;
+
+            const barW = Math.max(4, L[p].w - 4);
+
+            for (let tIdx = 0; tIdx < topics.length; tIdx++) {
+
+              const segH = ((counts[tIdx] || 0) / total) * usableH;
+
+              if (segH > 0) {
+
+                streamCtx.fillStyle = activeTopicIndices.has(tIdx) ? topics[tIdx].color : "rgba(100, 116, 139, 0.4)";
+
+                streamCtx.fillRect(L[p].x0 + 2, currentY - segH, barW, segH);
+
+                currentY -= segH;
+
+              }
+
+            }
+
+          });
+
+        }
+
+        frames.forEach((f, p) => {
+
+          if (!f.missing) return;
+
+          streamCtx.fillStyle = "rgba(100, 116, 139, 0.55)";
+
+          streamCtx.fillRect(L[p].x0 + 1, 4, Math.max(1, L[p].w - 2), h - 8);
+
+        });
+
+
+
+        // 3a. 斷點旗標（已確認＝旗標；待確認＝底部灰色空心點；撤回＝灰旗＋刪除線感）
+
+        evHits = [];
+
+        const perH = {};
+
+        evFlags.concat(evPend).forEach(e => {
+
+          const p = evHour[e.hour];
+
+          if (p == null || !L[p]) return;
+
+          const k = perH[p] = (perH[p] || 0);
+
+          perH[p]++;
+
+          const x = L[p].x0 + L[p].w / 2 + k * 8;
+
+          const conf = e.status === "confirmed";
+
+          const tc = e.retracted ? "#64748b" : ((topics[e.topic] || {}).color || "#fbbf24");
+
+          if (conf) {
+
+            streamCtx.save();
+
+            streamCtx.setLineDash([3, 3]);
+
+            streamCtx.strokeStyle = e.retracted ? "rgba(100,116,139,0.8)" : "rgba(255,255,255,0.8)";
+
+            streamCtx.lineWidth = 1;
+
+            streamCtx.beginPath(); streamCtx.moveTo(x, 0); streamCtx.lineTo(x, h); streamCtx.stroke();
+
+            streamCtx.restore();
+
+            streamCtx.fillStyle = tc; streamCtx.strokeStyle = "#fff"; streamCtx.lineWidth = 1;
+
+            streamCtx.beginPath(); streamCtx.moveTo(x, 2); streamCtx.lineTo(x + 10, 7); streamCtx.lineTo(x, 12); streamCtx.closePath();
+
+            streamCtx.fill(); streamCtx.stroke();
+
+            evHits.push({ x: x - 4, y: 0, w: 16, h: 16, ev: e });
+
+          } else {
+
+            streamCtx.strokeStyle = "rgba(203,213,225,0.9)"; streamCtx.lineWidth = 1;
+
+            streamCtx.beginPath(); streamCtx.arc(x, h - 6, 3, 0, Math.PI * 2); streamCtx.stroke();
+
+            evHits.push({ x: x - 5, y: h - 12, w: 10, h: 12, ev: e });
+
+          }
+
+        });
+
+
+
+        // 3b. Draw slider cursor on Stream Graph
+
+        const curIdx = parseInt(timeSlider.value, 10);
+
+        const curX = L[curIdx] ? L[curIdx].x0 + L[curIdx].w / 2 : 0;
+
+        streamCtx.strokeStyle = "#fff";
+
+        streamCtx.lineWidth = 2;
+
+        streamCtx.beginPath();
+
+        streamCtx.moveTo(curX, 0);
+
+        streamCtx.lineTo(curX, h);
+
+        streamCtx.stroke();
+
+      }
+
+
+
+      // 4. River Animation Loop
+
+      let isPlaying = true;
+
+      let speedMul = 1;
+
+      let pinnedItem = null;
+
+      let hoveredItem = null;
+
+      let mouseX = -100, mouseY = -100;
+
+
+
+      function renderRiver() {
+
+        const dpr = window.devicePixelRatio || 1;
+
+        const w = riverCanvas.width / dpr;
+
+        const h = riverCanvas.height / dpr;
+
+
+
+        riverCtx.clearRect(0, 0, w, h);
+
+
+
+        const activeTopics = topics.filter((_, idx) => activeTopicIndices.has(idx));
+
+        const rowTop = [], rowH = [];
+
+        {
+
+          const R = bands.rows, minH = R.map(r => 16 + 30 * r.nTrack);  // 上方 16px 留給帶名，卡片不壓字
+
+          const wt = R.map(r => r.share * (r.role === "main" ? 1.3 : 1));
+
+          const sw = wt.reduce((s, x) => s + x, 0) || 1;
+
+          const free = Math.max(0, h - minH.reduce((s, x) => s + x, 0));
+
+          let yy = 0;
+
+          R.forEach((r, ri) => { rowTop[ri] = yy; rowH[ri] = minH[ri] + free * wt[ri] / sw; yy += rowH[ri]; });
+
+        }
+
+
+
+        if (activeTopics.length === 0) {
+
+          riverCtx.fillStyle = "rgba(148, 163, 184, 0.7)";
+
+          riverCtx.font = "14px sans-serif";
+
+          riverCtx.textAlign = "center";
+
+          riverCtx.fillText("請點擊上方分類標籤勾選以顯示新聞河流", w / 2, h / 2);
+
+          riverCtx.textAlign = "start";
+
+        } else {
+
+          bands.rows.forEach((r, ri) => {
+
+            const tColor = r.color || "#38bdf8", y0 = rowTop[ri], lh = rowH[ri];
+
+            riverCtx.fillStyle = tColor + (r.role === "main" ? "14" : "09");
+
+            riverCtx.fillRect(0, y0, w, lh - 2);
+
+            riverCtx.fillStyle = tColor + (r.role === "main" ? "dd" : "99");
+
+            riverCtx.font = (r.role === "main" ? "bold 12px" : "11px") + " sans-serif";
+
+            riverCtx.textAlign = "right";
+
+            const tag = r.role === "main" ? "★ 主帶 · " : r.role === "other" ? "併入 · " : "";
+
+            riverCtx.fillText(tag + r.name + " · 佔比 " + Math.round(r.share * 100) + "%", w - 10, y0 + 13);
+
+            riverCtx.textAlign = "start";
+
+            riverCtx.strokeStyle = tColor + "22";
+
+            riverCtx.lineWidth = 1;
+
+            riverCtx.beginPath();
+
+            riverCtx.moveTo(0, y0 + lh);
+
+            riverCtx.lineTo(w, y0 + lh);
+
+            riverCtx.stroke();
+
+          });
+
+        }
+
+
+
+        // Draw flowing titles
+
+        riverCtx.font = "12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif";
+
+        let foundHover = null;
+
+
+
+        riverItems.forEach(item => {
+
+          const l = item.lane;
+
+          if (!activeTopicIndices.has(l)) return;
+
+
+
+          const tColor = topics[l] ? topics[l].color : "#38bdf8";
+
+          const title = item.art.title;
+
+          const badgeWidth = BADGE_W;
+
+          item.height = 28;
+
+          if (rowTop[item.row] === undefined) return;
+
+          const nT = bands.rows[item.row].nTrack, body = Math.min(rowH[item.row] - 16, nT * 56), subH = body / nT;
+
+          item.y = rowTop[item.row] + 16 + (rowH[item.row] - 16 - body) / 2 + subH * item.sub + (subH - item.height) / 2;
+
+
+
+          // Check hover
+
+          if (mouseX >= item.x && mouseX <= item.x + item.width &&
+
+              mouseY >= item.y && mouseY <= item.y + item.height) {
+
+            foundHover = item;
+
+          }
+
+
+
+          // Move leftwards
+
+          // P0-4: 滑鼠停在某張卡 -> 整條河凍結；其餘河照常流
+
+          const tk = item.track;
+
+          const laneFrozen = (hoveredItem && hoveredItem.track === tk) || (pinnedItem && pinnedItem.track === tk);
+
+          if (isPlaying && !laneFrozen) {
+
+            item.x -= (laneSpeed[tk] || 0.5) * speedMul;
+
+            if (item.x + item.width < -20) item.x += laneLoop[tk];
+
+          }
+
+
+
+          // Render Item pill card
+
+          const isItemHovered = (foundHover === item);
+
+          riverCtx.fillStyle = isItemHovered ? "rgba(30, 41, 59, 0.95)" : "rgba(15, 23, 42, 0.7)";
+
+          riverCtx.strokeStyle = isItemHovered ? "#38bdf8" : tColor + "55";
+
+          riverCtx.lineWidth = isItemHovered ? 1.5 : 1;
+
+
+
+          // Rounded rectangle
+
+          const rx = item.x, ry = item.y, rw = item.width, rh = item.height;
+
+          riverCtx.beginPath();
+
+          riverCtx.roundRect(rx, ry, rw, rh, 6);
+
+          riverCtx.fill();
+
+          riverCtx.stroke();
+
+          const evH = evByUrl[item.art.url];
+
+          if (evH) {
+
+            riverCtx.save();
+
+            riverCtx.strokeStyle = (topics[evH.topic] || {}).color || "#fbbf24";
+
+            riverCtx.lineWidth = 2; riverCtx.globalAlpha = 0.9;
+
+            riverCtx.beginPath(); riverCtx.roundRect(rx - 2, ry - 2, rw + 4, rh + 4, 8); riverCtx.stroke();
+
+            riverCtx.restore();
+
+          }
+
+
+
+          // Source Tag
+
+          const sc = SRC_COLOR[item.art.source] || "#94a3b8";
+
+          riverCtx.fillStyle = "rgba(2, 6, 23, 0.9)";
+
+          riverCtx.strokeStyle = sc;
+
+          riverCtx.lineWidth = 1;
+
+          riverCtx.beginPath();
+
+          riverCtx.roundRect(rx + 6, ry + 5, badgeWidth, rh - 10, 4);
+
+          riverCtx.fill();
+
+          riverCtx.stroke();
+
+
+
+          riverCtx.fillStyle = sc;
+
+          riverCtx.font = "bold 10px sans-serif";
+
+          riverCtx.textAlign = "center";
+
+          riverCtx.fillText(SRC_SHORT[item.art.source] || item.art.source, rx + 6 + badgeWidth / 2, ry + 17);
+
+          riverCtx.textAlign = "start";
+
+
+
+          // Title Text
+
+          riverCtx.fillStyle = isItemHovered ? "#ffffff" : "#e2e8f0";
+
+          riverCtx.font = "12px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif";
+
+          riverCtx.fillText(title, rx + badgeWidth + 16, ry + 18);
+
+        });
+
+
+
+        hoveredItem = foundHover;
+
+        document.getElementById("freezeChip").style.display = hoveredItem ? "block" : "none";
+
+        if (hoveredItem) {
+
+          hoverCard.style.display = "block";
+
+          hoverCard.style.left = Math.min(w - 380, Math.max(10, mouseX + 15)) + "px";
+
+          hoverCard.style.top = Math.min(h - 80, Math.max(10, mouseY + 15)) + "px";
+
+          cardTitle.textContent = hoveredItem.art.title;
+
+          cardSource.textContent = "來源: " + hoveredItem.art.source;
+
+          const topicName = topics[hoveredItem.lane] ? topics[hoveredItem.lane].name : "";
+
+          cardTopic.textContent = "領域: " + topicName;
+
+        } else {
+
+          hoverCard.style.display = "none";
+
+        }
+
+
+
+        requestAnimationFrame(renderRiver);
+
+      }
+
+
+
+      // Mouse Interaction
+
+      riverCanvas.addEventListener("mousemove", (e) => {
+
+        const rect = riverCanvas.getBoundingClientRect();
+
+        mouseX = e.clientX - rect.left;
+
+        mouseY = e.clientY - rect.top;
+
+      });
+
+      riverCanvas.addEventListener("mouseleave", () => {
+
+        mouseX = -100;
+
+        mouseY = -100;
+
+        hoveredItem = null;
+
+      });
+
+      // P1-10 點卡片開側欄詳情（取代直接開新分頁）
+
+      const detailPanel = document.getElementById("detailPanel");
+
+      function fmtTime(ts) {
+
+        if (!ts) return "--";
+
+        const d = new Date(ts);
+
+        return isNaN(d) ? ts : d.toLocaleString("zh-TW", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+
+      }
+
+      function openDetail(item) {
+
+        pinnedItem = item;
+
+        const art = item.art, t = topics[item.lane] || {};
+
+        document.getElementById("dpDot").style.background = t.color || "#38bdf8";
+
+        document.getElementById("dpTopic").textContent = t.name || "";
+
+        document.getElementById("dpTitle").textContent = art.title;
+
+        document.getElementById("dpSource").textContent = "來源：" + art.source + (art.paywall === "paywall" ? "　🔒 付費牆（全文需訂閱）" : art.paywall === "partial" ? "　🪙 部分付費" : art.paywall === "free" ? "　🆓 免費全文" : "");
+
+        document.getElementById("dpOrig").textContent = (art.title_orig && art.title_orig !== art.title) ? "原文：" + art.title_orig : "";
+
+        document.getElementById("dpTime").textContent = "發布：" + fmtTime(art.ts) + "　抓取：" + fmtTime(art.fetched_at);
+
+        const link = document.getElementById("dpLink");
+
+        if (art.url && art.url !== "https://example.com") { link.href = art.url; link.style.display = "inline-block"; }
+
+        else link.style.display = "none";
+
+        detailPanel.classList.remove("ev-mode");
+
+        let evl = document.getElementById("dpEvLink");
+
+        if (!evl) { evl = document.createElement("button"); evl.id = "dpEvLink"; evl.type = "button"; evl.className = "ev-link"; document.getElementById("dpLink").after(evl); }
+
+        const ev0 = evByUrl[art.url];
+
+        evl.style.display = ev0 ? "block" : "none";
+
+        if (ev0) { evl.textContent = "⚑ 這則屬於一個事件（" + ev0.n_groups + " 個獨立來源，自動判定・待驗證）→ 看事件"; evl.onclick = () => openEvent(ev0); }
+
+        const ul = document.getElementById("dpRelated");
+
+        ul.innerHTML = "";
+
+        const rel = riverItems.filter(r => r.lane === item.lane && r !== item).slice(0, 3);
+
+        if (!rel.length) { const li = document.createElement("li"); li.textContent = "此主題目前沒有其他新聞"; li.style.cursor = "default"; ul.appendChild(li); }
+
+        rel.forEach(r => {
+
+          const li = document.createElement("li");
+
+          li.textContent = r.art.title;
+
+          const sm = document.createElement("small");
+
+          sm.textContent = r.art.source + "・" + fmtTime(r.art.ts);
+
+          li.appendChild(sm);
+
+          li.addEventListener("click", () => openDetail(r));
+
+          ul.appendChild(li);
+
+        });
+
+        detailPanel.classList.add("open");
+
+        detailPanel.setAttribute("aria-hidden", "false");
+
+      }
+
+      function closeDetail() {
+
+        pinnedItem = null;
+
+        detailPanel.classList.remove("open");
+
+        detailPanel.setAttribute("aria-hidden", "true");
+
+      }
+
+      function rpArc(cx, cy, r0, r1, a0, a1) {
+
+        const pt = (r, a) => [(cx + r * Math.cos(a)).toFixed(1), (cy + r * Math.sin(a)).toFixed(1)];
+
+        const lg = (a1 - a0) > Math.PI ? 1 : 0;
+
+        const A = pt(r1, a0), B = pt(r1, a1), C = pt(r0, a1), D = pt(r0, a0);
+
+        return "M" + A[0] + " " + A[1] + "A" + r1 + " " + r1 + " 0 " + lg + " 1 " + B[0] + " " + B[1]
+
+          + "L" + C[0] + " " + C[1] + "A" + r0 + " " + r0 + " 0 " + lg + " 0 " + D[0] + " " + D[1] + "Z";
+
+      }
+
+      function rippleHtml(ev, t) {
+
+        const rp = ev.ripple;
+
+        if (!rp) return "";
+
+        const head = '<div class="ev-h">提及擴散（標題實際提到的報導）</div>';
+
+        const terms = (rp.terms || []).map(evEsc).join("、");
+
+        if (rp.insufficient) return head + '<p class="ev-note">比對詞不足（需 ≥' + (rp.min_hits || 2) + ' 個共同詞），不畫漣漪圖。' + (terms ? "目前只有：" + terms : "") + "</p>";
+
+        const col = t.color || "#38bdf8", cx = 156, cy = 134;
+
+        const r2 = rp.ring2 || [], n1 = (rp.ring1 || {}).n || 0;
+
+        const rc = Math.min(36, 14 + 4 * Math.sqrt(rp.core_n || 1));
+
+        const th1 = n1 ? Math.min(28, 8 + 3 * Math.sqrt(n1)) : 0;
+
+        let svg = '<svg viewBox="0 0 312 268" width="100%" role="img" aria-label="提及擴散漣漪圖：核心、同主題、其他主題">'
+
+          + '<circle cx="156" cy="134" r="64" fill="none" stroke="#1e293b" stroke-dasharray="2 4"/>'
+
+          + '<circle cx="156" cy="134" r="92" fill="none" stroke="#1e293b" stroke-dasharray="2 4"/>';
+
+        if (n1) {
+
+          svg += '<circle data-rp="r1" class="rp-hit" cx="156" cy="134" r="64" fill="none" stroke="' + evEsc(col) + '" stroke-opacity="0.45" stroke-width="' + th1.toFixed(1) + '"><title>同主題 ' + n1 + ' 則</title></circle>'
+
+            + '<text x="156" y="' + (134 - 64 - th1 / 2 - 4).toFixed(1) + '" text-anchor="middle" font-size="10" fill="#e2e8f0">' + n1 + "</text>";
+
+        }
+
+        svg += '<circle cx="156" cy="134" r="' + rc.toFixed(1) + '" fill="' + evEsc(col) + '"/><text x="156" y="139" text-anchor="middle" font-size="14" font-weight="700" fill="#020617">' + rp.core_n + "</text>";
+
+        const tot = r2.reduce((a, s2) => a + s2.n, 0);
+
+        if (tot) {
+
+          const gap = 0.05, avail = 2 * Math.PI - gap * r2.length;
+
+          const raw = r2.map(s2 => Math.max(0.22, s2.n / tot * avail));
+
+          const k = avail / raw.reduce((a, b) => a + b, 0);
+
+          let a0 = -Math.PI / 2;
+
+          r2.forEach((s2, i) => {
+
+            const tt = topics[s2.topic] || {}, ang = raw[i] * k, th = Math.min(20, 8 + 3 * Math.sqrt(s2.n));
+
+            const c2 = tt.color || "#94a3b8", mid = a0 + ang / 2;
+
+            svg += '<path data-rp="s' + i + '" class="rp-hit" d="' + rpArc(cx, cy, 92, 92 + th, a0, a0 + ang) + '" fill="' + evEsc(c2) + '" fill-opacity="0.85"><title>' + evEsc(tt.name || "未分類") + " " + s2.n + ' 則</title></path>'
+
+              + '<text x="' + (cx + (92 + th + 9) * Math.cos(mid)).toFixed(1) + '" y="' + (cy + (92 + th + 9) * Math.sin(mid) + 4).toFixed(1) + '" text-anchor="middle" font-size="10" fill="#e2e8f0">' + s2.n + "</text>";
+
+            a0 += ang + gap;
+
+          });
+
+        }
+
+        svg += "</svg>";
+
+        const mx = Math.max(n1, ...r2.map(s2 => s2.n), 1);
+
+        const row = (key, color, name, n) => '<div class="rp-row" data-rp="' + key + '"><i style="background:' + evEsc(color) + '"></i><span>' + evEsc(name) + "</span><b>" + n + '</b><em style="background:' + evEsc(color) + ";width:" + Math.max(4, Math.round(n / mx * 100)) + '%"></em></div>';
+
+        let rows = row("r1", col, "同主題・" + (t.name || ""), n1);
+
+        r2.forEach((s2, i) => { const tt = topics[s2.topic] || {}; rows += row("s" + i, tt.color || "#94a3b8", tt.name || "未分類", s2.n); });
+
+        const lim = rp.span_h != null && rp.span_h < rp.window_h ? "資料僅 " + rp.span_h + " 小時，未滿 " + rp.window_h + " 小時。" : "";
+
+        return head
+
+          + '<p class="ev-note">圈＝核心（事件本身 ' + rp.core_n + " 則）→ 第一圈（同主題提及）→ 第二圈（其他主題提及，依主題分扇）。粗細／角度＝最近 " + rp.window_h + " 小時相關報導數，數字標在旁。" + lim + "</p>"
+
+          + '<p class="ev-note">比對詞：' + terms + "（標題需同時含 ≥" + (rp.min_hits || 2) + " 個不同的詞才算提及）。連結是媒體標題自己寫的，不代表因果。自動比對・E0 待驗證。</p>"
+
+          + svg + rows + '<div id="rpList" class="rp-list"><p class="ev-note">點圖上的圈／扇，或下方列，查看提及的標題。</p></div>';
+
+      }
+
+      function bindRipple(ev) {
+
+        const rp = ev.ripple, box = document.getElementById("rpList");
+
+        if (!rp || rp.insufficient || !box) return;
+
+        const sets = { r1: { name: "同主題", d: rp.ring1 || { n: 0, items: [] } } };
+
+        (rp.ring2 || []).forEach((s2, i) => { sets["s" + i] = { name: (topics[s2.topic] || {}).name || "未分類", d: s2 }; });
+
+        const show = key => {
+
+          const st = sets[key];
+
+          if (!st) return;
+
+          const its = (st.d.items || []).map(it => {
+
+            const ok = /^https?:/i.test(it.url || "");
+
+            const ttl = evEsc(it.title);
+
+            return '<li><span class="ev-src" style="border-color:' + (SRC_COLOR[it.source] || "#94a3b8") + '">' + evEsc(it.source) + "</span>"
+
+              + (ok ? '<a href="' + evEsc(it.url) + '" target="_blank" rel="noopener">' + ttl + "</a>" : ttl)
+
+              + "<small>" + evEsc((it.at || "").slice(5)) + "　命中：" + evEsc((it.match || []).join("、")) + "</small></li>";
+
+          }).join("");
+
+          box.innerHTML = '<div class="ev-h">「' + evEsc(st.name) + "」提及 " + st.d.n + " 則" + (st.d.n > (st.d.items || []).length ? "（列最近 " + st.d.items.length + " 則）" : "") + "</div><ul>" + its + "</ul>";
+
+          document.querySelectorAll("#dpEvent .rp-row").forEach(r => r.classList.toggle("on", r.getAttribute("data-rp") === key));
+
+        };
+
+        document.querySelectorAll("#dpEvent [data-rp]").forEach(el => el.addEventListener("click", () => show(el.getAttribute("data-rp"))));
+
+      }
+
+      function openEvent(ev) {
+
+        pinnedItem = null;
+
+        detailPanel.classList.add("ev-mode");
+
+        const t = topics[ev.topic] || {};
+
+        const conf = ev.status === "confirmed";
+
+        const rows = ev.sources.map((s, i) => {
+
+          const upd = (s.title_updates || []).map(u => '<div class="ev-upd">標題更新 ' + evEsc((u.at || "").slice(5, 16)) + "：" + evEsc(u.title) + "</div>").join("");
+
+          const same = !s.title_zh || s.title_zh === s.title;
+
+          return "<li><span class=\"ev-src\" style=\"border-color:" + (SRC_COLOR[s.source] || "#94a3b8") + "\">" + evEsc(s.source) + "</span>"
+
+            + (s.new_group && i ? '<em class="ev-new">新增獨立來源</em>' : "")
+
+            + '<a href="' + evEsc(s.url) + '" target="_blank" rel="noopener">' + evEsc(s.title_zh || s.title) + "</a>"
+
+            + "<small>" + evEsc(s.at || "--") + (same ? "" : "　原文：" + evEsc(s.title)) + "</small>" + upd + "</li>";
+
+        }).join("");
+
+        const im = ev.impact;
+
+        const impact = im
+
+          ? "<p>「" + evEsc(t.name || "") + "」佔河中比例：事件前（前 " + im.before_n + " 幀平均）<b>" + im.before_share + "%</b>（" + im.before_cnt + " 則）→ 事件首見當時 <b>" + im.at_share + "%</b>（" + im.at_cnt + " 則）→ 現在 <b>" + im.now_share + "%</b>（" + im.now_cnt + " 則）；報導此事的獨立來源 " + im.src_count + " 家。</p><p class=\"ev-note\">以上是同時發生的事實對照，不代表因果。</p>"
+
+          : '<p class="ev-note">無前期資料可比（河中資料不足，或此事件不在可比的時間範圍內）。</p>';
+
+        const r = ev.retracted;
+
+        const cmd = "python z01_news_pulse\\build_events.py --retract " + ev.key + ' --reason "原因"';
+
+        const corr = r
+
+          ? '<div class="ev-retract">已撤回（保留紀錄，不刪除）：' + evEsc(r.reason) + "・" + evEsc(r.by) + "・" + evEsc(r.on) + "</div>"
+
+          : '<p class="ev-note">尚無撤回。若判定有誤，在 Windows 執行下列指令（只標記、不刪除），再重跑 build_trend_v2.py：</p><code>' + evEsc(cmd) + "</code>";
+
+        document.getElementById("dpEvent").innerHTML =
+
+          '<div class="dp-topic"><i style="background:' + (t.color || "#38bdf8") + '"></i><span>' + evEsc(t.name || "") + "</span></div><br>"
+
+          + '<span class="ev-badge ' + (conf ? "ok" : "pd") + '">' + (conf ? "✅ 已確認・" + ev.n_groups + " 個獨立來源" : "⏳ 待確認・單一來源") + "</span>"
+
+          + '<div class="ev-e0">自動判定・待驗證。規則：' + evEsc(EVD.rule || "") + "</div>"
+
+          + '<h3 class="' + (r ? "ev-struck" : "") + '">' + evEsc(ev.title) + "</h3>"
+
+          + '<div class="ev-note">河中首見 ' + evEsc((ev.captured || "").slice(5, 16)) + "；原文發布 " + evEsc((ev.first_seen || "").slice(5)) + (ev.delay_min > 0 ? "（約 " + ev.delay_min + " 分鐘後入河）" : "") + "</div>"
+
+          + '<div class="ev-h">來源驗證（逐一列出，點標題開原文）</div><ul>' + rows + "</ul>"
+
+          + rippleHtml(ev, t)
+
+          + '<div class="ev-h">前後對照</div>' + impact
+
+          + '<div class="ev-h">更正紀錄</div>' + corr;
+
+        bindRipple(ev);
+
+        detailPanel.classList.add("open");
+
+        detailPanel.setAttribute("aria-hidden", "false");
+
+      }
+
+      function evHitAt(e) {
+
+        const rc = streamCanvas.getBoundingClientRect();
+
+        const x = e.clientX - rc.left, y = e.clientY - rc.top;
+
+        return evHits.find(q => x >= q.x && x <= q.x + q.w && y >= q.y && y <= q.y + q.h);
+
+      }
+
+      streamCanvas.addEventListener("click", e => { const q = evHitAt(e); if (q) openEvent(q.ev); });
+
+      streamCanvas.addEventListener("mousemove", e => {
+
+        const q = evHitAt(e);
+
+        streamCanvas.style.cursor = q ? "pointer" : "";
+
+        streamCanvas.title = q ? ((q.ev.status === "confirmed" ? "⚑ 已確認事件：" : "待確認：") + q.ev.title) : "";
+
+      });
+
+      const evChipEl = document.getElementById("evChip");
+
+      if (evChipEl && evAll.length) {
+
+        evChipEl.style.display = "";
+
+        evChipEl.textContent = "⚑ " + evFlags.length + (evPend.length ? "・待確認 " + evPend.length : "");
+
+        evChipEl.onclick = () => { const l = evFlags[evFlags.length - 1]; if (l) openEvent(l); };
+
+      }
+
+      window.__z01ev = { openEvent, evFlags, evPend };
+
+      document.getElementById("detailClose").addEventListener("click", closeDetail);
+
+      riverCanvas.addEventListener("click", () => {
+
+        if (hoveredItem) openDetail(hoveredItem);
+
+      });
+
+      window.__z01 = { openDetail: () => riverItems.find(r => activeTopicIndices.has(r.lane)) && openDetail(riverItems.find(r => activeTopicIndices.has(r.lane))) };
+
+
+
+      // Controls & Playback
+
+      let playTimer = null;
+
+      function getValidIndices() {
+
+        const frames = timeline.frames || [];
+
+        return frames.map((f, i) => (!f.missing ? i : -1)).filter(i => i !== -1);
+
+      }
+
+
+
+      function updateSliderFrame(val) {
+
+        const frames = timeline.frames || [];
+
+        if (frames[val]) {
+
+          const f = frames[val];
+
+          if (f.missing) {
+
+            timeLabel.innerHTML = '<span style="color:#64748b;">' + f.timestamp + ' (缺格/跳過)</span>';
+
+          } else {
+
+            timeLabel.innerHTML = '<span style="color:var(--accent-sky); font-weight:700;">' + f.timestamp + '</span>';
+
+          }
+
+          drawStreamGraph();
+
+        }
+
+      }
+
+
+
+      function advancePlayback() {
+
+        const valid = getValidIndices();
+
+        if (valid.length <= 1) return;
+
+        const cur = parseInt(timeSlider.value, 10);
+
+        const nexts = valid.filter(i => i > cur);
+
+        const nextIdx = (nexts.length > 0) ? nexts[0] : valid[0];
+
+        timeSlider.value = nextIdx;
+
+        updateSliderFrame(nextIdx);
+
+      }
+
+
+
+      playBtn.addEventListener("click", () => {
+
+        isPlaying = !isPlaying;
+
+        playBtn.textContent = isPlaying ? "⏸ 暫停" : "▶ 播放";
+
+        if (isPlaying) {
+
+          if (!playTimer) playTimer = setInterval(advancePlayback, 2500);
+
+        } else {
+
+          if (playTimer) { clearInterval(playTimer); playTimer = null; }
+
+        }
+
+      });
+
+
+
+      document.querySelectorAll(".btn-speed").forEach(b => b.addEventListener("click", () => {
+
+        speedMul = parseFloat(b.dataset.speed);
+
+        document.querySelectorAll(".btn-speed").forEach(x => x.classList.toggle("active", x === b));
+
+      }));
+
+      document.addEventListener("keydown", (e) => {
+
+        if (e.code === "Space" || e.key === " ") { e.preventDefault(); playBtn.click(); }
+
+        else if (e.key === "Escape") closeDetail();
+
+      });
+
+
+
+      timeSlider.addEventListener("input", (e) => {
+
+        updateSliderFrame(parseInt(e.target.value, 10));
+
+      });
+
+
+
+      // Init Execution
+
+      resizeCanvases();
+
+      initRiverItems();
+
+      window.__z01RiverReady = true;
+
+      const frames = timeline.frames || [];
+
+      const realFramesCount = frames.filter(f => !f.missing).length;
+
+      const hudAcc = document.getElementById("hudAccumulated");
+
+      if (hudAcc) hudAcc.textContent = "已累積 " + realFramesCount + " 小時資料，完整趨勢需 24 小時";
+
+      const streamAcc = document.getElementById("streamAccumulatedStatus");
+
+      if (streamAcc) streamAcc.textContent = realFramesCount >= 24 ? "已滿 24 小時" : ("已累積 " + realFramesCount + " 小時資料，完整趨勢需 24 小時");
+
+
+
+      const validList = getValidIndices();
+
+      if (frames.length) {
+
+        timeSlider.max = frames.length - 1;
+
+        const initVal = validList.length ? validList[validList.length - 1] : (frames.length - 1);
+
+        timeSlider.value = initVal;
+
+        updateSliderFrame(initVal);
+
+      }
+
+      if (validList.length > 1) {
+
+        playTimer = setInterval(advancePlayback, 2500);
+
+      }
+
+      requestAnimationFrame(renderRiver);
+
+    })();
+
+  </script>
+
+  <script>
+
+    // P1 頁籤：河流／主題趨勢／資訊來源設定／主題勾選設定
+
+    (function () {
+
+      const API = window.Z01_API, Z = window.Z01_V2;
+
+      const $ = id => document.getElementById(id);
+
+      const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+      const tabbar = $("tabbar");
+
+      function setTop() { document.documentElement.style.setProperty("--tab-top", tabbar.getBoundingClientRect().bottom + "px"); }
+
+      setTop(); window.addEventListener("resize", setTop);
+
+      let cur = "river";
+
+      const btnSettings = $("btnSettings");
+
+      const settingsMenu = $("settingsMenu");
+
+
+
+      function closeSettingsMenu() {
+
+        if (settingsMenu) {
+
+          settingsMenu.hidden = true;
+
+          if (btnSettings) btnSettings.setAttribute("aria-expanded", "false");
+
+        }
+
+      }
+
+
+
+      function show(tab) {
+
+        cur = tab;
+
+        tabbar.querySelectorAll(".tab").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+
+        const isSetting = (tab === "source" || tab === "topic");
+
+        if (btnSettings) {
+
+          btnSettings.classList.toggle("on", isSetting);
+
+          btnSettings.innerHTML = isSetting
+
+            ? `⚙️ ${tab === "source" ? "資訊來源設定" : "主題勾選設定"} ▾`
+
+            : `⚙️ 設定 ▾`;
+
+        }
+
+        if (settingsMenu) {
+
+          settingsMenu.querySelectorAll(".tab-item").forEach(item => {
+
+            item.classList.toggle("on", item.dataset.tab === tab);
+
+          });
+
+        }
+
+        ["trend", "source", "topic"].forEach(k => { $("panel-" + k).hidden = k !== tab; });
+
+        if (tab === "trend") renderTrend();
+
+        if (tab === "source") renderSource();
+
+        if (tab === "topic") renderTopic();
+
+        try { history.replaceState(null, "", "#" + tab); } catch (e) {}
+
+      }
+
+
+
+      tabbar.addEventListener("click", e => {
+
+        const b = e.target.closest(".tab");
+
+        if (b) { closeSettingsMenu(); show(b.dataset.tab); }
+
+      });
+
+
+
+      if (btnSettings && settingsMenu) {
+
+        btnSettings.addEventListener("click", e => {
+
+          e.stopPropagation();
+
+          const willOpen = settingsMenu.hidden;
+
+          settingsMenu.hidden = !willOpen;
+
+          btnSettings.setAttribute("aria-expanded", willOpen ? "true" : "false");
+
+        });
+
+        document.addEventListener("click", e => {
+
+          if (!e.target.closest(".settings-dropdown")) {
+
+            closeSettingsMenu();
+
+          }
+
+        });
+
+        settingsMenu.querySelectorAll(".tab-item").forEach(item => {
+
+          item.addEventListener("click", e => {
+
+            e.stopPropagation();
+
+            closeSettingsMenu();
+
+            show(item.dataset.tab);
+
+          });
+
+        });
+
+      }
+
+
+
+      const srcClose = $("srcClose");
+
+      if (srcClose) srcClose.onclick = () => show("river");
+
+      const tpClose = $("tpClose");
+
+      if (tpClose) tpClose.onclick = () => show("river");
+
+      if (!API || !Z) {
+
+        $("tabNote").textContent = "⚠ 找不到 feed/trend_v2.js，請先執行 build_trend_v2.py";
+
+        return;
+
+      }
+
+      const T = API.topics, V = Z.V;
+
+      const st = Z.stats;
+
+      $("tabNote").textContent = "主題 v2 · 顯示 " + st.kept + " / " + st.total + " 則（矩陣未勾 " + st.filt + "、未分類 " + st.unc + "）" + (st.aligned ? "" : " ⚠ trend_v2 與最新快照不同步") + (st.untrans ? " · " + st.untrans + " 則國外標題未譯(Ollama 未啟動)" : "");
+
+      // 第 16 項：台灣 30%／國外 70% 開關
+
+      const q = Z.quota, qb = $("quotaBtn");
+
+      if (qb) {
+
+        qb.textContent = !q.intl ? "🌐 國內3成／國外7成：國外源尚未接入" : (q.on ? "🌐 國內3成／國外7成 ✓（國內" + q.shownTw + "・國外" + q.shownIntl + "）" : "🌐 國內3成／國外7成 關閉（國內" + q.tw + "・國外" + q.intl + "）");
+
+        qb.onclick = () => { try { localStorage.setItem("z01_quota", q.on ? "0" : "1"); } catch (e) {} location.reload(); };
+
+      }
+
+
+
+      // ---------- 趨勢：每來源正規化後佔比，全圖最高點 = 100 ----------
+
+      function series() {
+
+        const fr = V.frames;
+
+        const raw = fr.map(f => {
+
+          if (f.missing) return null;
+
+          const nj = V.feed_sources.map((src, j) => T.reduce((s, _, t) => s + (Z.allow(src, t) ? f.counts[t][j] : 0), 0));
+
+          const ns = nj.filter(x => x > 0).length || 1;
+
+          return T.map((_, t) => V.feed_sources.reduce((s, src, j) => s + (Z.allow(src, t) && nj[j] ? f.counts[t][j] / nj[j] : 0), 0) / ns);
+
+        });
+
+        const mx = Math.max(1e-9, ...raw.filter(Boolean).flat());
+
+        return raw.map(r => r ? r.map(v => Math.round(v / mx * 100)) : null);
+
+      }
+
+      let wcSel = -1, wcBucketIdx = -1, wcPlaying = false, wcTimer = null;
+
+      function renderWordcloud() {
+
+        const el = $("wcBar"), W = window.A23_WORDCLOUD_V2;
+
+        if (!el) return;
+
+        if (!W || !W.words || !W.words.length) { el.style.display = "none"; return; }
+
+        el.style.display = "";
+
+
+
+        const hasBuckets = W.buckets && W.buckets.length > 0;
+
+        if (wcBucketIdx < 0 || (hasBuckets && wcBucketIdx >= W.buckets.length)) {
+
+          wcBucketIdx = hasBuckets ? W.buckets.length - 1 : 0;
+
+        }
+
+        const curBucket = wcBucketIdx;
+
+        const allMax = Math.max(1, ...W.words.map(w => (w.series && w.series.length) ? Math.max(...w.series) : w.n));
+
+
+
+        const cloud = W.words.map((w, i) => {
+
+          const c = (T[w.topic] || {}).color || "#94a3b8", off = w.topic >= 0 && !API.isActive(w.topic);
+
+          const currCnt = (w.series && w.series[curBucket] !== undefined) ? w.series[curBucket] : w.n;
+
+          const prevCnt = (curBucket > 0 && w.series && w.series[curBucket - 1] !== undefined) ? w.series[curBucket - 1] : 0;
+
+
+
+          let arrow = "";
+
+          if (curBucket > 0 && w.series) {
+
+            if (currCnt - prevCnt >= 2 && currCnt >= 1.5 * Math.max(prevCnt, 1)) arrow = " ▲";
+
+            else if (prevCnt - currCnt >= 2 && prevCnt >= 1.5 * Math.max(currCnt, 1)) arrow = " ▼";
+
+          }
+
+
+
+          let fsz = 14, op = off ? 0.35 : 1;
+
+          if (currCnt === 0) {
+
+            fsz = 13;
+
+            op = Math.min(op, 0.38);
+
+          } else {
+
+            fsz = Math.round(14 + 18 * Math.sqrt(currCnt / allMax));
+
+          }
+
+
+
+          const isSurge = w.surge && w.surge[curBucket] === 1;
+
+
+
+          let spark = "";
+
+          if (w.series && w.series.length > 1) {
+
+            const sn = w.series.length, smx = Math.max(1, ...w.series);
+
+            let d = "", pen = false;
+
+            for (let bi = 0; bi < sn; bi++) {
+
+              const sx = (bi / (sn - 1)) * 44 + 2;
+
+              const sy = 14 - (w.series[bi] / smx) * 12;
+
+              d += (pen ? "L" : "M") + sx.toFixed(1) + " " + sy.toFixed(1) + " ";
+
+              pen = true;
+
+            }
+
+            const cx = ((curBucket / (sn - 1)) * 44 + 2).toFixed(1);
+
+            const cy = (14 - (currCnt / smx) * 12).toFixed(1);
+
+            spark = `<svg class="wc-spark" width="48" height="16" viewBox="0 0 48 16" aria-hidden="true"><path d="${d}" fill="none" stroke="${c}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/><circle cx="${cx}" cy="${cy}" r="2.2" fill="${c}"/></svg>`;
+
+          }
+
+
+
+          return `<button type="button" class="wc-w${i === wcSel ? " on" : ""}${isSurge ? " wc-surge" : ""}" data-i="${i}" style="font-size:${fsz}px;color:${c};opacity:${op}" title="${esc(w.w)}：當前桶 ${currCnt} 則；全期間 ${w.total_n || w.n} 則；近 24h ${w.n} 則">${esc(w.w)}<span class="wc-m">${w.mixed ? " ◐" : ""}${arrow}</span>${spark}<sup>${currCnt}</sup></button>`;
+
+        }).join("");
+
+
+
+        let det = "";
+
+        if (wcSel >= 0 && W.words[wcSel]) {
+
+          const selWord = W.words[wcSel];
+
+          const ctxList = (selWord.ctx && selWord.ctx.length) ? selWord.ctx : [];
+
+          det = '<div class="wc-detail"><div class="wc-ctx-head" style="grid-column: 1 / -1; font-size:12px; color:#94a3b8;">📌 「' + esc(selWord.w) + '」語境清單（代表最新 24 小時之標題共現與事件成員；證據等級 E0，待驗證）：</div>' +
+
+            (ctxList.length ? ctxList.map(g => `<div class="wc-g"><h4>${g.kind === "event" ? "📌 事件：" : ""}${esc(g.label)}（${g.n} 則）</h4><ul>` + g.items.map(it => `<li><a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.t)}</a><small>${esc(it.s)}</small></li>`).join("") + "</ul></div>").join("") : '<div class="wc-g" style="color:#94a3b8;">（近 24 小時無語境紀錄）</div>') +
+
+            "</div>";
+
+        }
+
+
+
+        let timelineHtml = "";
+
+        if (hasBuckets) {
+
+          const curBucketLabel = W.buckets[curBucket] || "";
+
+          const curBucketCount = (W.bucket_n && W.bucket_n[curBucket] !== undefined) ? W.bucket_n[curBucket] : 0;
+
+          const sampleFew = curBucketCount < 5 ? '<span class="wc-tag-few">（樣本少）</span>' : "";
+
+          timelineHtml = `
+
+            <div class="wc-timeline">
+
+              <button type="button" class="wc-play-btn" id="wcPlayBtn" title="播放/暫停時間軸">${wcPlaying ? "⏸ 暫停" : "▶ 播放"}</button>
+
+              <input type="range" class="wc-slider" id="wcSlider" min="0" max="${W.buckets.length - 1}" value="${curBucket}" title="拖曳切換時間桶">
+
+              <span class="wc-time-info"><span>${curBucketLabel}</span><span>(${curBucketCount} 篇)</span>${sampleFew}</span>
+
+            </div>
+
+          `;
+
+        }
+
+
+
+        const noteHtml = `<div class="wc-note">大小＝當前桶篇數（依全期間最大值開根號縮放，0 篇淡化保留）・色＝該詞主要主題・◐＝易混語境（分散在 ≥3 個主題）・▲▼＝與前一桶消長比較（差 ≥2 篇且 ≥1.5×）・脈衝光暈＝該桶暴增（≥2×前桶 且 ≥3 篇）。走勢線圓點＝當前時點。點詞展開最新 24h 語境（標題共現／事件成員，證據等級 E0 待驗證）。</div>`;
+
+
+
+        el.innerHTML = `<div class="wc-cloud">${cloud}</div>${timelineHtml}${det}${noteHtml}`;
+
+
+
+        const pb = $("wcPlayBtn");
+
+        if (pb) {
+
+          pb.onclick = () => {
+
+            wcPlaying = !wcPlaying;
+
+            if (wcPlaying) {
+
+              if (wcBucketIdx >= W.buckets.length - 1) wcBucketIdx = 0;
+
+              clearInterval(wcTimer);
+
+              wcTimer = setInterval(() => {
+
+                wcBucketIdx++;
+
+                if (wcBucketIdx >= W.buckets.length) {
+
+                  wcBucketIdx = W.buckets.length - 1;
+
+                  wcPlaying = false;
+
+                  clearInterval(wcTimer);
+
+                }
+
+                renderWordcloud();
+
+              }, 600);
+
+            } else {
+
+              clearInterval(wcTimer);
+
+            }
+
+            renderWordcloud();
+
+          };
+
+        }
+
+
+
+        const sl = $("wcSlider");
+
+        if (sl) {
+
+          sl.oninput = (e) => {
+
+            wcBucketIdx = parseInt(e.target.value, 10);
+
+            if (wcPlaying) {
+
+              wcPlaying = false;
+
+              clearInterval(wcTimer);
+
+            }
+
+            renderWordcloud();
+
+          };
+
+        }
+
+
+
+        el.onclick = e => {
+
+          const b = e.target.closest(".wc-w");
+
+          if (!b) return;
+
+          const i = +b.dataset.i;
+
+          wcSel = wcSel === i ? -1 : i;
+
+          renderWordcloud();
+
+        };
+
+      }
+
+      function renderTrend() {
+
+        renderWordcloud();
+
+        const S = series(), fr = V.frames;
+
+        const valid = fr.map((f, i) => i).filter(i => S[i]);
+
+        $("trSub").textContent = "熱度＝0–100 相對分數（各來源先正規化後的主題佔比，圖中最高點＝100）；近 24 小時・每小時；已累積 " + valid.length + " 小時，灰底＝該小時無快照";
+
+        $("trLegend").innerHTML = T.map((t, i) => `<span class="tr-chip ${API.isActive(i) ? "" : "off"}" data-i="${i}"><i style="background:${t.color}"></i>${esc(t.name)}</span>`).join("");
+
+        const svg = $("trSvg"), W = svg.clientWidth || 1200, H = 300, pl = 36, pr = 12, pt = 10, pb = 26;
+
+        const n = fr.length, xOf = i => pl + (n <= 1 ? 0 : i * (W - pl - pr) / (n - 1)), yOf = v => pt + (H - pt - pb) * (1 - v / 100);
+
+        let g = "";
+
+        fr.forEach((f, i) => { if (!S[i]) g += `<rect x="${xOf(i) - (W - pl - pr) / (2 * (n - 1 || 1))}" y="${pt}" width="${(W - pl - pr) / (n - 1 || 1)}" height="${H - pt - pb}" fill="rgba(100,116,139,.08)"/>`; });
+
+        [0, 25, 50, 75, 100].forEach(v => { g += `<line x1="${pl}" x2="${W - pr}" y1="${yOf(v)}" y2="${yOf(v)}" stroke="#1e293b"/><text x="${pl - 6}" y="${yOf(v) + 4}" fill="#64748b" font-size="10" text-anchor="end">${v}</text>`; });
+
+        fr.forEach((f, i) => { if (i % 3 === 0 || i === n - 1) g += `<text x="${xOf(i)}" y="${H - 8}" fill="#64748b" font-size="10" text-anchor="middle">${esc((f.timestamp || "").slice(11, 16))}</text>`; });
+
+        T.forEach((t, k) => {
+
+          if (!API.isActive(k)) return;
+
+          let d = "", pen = false;
+
+          fr.forEach((f, i) => { if (!S[i]) { pen = false; return; } d += (pen ? "L" : "M") + xOf(i).toFixed(1) + " " + yOf(S[i][k]).toFixed(1) + " "; pen = true; });
+
+          g += `<path d="${d}" fill="none" stroke="${t.color}" stroke-width="2.2" stroke-linejoin="round"/>`;
+
+          valid.forEach(i => { g += `<circle cx="${xOf(i)}" cy="${yOf(S[i][k])}" r="3" fill="${t.color}"/>`; });
+
+        });
+
+        g += `<line id="trCross" x1="0" x2="0" y1="${pt}" y2="${H - pb}" stroke="#94a3b8" stroke-dasharray="3 3" visibility="hidden"/>`;
+
+        svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+        svg.innerHTML = g;
+
+        svg.onmousemove = e => {
+
+          const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width;
+
+          let bi = valid[0], bd = 1e9; valid.forEach(i => { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; bi = i; } });
+
+          if (bi == null) return;
+
+          const c = $("trCross"); c.setAttribute("x1", xOf(bi)); c.setAttribute("x2", xOf(bi)); c.setAttribute("visibility", "visible");
+
+          const rows = T.map((t, k) => [k, S[bi][k]]).filter(([k]) => API.isActive(k)).sort((a, b) => b[1] - a[1]);
+
+          const tip = $("trTip");
+
+          tip.innerHTML = `<b>${esc(fr[bi].timestamp)}</b><br>` + rows.map(([k, v]) => `<span style="color:${T[k].color}">●</span> ${esc(T[k].name)}：<b>${v}</b>`).join("<br>");
+
+          tip.style.display = "block"; const th = tip.offsetHeight; tip.style.left = Math.min(e.clientX + 14, innerWidth - 260) + "px"; tip.style.top = Math.max(r.top + 4, Math.min(e.clientY + 10, r.bottom - th - 4)) + "px";
+
+        };
+
+        svg.onmouseleave = () => { $("trTip").style.display = "none"; const c = $("trCross"); if (c) c.setAttribute("visibility", "hidden"); };
+
+        const last = valid[valid.length - 1], prev = valid[valid.length - 2];
+
+        const mean = a => a.reduce((x, y) => x + y, 0) / (a.length || 1);
+
+        const rows = T.map((t, k) => {
+
+          const vals = valid.map(i => S[i][k]);
+
+          const v = last != null ? S[last][k] : 0;
+
+          const hist = vals.slice(0, -1), avg = hist.length ? mean(hist) : null;
+
+          const sd = hist.length >= 3 ? Math.sqrt(mean(hist.map(x => (x - avg) ** 2))) : 0;
+
+          const z = sd > 0 ? (v - avg) / sd : 0;
+
+          const surge = (hist.length >= 3 && sd > 0 && z >= 2 && v >= 20) || (hist.length >= 1 && avg != null && v >= 50 && v - avg >= 40);
+
+          const arts = API.getArticles().filter(a => a.cluster_id === k);
+
+          return { t, k, vals, v, avg, surge, arts, cnt: arts.length };
+
+        }).sort((a, b) => b.v - a.v || b.cnt - a.cnt);
+
+        const live = rows.filter(r => r.v > 0 || r.cnt > 0), quiet = rows.filter(r => !(r.v > 0 || r.cnt > 0));
+
+        $("trGrid").innerHTML = live.map(r => {
+
+          const { t, k, vals, v, avg } = r, on = API.isActive(k);
+
+          let dtxt = "累積中（需 2 小時以上）";
+
+          if (avg != null) { const pct = avg > 0 ? Math.round((v - avg) / avg * 100) : (v > 0 ? null : 0); dtxt = pct == null ? "▲ 新出現（過去平均 0）" : (pct > 0 ? "▲ +" : pct < 0 ? "▼ " : "＝ ") + pct + "%（較過去平均 " + Math.round(avg) + "）"; }
+
+          const sw = 240, sh = 44, lo = Math.min(...vals, avg == null ? 1e9 : avg), hi = Math.max(...vals, avg == null ? -1e9 : avg), span = Math.max(20, hi - lo), base = lo - (span - (hi - lo)) / 2;
+
+          const yy = y => (sh - 4 - (y - base) / span * (sh - 8)).toFixed(1), xx = j => (vals.length <= 1 ? sw / 2 : j * sw / (vals.length - 1)).toFixed(1);
+
+          const pts = vals.map((y, j) => xx(j) + "," + yy(y)).join(" ");
+
+          const bl = avg == null ? "" : `<line x1="0" x2="${sw}" y1="${yy(avg)}" y2="${yy(avg)}" stroke="#64748b" stroke-dasharray="3 3"/>`;
+
+          const tops = r.arts.slice(0, 3).map(a => (a.title_zh || a.title || "").replace(/"/g, "&quot;").slice(0, 60) + "（" + (a.source || "") + "）").join("&#10;");
+
+          return `<div class="tr-card ${on ? "" : "off"}" style="--c:${t.color}" data-k="${k}" title="${tops ? "最新 3 則：&#10;" + tops + "&#10;" : ""}點擊只看這條河">
+
+            <div class="nm"><span>${esc(t.name)}${r.surge ? '<span class="hot">🔥 爆量</span>' : ""}</span><span class="d">${on ? r.cnt + " 則" : '<span class="hid">河中已隱藏</span>'}</span></div>
+
+            <div class="v">熱度 ${v}<small>／100</small></div>
+
+            <div class="d">${dtxt}</div>
+
+            <svg viewBox="0 0 ${sw} ${sh}" preserveAspectRatio="none">${bl}<polyline points="${pts}" fill="none" stroke="${t.color}" stroke-width="2"/><circle cx="${xx(vals.length - 1)}" cy="${yy(v)}" r="3" fill="${t.color}"/></svg>
+
+            <div class="d lt">${tops ? "最新：" + esc((r.arts[0].title_zh || r.arts[0].title || "").slice(0, 22)) : "此小時無新訊"}</div></div>`;
+
+        }).join("") + (quiet.length ? `<div class="tr-quiet" style="grid-column:1/-1">無新訊：${quiet.map(r => esc(r.t.name)).join("、")}</div>` : "");
+
+      }
+
+      $("trLegend").addEventListener("click", e => {
+
+        const c = e.target.closest(".tr-chip"); if (!c) return; const i = +c.dataset.i;
+
+        const s = T.map((_, k) => k).filter(k => API.isActive(k)); API.setActive(API.isActive(i) ? s.filter(k => k !== i) : s.concat(i));
+
+      });
+
+      $("trGrid").addEventListener("click", e => { const b = e.target.closest(".tr-card"); if (!b) return; API.setActive([+b.dataset.k]); show("river"); });
+
+
+
+      // ---------- 資訊來源設定 ----------
+
+      const mat = Z.mat.map(r => r.slice()), srcOn = Z.srcOn.slice();
+
+      const feedCnt = {}; Z.allArticles.forEach(a => { feedCnt[a.source] = (feedCnt[a.source] || 0) + 1; });
+
+      function dirty() { return JSON.stringify(mat) !== JSON.stringify(Z.mat) || JSON.stringify(srcOn) !== JSON.stringify(Z.srcOn); }
+
+      function renderSource() {
+
+        const live = V.sources.filter(s => s.feed_source && feedCnt[s.feed_source]).length;
+
+        $("srcSub").textContent = "已接入 " + live + " / " + V.sources.length + " 個來源（免費 " + V.sources.filter(s => (s.tier || "free") === "free").length + "・部分免費 " + V.sources.filter(s => s.tier === "partial").length + "・付費佔位 " + V.sources.filter(s => s.tier === "paid").length + "）";
+
+        $("srcDirty").textContent = dirty() ? "● 有未套用的變更" : "";
+
+        const TIERS = [["free", "🆓 免費／開源", "可直接串接，不需付費"], ["partial", "🪙 部分免費", "限量、需註冊或全文受限"], ["paid", "🔒 付費來源（佔位）", "目前不接入；列出讓你知道有這些管道，日後有需求可付費串接"]];
+
+        const nT = 3 + T.length, cntOf = s => s.feed_source ? (feedCnt[s.feed_source] || 0) : 0;
+
+        const colSt = T.map((_, t) => { const rs = V.sources.map((s, r) => r).filter(r => V.sources[r].matrix[t] !== 0); const on = rs.filter(r => mat[r][t]).length; return { n: rs.length, on }; });
+
+        let h = "<tr><th>啟用</th><th>來源</th><th>狀態</th>" + T.map((t, i) => `<th style="color:${t.color}"><label class="col-all" title="整欄全選／全不選（${colSt[i].on}/${colSt[i].n}）"><input type="checkbox" class="col-cb" data-t="${i}" ${colSt[i].on === colSt[i].n && colSt[i].n ? "checked" : ""}> ${esc(t.name)}</label></th>`).join("") + "</tr>";
+
+        TIERS.forEach(([tk, tn, td]) => {
+
+          const idx = V.sources.map((s, r) => r).filter(r => (V.sources[r].tier || "free") === tk).sort((x, y) => (cntOf(V.sources[y]) > 0) - (cntOf(V.sources[x]) > 0) || x - y);
+
+          if (!idx.length) return;
+
+          h += `<tr class="grp ${tk}"><td colspan="${nT}">${tn}（${idx.length} 個，已接入 ${idx.filter(r => cntOf(V.sources[r]) > 0).length}）<small>${td}</small></td></tr>`;
+
+          idx.forEach(r => {
+
+            const s = V.sources[r], n = cntOf(s);
+
+            const st = n ? `<span class="st-on">已接入 ${n} 則</span>${tk === "paid" ? "<br><small>僅標題，全文需訂閱</small>" : ""}` : (tk === "paid" ? `<span class="st-paid">🔒 付費・佔位</span>` : `<span class="st-off">未接入</span>`);
+
+            h += `<tr class="${srcOn[r] ? "" : "off"} ${s.extra ? "extra" : ""}"><td class="en"><input type="checkbox" data-r="${r}" class="en-cb" ${srcOn[r] ? "checked" : ""}></td>
+
+            <td class="sn">${esc(s.name)}<span class="tg ${tk}">${tk === "free" ? "免費" : tk === "partial" ? "部分免費" : "付費"}</span><small>${esc(s.url)}</small></td>
+
+            <td>${st}</td>` +
+
+              T.map((_, t) => s.matrix[t] === 0 ? `<td style="color:#334155">—</td>` :
+
+                `<td><label class="mx-cell"><input type="checkbox" class="mx-cb" data-r="${r}" data-t="${t}" ${mat[r][t] ? "checked" : ""}><span class="s ${s.matrix[t] === 2 ? "p" : ""}">${s.matrix[t] === 2 ? "●" : "○"}</span></label></td>`).join("") + "</tr>";
+
+          });
+
+        });
+
+        $("srcTable").innerHTML = h;
+
+        $("srcTable").querySelectorAll(".col-cb").forEach(c => { const s = colSt[+c.dataset.t]; c.indeterminate = s.on > 0 && s.on < s.n; });
+
+      }
+
+      $("srcTable").addEventListener("change", e => {
+
+        const cb = e.target; const r = +cb.dataset.r;
+
+        if (cb.classList.contains("col-cb")) { const t = +cb.dataset.t; V.sources.forEach((s, rr) => { if (s.matrix[t] !== 0) mat[rr][t] = cb.checked; }); }
+
+        if (cb.classList.contains("en-cb")) srcOn[r] = cb.checked;
+
+        if (cb.classList.contains("mx-cb")) mat[r][+cb.dataset.t] = cb.checked;
+
+        renderSource();
+
+      });
+
+      $("srcApply").addEventListener("click", () => {
+
+        try { localStorage.setItem("z01_v2_matrix", JSON.stringify(mat)); localStorage.setItem("z01_v2_src", JSON.stringify(srcOn)); localStorage.removeItem("z01_v2_topics"); } catch (e) {}
+
+        location.hash = "#source"; location.reload();
+
+      });
+
+      $("srcReset").addEventListener("click", () => {
+
+        Z.def.forEach((row, r) => { mat[r] = row.slice(); srcOn[r] = true; }); renderSource();
+
+      });
+
+
+
+      // ---------- 主題勾選設定 ----------
+
+      function renderTopic() {
+
+        const arts = API.getArticles();
+
+        $("tpSub").textContent = "勾選會同步河流與趨勢；設定自動記住（本機瀏覽器）";
+
+        $("tcGrid").innerHTML = T.map((t, k) => {
+
+          const a = arts.filter(x => x.cluster_id === k);
+
+          const bySrc = {}; a.forEach(x => { bySrc[x.source] = (bySrc[x.source] || 0) + 1; });
+
+          return `<div class="tc ${API.isActive(k) ? "" : "off"}" style="--c:${t.color}" data-k="${k}">
+
+            <div class="hd"><input type="checkbox" ${API.isActive(k) ? "checked" : ""}><span>${esc(t.name)}</span><span class="n">${a.length} 則 · 河高佔比 ${Math.round((API.laneShare[k] || 0) * 100)}%</span></div>
+
+            <div class="srcs">${Object.keys(bySrc).length ? Object.entries(bySrc).map(([s, n]) => esc(s) + " " + n).join("　") : "目前勾選的來源沒有這類新聞"}</div>
+
+            <ul>${a.slice(0, 3).map(x => `<li>· ${esc(x.title)}</li>`).join("")}</ul></div>`;
+
+        }).join("");
+
+      }
+
+      $("tcGrid").addEventListener("click", e => {
+
+        const c = e.target.closest(".tc"); if (!c) return; const k = +c.dataset.k;
+
+        const s = T.map((_, i) => i).filter(i => API.isActive(i)); API.setActive(API.isActive(k) ? s.filter(i => i !== k) : s.concat(k));
+
+      });
+
+      $("tpAll").onclick = () => API.setActive(T.map((_, i) => i));
+
+      $("tpNone").onclick = () => API.setActive([]);
+
+      $("tpData").onclick = () => { const arts = API.getArticles(); API.setActive(T.map((_, i) => i).filter(i => arts.some(a => a.cluster_id === i))); };
+
+      API.onChange = () => { if (cur === "trend") renderTrend(); if (cur === "topic") renderTopic(); };
+
+
+
+      const h0 = (location.hash || "").slice(1);
+
+      if (["trend", "source", "topic"].includes(h0)) show(h0);
+
+    })();
+
+  </script>
+
+
+
+  <!-- 心跳警示偵測 (heartbeat check) -->
+  <script>
+    (function checkCrawlerHeartbeat() {
+      try {
+        const tl = window.A23_TIMELINE;
+        if (!tl) return;
+        let latestTs = null;
+        if (Array.isArray(tl.frames) && tl.frames.length > 0) {
+          for (let i = tl.frames.length - 1; i >= 0; i--) {
+            if (!tl.frames[i].missing && tl.frames[i].timestamp) {
+              latestTs = tl.frames[i].timestamp;
+              break;
+            }
+          }
+          if (!latestTs) latestTs = tl.frames[tl.frames.length - 1].timestamp;
+        } else if (tl.updated_at) {
+          latestTs = tl.updated_at;
+        }
+        if (!latestTs) return;
+        const normTs = latestTs.includes('T') ? latestTs : latestTs.replace(' ', 'T') + ':00';
+        const latestMs = new Date(normTs).getTime();
+        if (isNaN(latestMs)) return;
+        const diffHours = (Date.now() - latestMs) / 3600000;
+        const banner = document.getElementById('crawlerHeartbeatBanner');
+        if (banner && diffHours > 7) {
+          banner.style.display = 'block';
+          console.warn('[heartbeat] 雲端爬蟲疑似停擺：最新格距今已 ' + diffHours.toFixed(1) + ' 小時 (> 7h)');
+        }
+      } catch (err) {
+        console.error('[heartbeat] 心跳檢查失敗', err);
+      }
+    })();
+  </script>
+
+</body>
+
+</html>
+

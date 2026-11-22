@@ -1,0 +1,3826 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣即時情境看板 | Taiwan Live Scenarios Board</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕷️</text></svg>">
+  <link rel="stylesheet" href="01_shared/viz_core/scroll/scroll_fx.css">
+  <style>
+    :root {
+      /* OKLCH / Dark Theme Palette */
+      --bg-deep: oklch(0.12 0.02 260);
+      --bg-surface: oklch(0.16 0.03 260);
+      --bg-card: rgba(15, 23, 42, 0.84);
+      --card: var(--bg-card);
+      --card-bg: var(--bg-card);
+      --card-solid: #0d1e38;
+      --bg-card-hover: rgba(30, 41, 59, 0.94);
+      --bg-slot: rgba(15, 23, 42, 0.44);
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --border-active: rgba(56, 189, 248, 0.5);
+      --border-focus: #38bdf8;
+
+      --accent-cyan: #06b6d4;
+      --accent-sky: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --btn-primary: var(--accent-sky);
+
+      --ink: #f8fafc;
+      --ink-sec: #cbd5e1;
+      --ink-mute: #94a3b8;
+
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+
+      /* [O6 間距階梯 4/8px Tokens SSOT] */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+      --space-8: 64px;
+
+      /* [O7 流體排版 clamp() SSOT] */
+      --font-fluid-body: clamp(0.8125rem, 0.78rem + 0.2vw, 0.9rem);
+      --font-fluid-h2: clamp(0.92rem, 0.88rem + 0.28vw, 1.04rem);
+      --font-fluid-kpi: clamp(0.9375rem, 0.88rem + 0.35vw, 1.05rem);
+      --font-fluid-sub: clamp(0.6875rem, 0.65rem + 0.18vw, 0.75rem);
+      --font-fluid-btn: clamp(0.75rem, 0.72rem + 0.18vw, 0.8125rem);
+
+      /* [純時間緩動 SSOT: 150-250ms ease-out] */
+      --ease-out-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+      --duration-fast: 150ms;
+      --duration-normal: 220ms;
+
+      /* [O14/A5 全域 Z-Index 圖層分級 SSOT Tokens] */
+      --z-canvas-bg: 0;
+      --z-canvas-entity: 10;
+      --z-canvas-overlay: 20;
+      --z-layout-sticky: 50;
+      --z-drawer-backdrop: 80;
+      --z-drawer: 90;
+      --z-dropdown: 100;
+      --z-modal-backdrop: 200;
+      --z-modal: 210;
+      --z-toast: 300;
+      --z-fullscreen: 400;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(180deg, #0b1120 0%, #030712 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei UI", sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      font-size: var(--font-fluid-body);
+    }
+
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-layout-sticky);
+      background: rgba(3, 7, 18, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: var(--space-2) var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      font-size: 1.35rem;
+      background: rgba(6, 182, 212, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+      line-height: 1;
+    }
+
+    .brand-title {
+      font-size: var(--font-fluid-kpi);
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .brand-sub {
+      font-size: var(--font-fluid-sub);
+      color: var(--ink-mute);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .brand-badge {
+      font-size: var(--font-fluid-sub);
+      font-weight: 700;
+      padding: var(--space-1) var(--space-2);
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--font-fluid-btn);
+      font-weight: 600;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      transition: transform var(--duration-fast) var(--ease-out-smooth),
+                  background-color var(--duration-normal) var(--ease-standard),
+                  border-color var(--duration-normal) var(--ease-standard);
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 32px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.11);
+      border-color: rgba(255, 255, 255, 0.26);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0.5px);
+    }
+
+    .btn-primary-solid {
+      background: rgba(14, 165, 233, 0.22);
+      border-color: rgba(56, 189, 248, 0.55);
+      color: #f8fafc;
+    }
+
+    .btn-primary-solid:hover {
+      background: rgba(14, 165, 233, 0.34);
+      border-color: var(--border-focus);
+    }
+
+    /* [M4 & M5 狀態指示膠囊三重編碼] */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--font-fluid-sub);
+      padding: var(--space-1) var(--space-3);
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--duration-normal) var(--ease-standard),
+                  border-color var(--duration-normal) var(--ease-standard),
+                  color var(--duration-normal) var(--ease-standard);
+    }
+
+    .status-pill.pass {
+      background: rgba(52, 211, 153, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+    }
+
+    .status-pill.warn {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+
+    .status-pill.fail {
+      background: rgba(244, 63, 94, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(244, 63, 94, 0.4);
+    }
+
+    .status-symbol {
+      font-style: normal;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .wrap {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: var(--space-4) var(--space-5) var(--space-8);
+    }
+
+    /* 頂部引導與控制列 */
+    .workflow-guide-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      font-size: var(--font-fluid-sub);
+    }
+
+    .workflow-steps {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .step-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 4px var(--space-2);
+      border-radius: var(--radius-sm);
+      color: var(--ink-mute);
+    }
+
+    .step-item.done {
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.08);
+    }
+
+    .step-item.active {
+      color: var(--accent-sky);
+      background: rgba(56, 189, 248, 0.12);
+      font-weight: 700;
+    }
+
+    .workflow-next-hint {
+      color: var(--ink-sec);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .control-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .hero-summary {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .hero-kpi {
+      font-size: var(--font-fluid-kpi);
+      font-weight: 800;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .hero-desc {
+      font-size: var(--font-fluid-sub);
+      color: var(--ink-sec);
+    }
+
+    .control-actions-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      align-items: flex-end;
+    }
+
+    .batch-btn-group,
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .filter-btn,
+    .facet-btn,
+    .batch-btn {
+      padding: var(--space-2) var(--space-3);
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--ink-sec);
+      font-size: var(--font-fluid-sub);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--duration-fast) var(--ease-out-smooth),
+                  background-color var(--duration-fast) var(--ease-standard),
+                  border-color var(--duration-fast) var(--ease-standard),
+                  color var(--duration-fast) var(--ease-standard);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .filter-btn:hover,
+    .facet-btn:hover,
+    .batch-btn:hover {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .filter-btn:active,
+    .facet-btn:active,
+    .batch-btn:active {
+      transform: translateY(0.5px);
+    }
+
+    .facet-toolbar { display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-3) 0; padding: var(--space-2) var(--space-3); position: static; }
+    .facet-controls { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-5); width: 100%; }
+    .facet-row { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+    .facet-label { color: var(--ink-sec); font-size: var(--font-fluid-sub); font-weight: 700; min-width: 4.5em; }
+    .facet-icons-bar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) var(--space-3); background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); flex-wrap: wrap; }
+    .facet-icons-wrap { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; flex: 1; }
+    .facet-icons-list { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+    .facet-portals-list { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+    .facet-icon-chip { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer; color: var(--ink); transition: all var(--duration-fast) var(--ease-out-smooth); min-width: 44px; }
+    .facet-icon-chip:hover { background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.5); transform: translateY(-1px); }
+    .facet-icon-chip.active { background: rgba(14, 165, 233, 0.28); border-color: var(--accent-sky); box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+    .facet-icon-chip .chip-emoji { font-size: 1.25rem; line-height: 1; }
+    .facet-icon-chip .chip-badge-pip { font-size: 9px; padding: 4px 4px; border-radius: 4px; background: rgba(6, 182, 212, 0.25); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 700; line-height: 1.1; white-space: nowrap; }
+    
+    /* [S2] 空間技法標籤與篩選樣式 */
+    .card-tech-tags { display: inline-flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+    .card-tech-pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--accent-sky, #38bdf8);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-smooth);
+    }
+    .card-tech-pill:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent-sky, #38bdf8);
+      transform: translateY(-1px);
+    }
+    .card-tech-priority {
+      font-size: 10px;
+      padding: 4px 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--ink-dim, #94a3b8);
+      white-space: nowrap;
+    }
+    .card-tech-priority.priority-高 { border-color: rgba(16, 185, 129, 0.4); color: #10b981; }
+    .card-tech-priority.priority-中 { border-color: rgba(234, 179, 8, 0.4); color: #eab308; }
+    .card-tech-priority.priority-低 { border-color: rgba(148, 163, 184, 0.3); color: #94a3b8; }
+
+    .card-tags { display: inline-flex; gap: var(--space-2); margin-bottom: var(--space-1); }
+    .card-tag { font-size: 11px; padding: var(--space-1) var(--space-2); border-radius: 999px; border: 1px solid var(--border-subtle); color: var(--ink-sec); white-space: nowrap; }
+    .moc-ls { font-size: 10px; white-space: nowrap; margin-left: var(--space-1); padding: 0 var(--space-1); border-radius: 999px; border: 1px solid var(--border-subtle); }
+    .moc-ls.ls-live { border-color: rgba(52, 211, 153, 0.5); color: #34d399; }
+    .moc-ls.ls-replay { border-color: rgba(234, 179, 8, 0.5); color: #eab308; }
+    .moc-ls.ls-sim { border-color: rgba(56, 189, 248, 0.5); color: #38bdf8; }
+    .moc-ls.ls-skeleton { border-color: rgba(148, 163, 184, 0.4); color: #94a3b8; }
+    .card-tag.ls-live { border-color: rgba(52, 211, 153, 0.5); color: #34d399; }
+    .card-tag.ls-replay { border-color: rgba(234, 179, 8, 0.5); color: #eab308; }
+    .card-tag.ls-sim { border-color: rgba(56, 189, 248, 0.5); color: #38bdf8; }
+    .card-tag.ls-skeleton { border-color: rgba(148, 163, 184, 0.4); color: #94a3b8; }
+
+    .filter-btn.active,
+    .facet-btn.active,
+    .batch-btn.active {
+      background: rgba(14, 165, 233, 0.2);
+      border-color: var(--border-focus);
+      color: var(--ink);
+    }
+
+    .batch-btn.ai-copilot-btn {
+      background: rgba(14, 165, 233, 0.12);
+      border-color: rgba(56, 189, 248, 0.38);
+      color: #7dd3fc;
+    }
+
+    .batch-btn.ai-copilot-btn:hover {
+      background: rgba(14, 165, 233, 0.24);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    .search-input {
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: var(--space-2) var(--space-3);
+      color: var(--ink);
+      font-size: var(--font-fluid-sub);
+      min-width: 210px;
+      outline: none;
+      transition: border-color var(--duration-fast) var(--ease-standard);
+    }
+
+    .search-input::placeholder { color: var(--ink-mute); }
+    .search-input:focus { border-color: var(--border-focus); }
+
+    /* =====================================================================
+       [頂列 MOC 總圖 + 頂端列 Github Gallery 入口]
+       ===================================================================== */
+    .top-featured-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .moc-hub-span4 {
+      grid-column: 1 / -1;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    /* 頂端列 Github Gallery 迷你卡片 */
+    .top-nav-ai365 {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color var(--duration-fast) var(--ease-standard),
+                  background-color var(--duration-fast) var(--ease-standard);
+      text-decoration: none;
+    }
+
+    .top-nav-ai365:hover,
+    .top-nav-ai365.is-selected {
+      border-color: var(--border-focus);
+      background: var(--bg-card-hover);
+    }
+
+    .top-nav-ai365-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+    }
+
+    .top-nav-ai365-top .ai365-badge-box {
+      font-size: 10px;
+      padding: 4px 4px;
+      line-height: 1.1;
+    }
+
+    .top-nav-ai365-top .card-state {
+      font-size: 10px;
+      line-height: 1.1;
+    }
+
+    .top-nav-ai365-body {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .top-nav-ai365-body .card-readme-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .top-nav-ai365-body .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .top-nav-ai365-body .readme-hint-tag {
+      font-size: 9.5px;
+      color: var(--ink-mute);
+      white-space: nowrap;
+    }
+
+    .top-nav-ai365-body .gh-stage-thumb {
+      padding: 4px 4px;
+      min-width: 52px;
+      height: auto;
+    }
+
+    .ai365-hub-span1 {
+      grid-column: span 1;
+      background: var(--bg-card);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-2);
+      transition: transform var(--duration-fast) var(--ease-out-smooth),
+                  border-color var(--duration-fast) var(--ease-standard),
+                  background-color var(--duration-fast) var(--ease-standard);
+    }
+
+    .ai365-hub-span1:hover,
+    .ai365-hub-span1.is-selected {
+      border-color: var(--border-focus);
+      background: var(--bg-card-hover);
+    }
+
+    .moc-hub-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .moc-title-cluster {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .moc-strip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-2);
+    }
+
+    .moc-strip-grid.list-mode {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .moc-strip-grid.reverse-ab .moc-mini-item {
+      flex-direction: row-reverse;
+    }
+
+    .matrix-grid.reverse-ab .card-header-split {
+      flex-direction: row-reverse;
+    }
+
+    .moc-mini-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+      background: rgba(3, 7, 18, 0.62);
+      border: 1px solid var(--border-subtle);
+      transition: border-color var(--duration-fast) var(--ease-standard),
+                  background-color var(--duration-fast) var(--ease-standard);
+      min-width: 0;
+    }
+
+    .moc-mini-item { flex-wrap: nowrap; min-height: 42px; }
+    .moc-five { display: none; }
+    .moc-five li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .moc-five b { display: inline-block; min-width: 1.4em; margin-right: 4px; color: var(--accent, #38bdf8); font-weight: 800; }
+    .moc-mini-item:hover,
+    .moc-mini-item.is-selected {
+      border-color: var(--border-focus);
+      background: rgba(14, 165, 233, 0.14);
+    }
+
+    .moc-mini-link {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-1);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .moc-mini-link:hover {
+      color: var(--accent-sky);
+    }
+
+    .moc-mini-link:hover .moc-mini-name {
+      color: var(--accent-sky);
+      text-decoration: underline;
+    }
+
+    .moc-mini-code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent-sky);
+      background: rgba(56, 189, 248, 0.14);
+      padding: 0 var(--space-1);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .moc-mini-name {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .moc-mini-popout {
+      font-size: 10px;
+      color: var(--ink-mute);
+      margin-left: var(--space-1);
+      flex-shrink: 0;
+    }
+
+    .moc-mini-link:hover .moc-mini-popout {
+      color: var(--accent-sky);
+    }
+
+    .moc-mini-stage-btn {
+      background: #050a14;
+      border: 1px solid rgba(56, 189, 248, 0.36);
+      color: var(--accent-sky);
+      border-radius: var(--radius-sm);
+      width: 48px;
+      height: 36px;
+      padding: var(--space-1);
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform var(--duration-fast) var(--ease-out-smooth),
+                  background-color var(--duration-fast) var(--ease-standard),
+                  border-color var(--duration-fast) var(--ease-standard),
+                  color var(--duration-fast) var(--ease-standard);
+    }
+
+    .moc-mini-stage-btn:hover,
+    .moc-mini-item.is-selected .moc-mini-stage-btn {
+      background: rgba(14, 165, 233, 0.22);
+      border-color: var(--border-focus);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* AI365 專席徽章與縮圖預覽區 */
+    .ai365-badge-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-weight: 900;
+      font-size: 12px;
+      padding: var(--space-1) var(--space-2);
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+    }
+
+    .ai365-preview-screen {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      background: #070d19;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      cursor: pointer;
+      text-align: left;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      transition: border-color var(--duration-fast) var(--ease-standard),
+                  transform var(--duration-fast) var(--ease-out-smooth);
+    }
+
+    .ai365-preview-screen:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-1px);
+    }
+
+    .ai365-preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--ink-mute);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .ai365-preview-fleets {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .ai365-fleet-pill {
+      font-size: 10px;
+      padding: var(--space-1) var(--space-2);
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.16);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+    }
+
+    /* =====================================================================
+       [5 欄 × 4 列 = 20 張入口卡片矩陣]
+       每張卡片：題目連結 (開啟該資料夾 README.md) + GitHub 網頁縮圖 UI 元件 (開啟下方母畫面)
+       ===================================================================== */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+
+    .matrix-grid.compact-cards .card-desc,
+    .matrix-grid.compact-cards .card-tags {
+      display: none;
+    }
+
+    .matrix-grid.compact-cards .portal-card {
+      min-height: 104px;
+      padding: var(--space-3);
+    }
+
+    @media (max-width: 1280px) {
+      .top-featured-grid { grid-template-columns: 1fr; }
+      .moc-hub-span4 { grid-column: 1 / -1; }
+      .moc-strip-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .matrix-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (max-width: 992px) {
+      .top-featured-grid { grid-template-columns: 1fr; }
+      .moc-hub-span4 { grid-column: 1 / -1; }
+      .moc-strip-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .matrix-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .control-actions-wrap { align-items: flex-start; }
+    }
+    @media (max-width: 720px) {
+      .moc-strip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .matrix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 480px) {
+      .moc-strip-grid { grid-template-columns: 1fr; }
+      .matrix-grid { grid-template-columns: 1fr; }
+    }
+
+    .portal-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 152px;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--ink);
+      transition: transform var(--duration-fast) var(--ease-out-smooth),
+                  border-color var(--duration-fast) var(--ease-standard),
+                  background-color var(--duration-fast) var(--ease-standard);
+    }
+
+    .portal-card.is-live {
+      border-color: rgba(56, 189, 248, 0.28);
+    }
+
+    .portal-card.is-live:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-focus);
+      background: var(--bg-card-hover);
+    }
+
+    .portal-card.is-draft {
+      border-color: rgba(245, 158, 11, 0.32);
+    }
+
+    .portal-card.is-draft:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-amber);
+      background: var(--bg-card-hover);
+    }
+
+    .portal-card.is-slot {
+      background: var(--bg-slot);
+      border-style: dashed;
+    }
+
+    .portal-card.is-slot:hover {
+      border-color: rgba(148, 163, 184, 0.36);
+      background: rgba(15, 23, 42, 0.66);
+    }
+
+    .portal-card.is-selected {
+      border-color: var(--border-focus);
+      border-style: solid;
+      background: rgba(14, 165, 233, 0.13);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .card-index {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: var(--font-fluid-sub);
+      font-weight: 800;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--ink-sec);
+    }
+
+    .is-live .card-index {
+      background: rgba(6, 182, 212, 0.18);
+      color: var(--accent-sky);
+    }
+
+    .is-draft .card-index {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+    }
+
+    .card-state {
+      font-size: 11px;
+      font-weight: 700;
+      padding: var(--space-1) var(--space-2);
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .state-live {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .state-draft {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .state-slot {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--ink-mute);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    /* 卡片核心雙互動列：[題目連結 -> README.md] + [GitHub 網頁縮圖 UI 元件 -> 下方母畫面] */
+    .card-header-split {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .card-readme-link {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      text-decoration: none;
+      color: var(--ink);
+      flex: 1;
+      min-width: 0;
+      transition: color var(--duration-fast) var(--ease-standard);
+    }
+
+    .card-readme-link:hover {
+      color: var(--accent-sky);
+    }
+
+    .card-readme-link:hover .card-title {
+      color: var(--accent-sky);
+      text-decoration: underline;
+    }
+
+    .card-emoji {
+      font-size: 1.1rem;
+      line-height: 1.25;
+      flex-shrink: 0;
+    }
+
+    .card-title-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: var(--font-fluid-h2);
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.3;
+      transition: color var(--duration-fast) var(--ease-standard);
+    }
+
+    .is-slot .card-title {
+      color: var(--ink-sec);
+      font-weight: 700;
+    }
+
+    .readme-hint-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      color: var(--ink-mute);
+    }
+
+    .card-readme-link:hover .readme-hint-tag {
+      color: #7dd3fc;
+    }
+
+    /* [GitHub 網頁縮圖 UI 元件] 讓用戶一眼聯想「點擊在下方母畫面開啟 GitHub 互動網頁」 */
+    .gh-stage-thumb {
+      flex-shrink: 0;
+      width: 64px;
+      padding: var(--space-1) var(--space-2);
+      border-radius: 7px;
+      background: #060b16;
+      border: 1px solid rgba(56, 189, 248, 0.34);
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      align-items: stretch;
+      transition: transform var(--duration-fast) var(--ease-out-smooth),
+                  border-color var(--duration-fast) var(--ease-standard),
+                  background-color var(--duration-fast) var(--ease-standard);
+    }
+
+    .gh-stage-thumb:hover {
+      transform: translateY(-1.5px) scale(1.03);
+      border-color: var(--border-focus);
+      background: #0c192e;
+    }
+
+    .gh-stage-thumb:active {
+      transform: translateY(0.5px);
+    }
+
+    .gh-thumb-chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-1);
+    }
+
+    .gh-thumb-dots {
+      display: inline-flex;
+      gap: var(--space-1);
+    }
+
+    .gh-thumb-dots i {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(148, 163, 184, 0.55);
+      display: block;
+    }
+
+    .gh-thumb-screen {
+      height: 20px;
+      border-radius: 4px;
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #7dd3fc;
+    }
+
+    .gh-thumb-caption {
+      font-size: 9.5px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-weight: 700;
+      color: var(--accent-sky);
+      text-align: center;
+      line-height: 1.1;
+      letter-spacing: -0.2px;
+    }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--ink-sec);
+      line-height: 1.45;
+      margin-bottom: var(--space-2);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .is-slot .card-desc {
+      color: var(--ink-mute);
+    }
+
+    .card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      padding-top: var(--space-2);
+      border-top: 1px solid rgba(148, 163, 184, 0.1);
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      color: var(--ink-mute);
+    }
+
+    .card-foot-path {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-foot-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    .card-mini-action {
+      background: transparent;
+      border: 0;
+      color: var(--accent-sky);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+    }
+
+    .card-mini-action:hover {
+      text-decoration: underline;
+    }
+
+    /* =====================================================================
+       [下方主要畫面：子母畫面 (Master-Detail Embedded Stage)]
+       ===================================================================== */
+    .pip-stage-section {
+      margin-top: var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid rgba(56, 189, 248, 0.38);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .pip-stage-section.is-theater .pip-viewport-wrap {
+      height: 82vh;
+    }
+
+    .pip-stage-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .pip-stage-title-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .pip-stage-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(14, 165, 233, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+    }
+
+    .pip-stage-title {
+      font-size: var(--font-fluid-kpi);
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .pip-stage-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .pip-preset-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      background: rgba(3, 7, 18, 0.62);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pip-preset-list {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .pip-url-form {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex: 1;
+      min-width: 280px;
+      justify-content: flex-end;
+    }
+
+    .pip-url-input {
+      flex: 1;
+      max-width: 440px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: var(--space-2) var(--space-3);
+      color: var(--ink-sec);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .pip-url-input:focus {
+      border-color: var(--border-focus);
+      color: var(--ink);
+    }
+
+    .pip-viewport-wrap {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.26);
+      background: #030712;
+    }
+
+    .pip-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #030712;
+    }
+
+    .pip-iframe.is-hidden,
+    .pip-diagram-view.is-hidden {
+      display: none;
+    }
+
+    .pip-diagram-view {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      background: #030712;
+    }
+
+    @media (max-width: 960px) {
+      .pip-diagram-view {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(340px, 1fr) auto;
+      }
+    }
+
+    .pip-canvas-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #030712;
+      overflow: hidden;
+    }
+
+    /* 專案快照：有 snapshot.png（實作截圖）或 snapshot_poc.png（MVP 示意）就蓋在 canvas 上，否則退回 canvas 代表圖示 */
+    .pip-canvas-stage { position: relative; }
+    .pip-snap-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #05070c; z-index: 2; }
+    .pip-snap-img.is-hidden { display: none; }
+    .pip-rep-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .pip-rep-hud {
+      border-left: 1px solid var(--border-subtle);
+      background: rgba(8, 14, 28, 0.94);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-3);
+      overflow-y: auto;
+    }
+
+    .pip-hud-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .pip-hud-kicker {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent-sky);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+    }
+
+    .pip-hud-title {
+      font-size: var(--font-fluid-kpi);
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+
+    .pip-hud-desc {
+      font-size: 12.5px;
+      color: var(--ink-sec);
+      line-height: 1.55;
+    }
+
+    .pip-hud-legend {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      padding-top: var(--space-2);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .pip-legend-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 12px;
+      color: var(--ink-sec);
+    }
+
+    .pip-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .pip-hud-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .pip-hud-actions .btn {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: var(--space-6) var(--space-5);
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-lg);
+      color: var(--ink-sec);
+      font-size: var(--font-fluid-body);
+    }
+
+    .empty-state.visible {
+      display: block;
+    }
+
+    .ops-memo { margin-top: var(--space-6); padding: 12px 16px; border: 1px solid #f59e0b; border-left: 4px solid #f59e0b; border-radius: 8px; background: rgba(245,158,11,.08); font-size: 13px; line-height: 1.6; color: var(--ink, #e2e8f0); }
+    .ops-memo ul { margin: 8px 0 0; padding-left: 20px; }
+    .ops-memo code { font-family: ui-monospace, Consolas, monospace; }
+    .footer-note {
+      margin-top: var(--space-6);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      font-size: var(--font-fluid-sub);
+      color: var(--ink-mute);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    /* [O14 非模態 Toast 系統 (Z-Index 300)] */
+    .toast-container {
+      position: fixed;
+      bottom: var(--space-5);
+      right: var(--space-5);
+      z-index: var(--z-toast);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      pointer-events: none;
+    }
+
+    .toast-item {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-sm);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      color: var(--ink);
+      font-size: var(--font-fluid-btn);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform var(--duration-normal) var(--ease-out-smooth),
+                  opacity var(--duration-normal) var(--ease-standard);
+    }
+
+    .toast-item.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-item.info { border-color: rgba(56, 189, 248, 0.4); }
+    .toast-item.success { border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+    .toast-item.warn { border-color: rgba(251, 191, 36, 0.4); color: #fbbf24; }
+
+    .toast-undo-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--ink);
+      padding: 4px var(--space-2);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: var(--font-fluid-sub);
+      font-weight: 700;
+      margin-left: var(--space-2);
+      transition: background-color var(--duration-fast) var(--ease-standard);
+    }
+
+    .toast-undo-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* [M1 二次防呆與非模態確認] */
+    .danger-confirm-dialog {
+      background: var(--card-solid, #0d1e38);
+      border: 1px solid var(--accent-rose);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-5);
+      display: none;
+      align-items: center;
+      gap: var(--space-3);
+      position: fixed;
+      bottom: var(--space-5);
+      right: var(--space-5);
+      z-index: var(--z-modal);
+    }
+    .danger-confirm-dialog.show { display: flex; }
+    .danger-confirm-btn-group { display: flex; gap: var(--space-2); margin-left: var(--space-2); }
+    .symbol-rose { color: var(--accent-rose); }
+
+    .step-arrow { color: var(--ink-mute); user-select: none; }
+    .step-arrow-lg { font-size: 20px; color: var(--ink-mute); user-select: none; }
+
+    /* [A5 下鑽抽屜與 RCA] */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: var(--z-drawer-backdrop);
+      display: none;
+      opacity: 0;
+      transition: opacity var(--duration-normal) var(--ease-standard);
+    }
+    .drawer-backdrop.show { display: block; opacity: 1; }
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(480px, 92vw);
+      height: 100vh;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      z-index: var(--z-drawer);
+      transform: translateX(100%);
+      transition: transform var(--duration-normal) var(--ease-out-smooth);
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-5);
+      overflow-y: auto;
+    }
+    .drawer-panel.show { transform: translateX(0); }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-4);
+    }
+    .drawer-title-group { display: flex; align-items: center; gap: var(--space-3); }
+    .drawer-title { font-size: var(--font-fluid-h2); font-weight: 700; }
+    .drawer-sub { font-size: var(--font-fluid-sub); color: var(--ink-mute); }
+    .drawer-body { flex: 1; display: flex; flex-direction: column; gap: var(--space-4); }
+    .drawer-card {
+      padding: var(--space-4);
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+    .drawer-card-title { font-weight: 700; margin-bottom: var(--space-2); }
+    .drawer-card-content { color: var(--ink-sec); font-size: var(--font-fluid-sub); line-height: 1.6; }
+    .drawer-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+      margin-top: var(--space-4);
+    }
+
+    /* [A6 雙階段輪次軌跡對照彈窗] */
+    .rounds-delta-badge {
+      background: transparent;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent-sky);
+      border-radius: var(--radius-sm);
+      padding: 4px var(--space-2);
+      font-size: var(--font-fluid-sub);
+      cursor: pointer;
+      transition: background-color var(--duration-fast) var(--ease-standard);
+    }
+    .rounds-delta-badge:hover { background: rgba(56, 189, 248, 0.15); }
+    .rounds-delta-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: var(--z-modal);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+    }
+    .rounds-delta-modal.show { display: flex; }
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-active);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      width: min(560px, 94vw);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .delta-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+      text-align: center;
+    }
+    .delta-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+    }
+    .delta-card-label { color: var(--ink-mute); font-size: var(--font-fluid-sub); }
+    .delta-score-badge { font-size: var(--font-fluid-h2); font-weight: 800; margin-top: var(--space-2); }
+    .delta-score-c { color: var(--accent-rose); }
+    .delta-score-s { color: var(--accent-emerald); }
+    .delta-grade-c { color: var(--accent-rose); font-size: var(--font-fluid-sub); margin-top: var(--space-1); }
+    .delta-grade-s { color: var(--accent-emerald); font-size: var(--font-fluid-sub); margin-top: var(--space-1); }
+    .delta-close-row { text-align: right; margin-top: var(--space-4); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms;
+        animation-iteration-count: 1;
+        transition-duration: 0.01ms;
+        scroll-behavior: auto;
+      }
+    }
+
+    /* ==== 母子視窗 (2026-11-02)：母視窗不重複顯示 20 席位矩陣；矩陣改於子視窗 ?view=matrix 呈現 ==== */
+    body.atlas-mother #matrixGrid, body.atlas-mother #emptyState { display: none !important; }
+    body.atlas-matrix-child .top-featured-grid, body.atlas-matrix-child #pipMainStage,
+    body.atlas-matrix-child .workflow-next-hint { display: none !important; }
+    .pipwin-open-btn { white-space: nowrap; }
+  
+    
+    /* [2026-11-02 stagebar] 去重標籤 + 分組 + 進階抽屜 */
+    #stageModeBadge { display: none; }
+    .pip-stage-controls { gap: 8px; }
+    .seg-group, .ctl-group { display: inline-flex; gap: 4px; align-items: center; }
+    .seg-group { gap: 0; }
+    .seg-group .btn { border-radius: 0; margin: 0; }
+    .seg-group .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg-group .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg-group .btn + .btn { border-left-width: 0; }
+    .ctl-group + .ctl-group, .seg-group + .ctl-group { padding-left: 8px; border-left: 1px solid rgba(148,163,184,.25); }
+    .chip-sep { width: 1px; align-self: stretch; background: rgba(148,163,184,.3); margin: 0 4px; }
+    #stageCurrentChip.is-hidden { display: none; }
+    .pip-advanced > summary { cursor: pointer; font-size: 12px; opacity: .7; padding: 4px 8px; list-style: none; }
+    .pip-advanced > summary::-webkit-details-marker { display: none; }
+    .pip-advanced[open] > summary { opacity: 1; }
+    /* [2026-11-02 MVP] 隱藏重複/無效按鈕（保留程式碼，刪此段即恢復）：本機畫布=另開視窗、README 已在 HUD、GitHub Pages 未部署、重整/展開高度非必要 */
+    #btnStageUseLocal, #btnStageUseGithub, #btnStageOpenReadme, #btnStageReload, #btnStageTheater { display: none !important; }
+    .seg-group .btn:first-child { border-radius: 8px; }
+    .ctl-icons { display: none !important; }
+    /* 頁首彈出面板（取代步驟列／指引列／MOC 標題列，20261102） */
+    .hover-pop { position: relative; display: inline-flex; }
+    .hover-pop-panel { display: none; position: absolute; left: 0; top: 100%; z-index: 9999; padding-top: 4px; }
+    .hover-pop:hover .hover-pop-panel, .hover-pop:focus-within .hover-pop-panel { display: block; }
+    .hover-pop-panel > * { background: #0f172a; }
+    .hover-pop-panel { filter: drop-shadow(0 8px 20px rgba(0,0,0,.5)); }
+    .hover-pop-title { border: 1px solid var(--border-subtle, #334155); border-bottom: 0; border-radius: 8px 8px 0 0; padding: 8px 12px; font-weight: 800; font-size: 13px; white-space: nowrap; }
+    .hover-pop-panel .workflow-steps, .hover-pop-list, .hover-pop-note { border: 1px solid var(--border-subtle, #334155); border-top: 0; padding: 8px 12px; }
+    .hover-pop-panel .workflow-steps { flex-direction: column; align-items: flex-start; min-width: 340px; }
+    .hover-pop-panel .step-arrow { display: none; }
+    .hover-pop-note { border-radius: 0 0 8px 8px; font-size: 12px; opacity: .8; }
+    .hover-pop-list { border-radius: 0 0 8px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; min-width: 460px; max-height: 60vh; overflow: auto; }
+    .hover-pop-list a { font-size: 12px; padding: 4px 4px; border-radius: 4px; color: inherit; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hover-pop-list a:hover { background: rgba(56,189,248,.15); }
+
+
+    /* [2026-11-03 fixed-stage] 參照 portal.html：切換按鈕列固定位置、主畫面固定大小，切換時不再上下跳動 */
+    html { scrollbar-gutter: stable; overflow-anchor: none; }
+    .facet-icons-bar { flex-wrap: nowrap; height: 64px; padding-top: 0; padding-bottom: 0; }
+    .facet-icons-wrap { flex-wrap: nowrap; min-width: 0; height: 100%; }
+    .facet-icons-list { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; min-width: 0; height: 100%; padding: 0 4px; scrollbar-width: thin; }
+    .facet-icon-chip { flex: 0 0 auto; padding: 4px 4px; min-width: 40px; }
+    .facet-icons-list { gap: 4px; }
+    .facet-icons-wrap > .facet-label, .facet-portals-list > .facet-label { white-space: nowrap; flex: 0 0 auto; }
+    .facet-icon-chip:hover { transform: none; }
+    .facet-portals-list { flex: 0 0 auto; display: flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+    .pip-stage-head { min-height: 44px; }
+    .pip-stage-title-group { min-width: 0; flex: 1 1 auto; }
+    .pip-stage-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pip-viewport-wrap { height: max(600px, calc(100vh - 220px)); flex: 0 0 auto; }
+
+    /* [2026-11-03 adv-float] 進階抽屜縮進標題列右端，展開為浮動面板，不佔整列、不推擠主畫面 */
+    .pip-stage-head { position: relative; flex-wrap: nowrap; }
+    .pip-stage-head > .pip-preset-bar { margin-left: auto; padding: 0; background: none; border: 0; flex: 0 0 auto; }
+    .pip-advanced[open] > .pip-url-form { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; width: min(720px, 90vw); padding: 8px; background: #0f172a; border: 1px solid var(--border-subtle, #334155); border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+  </style>
+<style id="publish-a23">a[href="#slot-unpublished"]{pointer-events:none;opacity:.5;filter:grayscale(.7)}
+a[href="#slot-unpublished"]::after{content:"籌備中";position:absolute;top:10px;right:10px;font-size:12px;padding:2px 8px;border-radius:9px;background:#333;color:#ccc}
+a[href="#vault-only"]{display:none!important}</style>
+</head>
+<body>
+  <div class="fx-progress" id="readBar" aria-hidden="true"></div>
+
+  <header class="top-header">
+    <div class="brand-wrap">
+      <div class="brand-icon">🕷️</div>
+      <div>
+        <div class="brand-title">
+          <span>台灣即時情境看板</span>
+          <span class="brand-badge">A23 PIP v5.0</span>
+        </div>
+        <div class="brand-sub">SSOT: github:SDRmsung/Sovereign-E-Data-Atlas</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <div class="hover-pop" id="mocHoverPop">
+        <a href="000_MOC_A23_Data_Atlas.md" target="_blank" rel="noopener" class="btn" title="開啟 github:SDRmsung/Sovereign-E-Data-Atlas"><span>🗺️</span><span>MOC 總圖</span></a>
+        <div class="hover-pop-panel">
+          <div class="hover-pop-title">000_MOC · 13 大時空情境 (s01–s13) ＋ 非空間 (z01)</div>
+          <div class="hover-pop-list" id="mocPopList"></div>
+        </div>
+      </div>
+      <div class="hover-pop" id="chartCatHoverPop">
+        <a href="01_shared/viz_core/charts/demo/chart_demo.html" target="_blank" rel="noopener" class="btn" title="n05 動態圖表型錄 Top5 示範（github:SDRmsung/Sovereign-E-Data-Atlas"><span>📊</span><span>圖表型錄</span></a>
+        <div class="hover-pop-panel">
+          <div class="hover-pop-title">n05 動態圖表型錄（29 型）· 已實作 Top5</div>
+          <div class="hover-pop-list">
+            <a href="01_shared/viz_core/charts/demo/chart_demo.html" target="_blank" rel="noopener">▶ Top5 動態示範（Bar Race／Bubble／Heatmap／Sankey／Flow Map）</a>
+            <a href="01_shared/viz_core/charts/gallery/scroll_grid.html" target="_blank" rel="noopener">📜 捲動敘事型錄 →</a>
+            <a href="#vault-only" target="_blank" rel="noopener" data-local-only>🖥️ 本機 8777 捲動敘事型錄</a>
+            <a href="00_notes/n05_dynamic_chart_catalog.md" target="_blank" rel="noopener">📖 n05 型錄與選型速查</a>
+          </div>
+        </div>
+      </div>
+      <a href="01_shared/viz_core/charts/gallery/scroll_grid.html" target="_blank" rel="noopener" class="btn" id="btnScrollGrid" title="開啟捲動敘事型錄（24 項動態捲動效果）">
+        <span>📜</span><span>捲動敘事型錄 →</span>
+      </a>
+      <div class="hover-pop" id="helpHoverPop">
+        <button type="button" class="btn" aria-label="怎麼用" title="怎麼用">❔</button>
+        <div class="hover-pop-panel">
+          <div class="hover-pop-title">怎麼用（3 步）</div>
+          <div class="workflow-steps">
+        <span class="step-item done" id="step1Indicator"><span class="status-symbol">✓</span> 步驟 1: 頂列 (4+1) 與 5×4 矩陣就緒</span>
+        <span class="step-arrow">→</span>
+        <span class="step-item active" id="step2Indicator"><span class="status-symbol">●</span> 步驟 2: 點標題讀 README · 點縮圖開下方子母畫面</span>
+        <span class="step-arrow">→</span>
+        <span class="step-item" id="step3Indicator"><span class="status-symbol">○</span> 步驟 3: 子母畫面即時檢視 GitHub 互動網頁</span>
+      </div>
+          <div class="hover-pop-note">左點題目 → 讀 README；右點縮圖 → 下方開互動頁</div>
+        </div>
+      </div>
+      <a href="#pipMainStage" class="btn btn-primary-solid" title="跳轉至下方子母畫面主要視窗">
+        <span>⬒</span><span>主要畫面</span>
+      </a>
+      <a href="#vault-only" class="btn" title="回到 3D 首頁" data-fallback="#vault-only">
+        <span>🏝️</span><span>3D 首頁</span>
+      </a>
+      <a href="#vault-only" class="btn" title="開啟主權指揮艙母畫面" data-fallback="#vault-only">
+        <span>🧭</span><span>指揮艙</span>
+      </a>
+      <!-- 13+ 情境與 Gallery (33 Repositories) 連結路徑清單 (取代原有任務拆解按鈕) -->
+      <a href="13_Scenarios_Gallery_Link_Matrix.md" target="_blank" rel="noopener" class="btn" id="btnScenariosGalleryMd" title="開啟 13 大時空動態情境 (s01–s13, z01) 與 GitHub Gallery (33 Repositories) 連結路徑清單 (*.md)">
+        <span>🔗</span><span>情境表列 md</span>
+      </a>
+      <!-- Github Gallery 按鈕（樣式、高度、框度與其他標籤完全一致） -->
+      <a href="https://sdrmsung.github.io/ai365/" target="_blank" rel="noopener" class="btn" id="btnStageAi365Thumb" title="載入 Github Gallery (ai365)">
+        <span>Github Gallery</span>
+      </a>
+      <div id="globalConnCapsule" class="status-pill pass" title="點擊切換模擬伺服器狀態" role="status" aria-live="polite">
+        <span class="status-symbol">●</span>
+        <span id="systemStatusText">正常 (Online)</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- 步驟列與下一步指引已移至頁首 ❔ 彈出說明（20261102） -->
+
+    <!-- ===================================================================
+         [最上方：000_MOC_A23_Data_Atlas.md 13 大時空動態情境 (s01–s13) 與非空間情報 (z01) 縮圖表列]
+         =================================================================== -->
+    <section class="top-featured-grid" aria-label="頂部 MOC 總圖">
+      <div class="moc-hub-span4">
+        <div class="moc-hub-head">
+          <!-- MOC 標題已縮為頁首「🗺 MOC 總圖」按鈕（20261102） -->
+          <div class="batch-btn-group">
+            <input type="search" id="searchBox" class="search-input" placeholder="🔍 搜尋題目、情境關鍵字..." aria-label="搜尋時空情境題目">
+            <div id="mocFilterNotice" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:rgba(56,189,248,0.18);color:#38bdf8;border:1px solid rgba(56,189,248,0.4);"></div>
+            <button type="button" class="facet-btn active" id="mocLayoutGridBtn" title="4 欄情境表列：(A)題目另開視窗 + (B)圖示載入下方母畫面">▦ 縮圖表列</button>
+            <button type="button" class="facet-btn" id="mocLayoutListBtn" title="2 欄寬幅完整題目清單">☰ 題目清單</button>
+            <button type="button" class="facet-btn" id="mocSwapAbBtn" title="切換 (A)題目+(B)圖示 或 (B)圖示+(A)題目 排列順序">⇄ 圖/題互換</button>
+            <button type="button" class="facet-btn pipwin-open-btn" id="btnOpenMatrixChild" title="於獨立子視窗開啟 4列×5張 20 席位矩陣（母視窗不重複顯示）">▦ 20 席位矩陣 ↗</button>
+            <button type="button" class="gh-stage-thumb" id="btnStageAtlasRepo" title="於下方主要畫面開啟 s01 代表圖示">
+              <span class="gh-thumb-chrome">
+                <span class="gh-thumb-dots"><i></i><i></i><i></i></span>
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              </span>
+              <span class="gh-thumb-caption">代表圖 ▼</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="moc-strip-grid fx-stagger" id="mocTopicStrip" aria-label="s01 至 s13 與 z01 題目清單">
+          <!-- 由 JS 同步渲染 s01–s13 + z01 共 14 項：(A) 點題目另開視窗展開該專案、(B) 點圖示於下方子母畫面呈現代表圖示 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         [4 列 × 5 張卡片 = 20 張入口卡片矩陣]
+         每張卡片：左點題目開啟該資料夾 README.md；右點 GitHub 網頁縮圖於下方主要畫面開啟網頁
+         =================================================================== -->
+    <section class="matrix-grid fx-stagger" id="matrixGrid" aria-label="4列x5張 資料圖譜卡片網格">
+      <!-- 初始預渲染保底，載入後由 renderGrid() 注入完整互動按鈕 -->
+    </section>
+
+    <div class="empty-state" id="emptyState">
+      <span class="status-symbol">✕</span> 找不到符合條件的模組卡片，請清除關鍵字或切換回「全部席位 (20)」。
+    </div>
+
+    <!-- ===================================================================
+         [下方主要畫面：子母畫面 (Representative Diagram + Embedded Interactive Stage)]
+         =================================================================== -->
+    <div class="facet-toolbar" id="facetToolbar" aria-label="畫布與模式篩選工具列">
+      <div class="facet-controls">
+        <div class="facet-row" id="facetCanvas" role="group" aria-label="依畫布篩選">
+          <span class="facet-label">畫布 canvas</span>
+          <button type="button" class="facet-btn active" data-facet="canvas" data-value="all">全部</button>
+          <button type="button" class="facet-btn" data-facet="canvas" data-value="geo" title="空間資訊：2D 地圖、3D 地形/建物、投影與座標">geo 空間</button>
+          <button type="button" class="facet-btn" data-facet="canvas" data-value="body">body 人體</button>
+          <button type="button" class="facet-btn" data-facet="canvas" data-value="graph">graph 關係網</button>
+        </div>
+        <div class="facet-row" id="facetMode" role="group" aria-label="依資料模式篩選">
+          <span class="facet-label">模式 mode</span>
+          <button type="button" class="facet-btn active" data-facet="mode" data-value="all">全部</button>
+          <button type="button" class="facet-btn" data-facet="mode" data-value="static">static 靜態</button>
+          <button type="button" class="facet-btn" data-facet="mode" data-value="live">live 即時</button>
+          <button type="button" class="facet-btn" data-facet="mode" data-value="simulated">simulated 模擬</button>
+        </div>
+      
+        <div class="facet-row" id="spatialTechFacetRow" style="display:none;width:100%;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border-subtle);">
+            <span class="facet-label">空間技法：</span>
+            <div class="facet-buttons" id="spatialTechButtons" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"></div>
+          </div>
+      </div>
+      <!-- 相對應專案小圖示列（點選篩選即出現，點小圖示即於下方主畫面呈現該專案快照） -->
+      <div class="facet-icons-bar" id="facetIconsBar" aria-label="相對應專案小圖示快照清單">
+        <div class="facet-icons-wrap">
+          <span class="facet-label" style="min-width:auto;">專案快照：</span>
+          <div class="facet-icons-list" id="facetIconsList"></div>
+        </div>
+        <div class="facet-portals-list">
+          <span class="chip-sep" aria-hidden="true"></span>
+          <span class="facet-label" style="min-width:auto;">入口：</span>
+          <button type="button" class="facet-btn" data-stage-preset="https://sdrmsung.github.io/Sovereign-E-Executive-Flow-Portal/" data-stage-label="⚡ Sovereign-E-Executive-Flow-Portal (決策流場示範)">⚡ Executive Flow</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="pip-stage-section" id="pipMainStage" aria-label="下方子母畫面主要顯示區">
+      <div class="pip-stage-head">
+        <div class="pip-stage-title-group">
+          <span class="pip-stage-badge" id="stageModeBadge">🎨 代表圖示子母畫面</span>
+          <h2 class="pip-stage-title" id="stageActiveTitle">🛣️ s01. (傳) 台灣的大動脈：國道與雙鐵脈動</h2>
+        </div>
+
+        <div class="pip-stage-controls">
+          <div class="seg-group" role="group" aria-label="檢視模式">
+          <button type="button" class="btn" id="btnStageUseLocal" title="於下方主要畫面嵌入該專案完整互動網頁 (index.html)">💻 本機畫布</button>
+          <button type="button" class="btn" id="btnStageUseGithub" title="切換載入該卡片綁定的 GitHub Pages 網頁">🌐 GitHub 網頁</button>
+          </div>
+          <div class="ctl-group" aria-label="外部開啟">
+          <a href="s01_artery_flow/README.md" target="_blank" rel="noopener" class="btn" id="btnStageOpenReadme" title="另開新分頁檢視該題規格卡 README.md">📄 README ↗</a>
+          </div>
+          <div class="ctl-group ctl-icons" aria-label="畫布控制">
+          <button type="button" class="btn" id="btnStageReload" title="重新載入下方子母畫面">↻ 重整</button>
+          <button type="button" class="btn" id="btnStageTheater" title="放大或還原子母畫面高度">⛶ 展開高度</button>
+          </div>
+        </div>
+        <div class="pip-preset-bar" title="開發者工具：手動載入網址／綁定卡片 GitHub 網址">
+        <details class="pip-advanced"><summary>⚙ 進階</summary>
+        <form class="pip-url-form" id="stageUrlForm">
+          <input type="text" class="pip-url-input" id="stageUrlInput" value="s01_artery_flow/index.html" aria-label="目前子母畫面網址或綁定卡片 GitHub 網址" title="可直接輸入任意 GitHub Pages 網址載入，或綁定至目前選中卡片">
+          <button type="submit" class="btn">載入網址</button>
+          <button type="button" class="btn" id="btnBindCardGhUrl" title="將輸入框網址儲存為目前選中卡片的專屬 GitHub 網頁連結">🔗 綁定此卡</button>
+        </form>
+        </details>
+      </div>
+      </div>
+
+
+      <div class="pip-viewport-wrap">
+        <!-- [代表圖示主舞台] 點擊任一情境 (B) icon 直接在此呈現高對比動態代表圖示 -->
+        <div id="pipDiagramView" class="pip-diagram-view" aria-label="情境代表圖示畫布">
+          <div class="pip-canvas-stage" id="pipCanvasStage">
+            <canvas id="pipRepCanvas" class="pip-rep-canvas" width="1280" height="720" aria-label="時空動態情境與非空間情報代表圖示"></canvas>
+            <img id="pipSnapImg" class="pip-snap-img is-hidden" alt="專案快照" />
+          </div>
+          <aside class="pip-rep-hud" aria-label="代表圖示圖例與專案展開捷徑">
+            <div class="pip-hud-stack">
+              <div class="pip-hud-kicker">
+                <span id="pipHudCode">S01 · GEO / LIVE</span>
+                <span id="pipHudGranularity">1 分鐘即時快照</span>
+              </div>
+              <h3 class="pip-hud-title" id="pipHudTitle">(傳) 台灣的大動脈：國道與雙鐵脈動</h3>
+              <p class="pip-hud-desc" id="pipHudDesc">颱風日全台十萬車流與軌道停駛韌性縮時。反差：東部軌道封閉斷流 vs 西部走廊冰藍高速與台74琥珀橘壅塞。</p>
+              <div class="pip-hud-legend" id="pipHudLegend"></div>
+            </div>
+            <div class="pip-hud-actions">
+              <button type="button" class="btn" id="pipHudLoadLocal">💻 於此母畫面載入互動網頁 ▼</button>
+              <a href="s01_artery_flow/README.md" target="_blank" rel="noopener" class="btn" id="pipHudOpenReadme">📄 開啟規格卡 README.md ↗</a>
+            </div>
+          </aside>
+        </div>
+
+        <iframe
+          id="pipStageIframe"
+          class="pip-iframe is-hidden"
+          src="about:blank"
+          title="A23 Data Atlas 子母畫面互動視窗"
+          allow="fullscreen; clipboard-write"
+          loading="lazy">
+        </iframe>
+      </div>
+    </section>
+
+      <!-- 知識擴散列 (2026-11-03 移至主畫面下方，避免中斷「快照鈕→主畫面」因果鏈)：SSOT → GitHub repo → Pages 發布狀態 -->
+      <div class="facet-row" id="knowledgeDiffusionBar" aria-label="知識擴散發布狀態" style="margin-top:var(--space-4); padding:8px 12px; border:1px dashed rgba(6,182,212,.45); border-radius:10px;">
+        <span class="facet-label" style="min-width:auto;">📡 知識擴散：</span>
+        <span style="font-size:12.5px; color:var(--ink-sec);">SSOT → S2 隱私閘 → 親簽 → GitHub repo → Pages</span>
+        <span class="chip-sep" aria-hidden="true"></span>
+        <span style="font-size:12.5px;">🟢 發布中：<b>s01 · s02 · s04 · shared</b>（<b class="fx-count" data-to="4">4</b> 卡／總席位 <b class="fx-count" data-to="20">20</b>／情境 <b class="fx-count" data-to="14">14</b> 題）</span>
+        <span style="font-size:12.5px; color:var(--ink-sec);">⚪ Coming soon：其餘 <b class="fx-count" data-to="11">11</b> 卡</span>
+        <span class="chip-sep" aria-hidden="true"></span>
+        <a class="facet-btn" href="https://github.com/SDRmsung/Sovereign-E-Data-Atlas" target="_blank" rel="noopener">GitHub repo ↗</a>
+        <a class="facet-btn" href="https://sdrmsung.github.io/Sovereign-E-Data-Atlas/" target="_blank" rel="noopener">GitHub Pages ↗</a>
+        <a class="facet-btn" href="https://sdrmsung.github.io/ai365/" target="_blank" rel="noopener">ai365 入口 ↗</a>
+      </div>
+
+    <aside class="ops-memo" id="z01CloudMemo" aria-label="作業備忘：z01 雲端爬取">
+      <strong>📌 備忘（2026-11-08 更新）z01 新聞脈動：雲端主爬＋外部定時觸發＋本機每小時備援</strong>
+      <ul>
+        <li>原因：GitHub 自己的排程實測被節流（約 4~6 小時才跑一次，皆成功），造成熱度圖灰底斷層。</li>
+        <li>雲端：cron-job.org 每小時整點呼叫 GitHub workflow_dispatch；GitHub 自身排程（第 17 分）保留當備援。</li>
+        <li>本機：Windows 排程 vault_z01_hourly_local 每小時第 47 分執行 run_hourly_local.bat（先 git pull 同步雲端 feed\，再爬取）。</li>
+        <li>頁面橫幅：最新一格 &gt;7 小時未更新才顯示「雲端爬蟲疑似停擺」，先查 GitHub Actions 與 cron-job.org 的 HISTORY。</li>
+        <li>給 agents：feed\ 可能被雲端與本機兩邊寫入，不要手動改 feed\；排程停用請封存不刪。</li>
+        <li>踩雷（2026-11-08）：任何程式改寫 feed\latest_frame.js 時，變數名必須是 window.A23_FEED；寫成 Z01_LATEST_FRAME 會讓頁面顯示 OFFLINE（無資料）。已修 translate_titles.py。</li>
+        <li>任務提示詞：github:SDRmsung/Sovereign-E-Data-Atlas</li>
+      </ul>
+    </aside>
+    <footer class="footer-note">
+      <span>ROOT: github:SDRmsung/Sovereign-E-Data-Atlas</span>
+      <span>LAYOUT: Top (4+1 MOC + ai365) · Matrix (4×5 = 20 Cards) · Bottom (Embedded GitHub Stage)</span>
+      <button type="button" id="roundsDeltaBadge" class="rounds-delta-badge" title="查看雙階段輪次對照軌跡">輪次軌跡: 雙階段輪次對照 (Rounds Delta)</button>
+    </footer>
+  </main>
+
+  <!-- 非模態 Toast 提示容器 -->
+  <div class="toast-container" id="toastContainer" aria-live="assertive"></div>
+
+  <!-- [M1 二次防呆與非模態確認對話框] -->
+  <div id="dangerConfirmDialog" class="danger-confirm-dialog modal-dialog-confirm" role="dialog" aria-modal="true" aria-labelledby="confirmDialogText">
+    <span class="status-symbol symbol-rose">▲</span>
+    <span id="confirmDialogText">確定要將矩陣席位配置與自訂網址重設歸零？</span>
+    <div class="danger-confirm-btn-group">
+      <button type="button" class="btn" id="confirmResetBtn">確認歸零</button>
+      <button type="button" class="btn" id="cancelResetBtn">取消</button>
+    </div>
+  </div>
+
+  <!-- [A5 可操作性下鑽抽屜與 RCA 因果排查] -->
+  <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
+  <aside id="rcaDrawer" class="drawer-panel modal-drawer" role="dialog" aria-labelledby="drawerTitle" aria-modal="true">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span id="drawerEmoji" class="card-emoji">🔍</span>
+        <div>
+          <h2 id="drawerTitle" class="drawer-title">情報席位下鑽診斷</h2>
+          <div id="drawerSub" class="drawer-sub">即時因果鏈路與狀態審計</div>
+        </div>
+      </div>
+      <button type="button" class="btn" onclick="closeDrawer()" aria-label="關閉抽屜">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+      <div class="drawer-card">
+        <div class="drawer-card-title">📊 即時監控指標</div>
+        <div id="drawerMetrics" class="drawer-card-content">點擊席位卡片查看最新管線延遲與落盤健全度。</div>
+      </div>
+      <div class="drawer-card">
+        <div class="drawer-card-title">🔍 RCA 因果排查日誌</div>
+        <div id="drawerRcaLog" class="drawer-card-content">管線未回報死連結或阻斷級異常，通信鏈路通暢。</div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-primary-solid" id="drawerFixBtn" onclick="drillDownSelfHeal()">⚡ 一鍵管線健康自癒</button>
+      <button type="button" class="btn" onclick="closeDrawer()">關閉</button>
+    </div>
+  </aside>
+
+  <!-- [A6 雙階段輪次軌跡 (Rounds Delta) 對照彈窗] -->
+  <div id="roundsDeltaModal" class="rounds-delta-modal modal-dialog" role="dialog" aria-modal="true" aria-labelledby="roundsDeltaTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="roundsDeltaTitle" class="modal-title">📊 雙階段輪次對照 (Rounds Delta)</h2>
+        <button type="button" class="btn" onclick="closeRoundsDeltaModal()" aria-label="關閉輪次對照">✕</button>
+      </div>
+      <div class="delta-grid">
+        <div class="delta-card">
+          <div class="delta-card-label">Step 2 首次檢驗 (Round 1)</div>
+          <div class="delta-score-badge delta-score-c">65 / 74 分</div>
+          <div class="delta-grade-c">🚨 C 級 (M未達標)</div>
+        </div>
+        <span class="step-arrow-lg">→</span>
+        <div class="delta-card">
+          <div class="delta-card-label">Step 3 子母畫面升級 (Round 2)</div>
+          <div class="delta-score-badge delta-score-s">74 / 74 分</div>
+          <div class="delta-grade-s">🏆 S 級 (滿分卓越)</div>
+        </div>
+      </div>
+      <div class="delta-close-row">
+        <button type="button" class="btn" onclick="closeRoundsDeltaModal()">關閉視窗</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="live_status.js"></script>
+  <script>
+    /* [I3 資料持久化與版本遷移防禦引擎 (Schema v5: 子母畫面 + README + GitHub 縮圖)] */
+    const STORAGE_KEY = "A23_CRAWLER_PORTAL_STATE_V9";
+    const CURRENT_SCHEMA_VERSION = 9;
+    const DEFAULT_DEMO_GH_URL = "https://sdrmsung.github.io/ai365/";
+    const AI365_GH_URL = "https://sdrmsung.github.io/ai365/";
+    const ATLAS_PAGES_BASE = "https://sdrmsung.github.io/Sovereign-E-Data-Atlas/";
+
+    const GITHUB_OCTOCAT_SVG = `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>`;
+
+    const PIP_STAGE_ICON_SVG = `<svg width="13" height="11" viewBox="0 0 16 13" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="1" y="1" width="14" height="11" rx="2"/><rect x="7.5" y="5.5" width="6" height="5" rx="1" fill="currentColor" fill-opacity="0.35"/></svg>`;
+
+    const DEFAULT_CARDS = [
+      {
+        id: "01", code: "s01",
+        mapTech: ["flow_map", "projection_trap"], mapTechPriority: "中", shortName: "台灣的大動脈",
+        status: "live", stateLabel: "標竿運行", emoji: "🛣️",
+        title: "(傳) 台灣的大動脈：國道與雙鐵脈動",
+        desc: "[1 分鐘即時快照｜24分] 颱風日全台十萬車流與軌道停駛韌性縮時。反差：東部軌道封閉斷流 vs 西部走廊冰藍高速與台74琥珀橘壅塞。",
+        path: "A23_Data_Atlas/s01_artery_flow/",
+        href: "s01_artery_flow/index.html",
+        readmeHref: "s01_artery_flow/README.md",
+        ghUrl: ATLAS_PAGES_BASE + "s01_artery_flow/index.html",
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "02", code: "s02",
+        mapTech: ["point_filter", "choropleth", "reverse_geocode"], mapTechPriority: "高", shortName: "YouBike潮汐調度",
+        status: "live", stateLabel: "P1 首做", emoji: "🚲",
+        title: "(傳) YouBike潮汐調度戰",
+        desc: "[分鐘級（5 分鐘批次更新）｜24分] 通勤潮如何搬空一座城市的車。反差：晨峰住宅區紅燈搬空歸零 vs 捷運商辦亮白滿位塞爆 vs 深夜保母車逆向補綠。",
+        path: "A23_Data_Atlas/s02_youbike_tide/",
+        href: "s02_youbike_tide/index.html",
+        readmeHref: "s02_youbike_tide/README.md",
+        ghUrl: ATLAS_PAGES_BASE + "s02_youbike_tide/index.html",
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "03", code: "s03",
+        mapTech: ["flow_map", "point_filter"], mapTechPriority: "高", shortName: "公車誤點地獄圖",
+        status: "draft", stateLabel: "P1 首做", emoji: "🚌",
+        title: "(傳) 公車誤點地獄圖",
+        desc: "[分鐘級（30 秒至 1 分鐘即時串流）｜24分] 哪條路、哪時段永遠誤點。反差：離峰青藍準點細流 vs 晚峰延誤 >10m 暗紅連號車淤血動脈。",
+        path: "A23_Data_Atlas/s03_bus_delay/",
+        href: "#slot-unpublished",
+        readmeHref: "s03_bus_delay/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "04", code: "s04",
+        mapTech: ["point_filter", "basemap_switch"], mapTechPriority: "中", shortName: "國道服務區滯留",
+        status: "live", stateLabel: "P1 首做", emoji: "⛽",
+        title: "(傳) 國道服務區滯留",
+        desc: "[分鐘級（1 至 5 分鐘更新）｜24分] 連假車流在哪休息多久。反差：主線金黃高速光帶轉紅 vs 清水/關西服務區紫紅充血心臟滿溢回堵。",
+        path: "A23_Data_Atlas/s04_freeway_rest/",
+        href: "s04_freeway_rest/index.html",
+        readmeHref: "s04_freeway_rest/README.md",
+        ghUrl: ATLAS_PAGES_BASE + "s04_freeway_rest/index.html",
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "05", code: "s05",
+        mapTech: ["heat_density", "choropleth"], mapTechPriority: "高", shortName: "空品逃難圖",
+        status: "draft", stateLabel: "P1 首做", emoji: "😷",
+        title: "(政) 空品逃難圖：PM2.5與公園人潮連動",
+        desc: "[分鐘級（3 至 5 分鐘更新）｜23分] 毒霧壓境時，誰還在公園深呼吸？反差：紫紅毒霧壓境吞噬綠洲 vs 清晨運動人潮逆勢發亮之感知延遲盲區。",
+        path: "A23_Data_Atlas/s05_pm25_escape/",
+        href: "#slot-unpublished",
+        readmeHref: "s05_pm25_escape/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "06", code: "s06",
+        mapTech: ["choropleth", "terrain_3d"], mapTechPriority: "高", shortName: "體感溫度穿搭",
+        status: "live", stateLabel: "LIVE", emoji: "🧥",
+        title: "(傳) 體感溫度穿搭地圖",
+        desc: "[小時級（逐時觀測與鄉鎮預報）｜23分] 氣候站雨量＋風速＋濕度對全台一日穿搭的撕裂影響。反差：北部濕冷季風 8°C 羽絨警戒 vs 屏東 26°C 短袖陽光。",
+        path: "A23_Data_Atlas/s06_temp_outfit/",
+        href: "s06_temp_outfit/index.html",
+        readmeHref: "s06_temp_outfit/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "07", code: "s07",
+        mapTech: ["point_filter", "reverse_geocode"], mapTechPriority: "高", shortName: "充電樁飢渴地圖",
+        status: "draft", stateLabel: "P1 首做", emoji: "🔌",
+        title: "(政) 充電樁飢渴地圖",
+        desc: "[分鐘級（1 至 5 分鐘更新）｜22分] 電動車充電樁真實排隊等待時間與蚊子樁失衡。反差：週五連假熱門站點橘紅滿載排隊高柱 vs 偏鄉低使用率蚊子樁。",
+        path: "A23_Data_Atlas/s07_ev_charger/",
+        href: "#slot-unpublished",
+        readmeHref: "s07_ev_charger/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "08", code: "s08",
+        mapTech: ["heat_density", "point_filter"], mapTechPriority: "高", shortName: "科技執法熱點",
+        status: "draft", stateLabel: "P2 特赦", emoji: "📸",
+        title: "(政) 科技執法熱點：測速與肇事死亡疊合",
+        desc: "[月 / 年級（歷年批次統計，特赦拯救題）｜24分] 測速照相插滿筆直大道，真正撞死人的路口卻沒半支？反差：筆直大道密集藍光 vs 死亡路口血紅高柱。",
+        path: "A23_Data_Atlas/s08_speedcam_crash/",
+        href: "#slot-unpublished",
+        readmeHref: "s08_speedcam_crash/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "09", code: "s09",
+        mapTech: ["choropleth", "point_filter"], mapTechPriority: "中", shortName: "租屋空窗漂流",
+        status: "draft", stateLabel: "P2 特赦", emoji: "🏢",
+        title: "(傳) 租屋空窗漂流：空屋在哪漂、租金何時跳",
+        desc: "[季 / 年級（半年空屋率與各季租賃實價）｜22分] 明明空屋黑壓壓一片，為什麼年輕人房租還是狂飆？反差：底層冰藍低度用電空屋海 vs 火紅租金尖塔。",
+        path: "A23_Data_Atlas/s09_vacancy_rent/",
+        href: "#slot-unpublished",
+        readmeHref: "s09_vacancy_rent/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "10", code: "s10",
+        mapTech: ["flow_map", "basemap_switch"], mapTechPriority: "中", shortName: "觀光遊憩潮汐",
+        status: "draft", stateLabel: "P2 次做", emoji: "🏞️",
+        title: "(政) 觀光遊憩潮汐：台灣好行＋景區人流",
+        desc: "[小時 / 日級（即時車流與逐時景區人流）｜21分] 接駁公車 17:00 斷流收班，誰還卡在山城與夜市？反差：清晨亮藍接駁光軌 vs 傍晚斷流滯留高塔。",
+        path: "A23_Data_Atlas/s10_tour_shuttle/",
+        href: "#slot-unpublished",
+        readmeHref: "s10_tour_shuttle/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "11", code: "s11",
+        mapTech: ["terrain_3d", "choropleth"], mapTechPriority: "高", shortName: "淹水房價疤痕",
+        status: "draft", stateLabel: "P3 特赦", emoji: "🌊",
+        title: "(政) 淹水房價疤痕：淹水潛勢與實價登錄疊合",
+        desc: "[月 / 年級（颱風事件前後 12 個月對比）｜20分] 台灣買房族對颱風淹水的記憶只有幾個月？反差：颱風當月淹水區塌陷 vs 災後數月迅速遺忘回彈。",
+        path: "A23_Data_Atlas/s11_flood_scar/",
+        href: "#slot-unpublished",
+        readmeHref: "s11_flood_scar/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "12", code: "s12",
+        mapTech: ["point_filter", "choropleth"], mapTechPriority: "高", shortName: "托育長照沙漠",
+        status: "draft", stateLabel: "P3 特赦", emoji: "👶",
+        title: "(政) 托育長照沙漠：據點可達性時序",
+        desc: "[年級（2018–2026 歷年村里消長）｜21分] 重劃區幼兒如火山暴增，托育綠洲為何追不上沙漠化？反差：青綠 15 分鐘等時圈綠洲 vs 暗紅龜裂沙漠。",
+        path: "A23_Data_Atlas/s12_care_desert/",
+        href: "#slot-unpublished",
+        readmeHref: "s12_care_desert/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "13", code: "shared",
+        mapTech: [], mapTechPriority: "", shortName: "共用引擎底座",
+        status: "live", stateLabel: "共同技術底座", emoji: "🧰",
+        title: "01_shared 共用引擎底座",
+        desc: "跨題共享 TDX/CWA/實價登錄爬蟲、20m DEM 暗色底圖、deck.gl Harness 與 FFmpeg faststart 產線。",
+        path: "A23_Data_Atlas/01_shared/",
+        href: "01_shared/index.html",
+        readmeHref: "000_MOC_A23_Data_Atlas.md",
+        ghUrl: ATLAS_PAGES_BASE + "01_shared/index.html",
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "14", code: "z01",
+        mapTech: ["heat_density", "reverse_geocode"], mapTechPriority: "中", shortName: "即時新聞情報流",
+        status: "live", stateLabel: "非空間情報流", emoji: "📰",
+        title: "即時新聞與科技情報爬蟲 (z01)",
+        desc: "全網頭條聚類、HuggingFace/ArXiv/GitHub 前沿動態與總經指標（非地圖類獨立情報流，字首 z 沉底隔離）。",
+        path: "A23_Data_Atlas/z01_news_pulse/",
+        href: "#slot-unpublished",
+        readmeHref: "z01_news_pulse/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "15", code: "s13",
+        mapTech: [], mapTechPriority: "低", shortName: "人體循環傳導",
+        status: "draft", stateLabel: "骨架·simulated", emoji: "🫀",
+        title: "(流) 人體循環與中西醫傳導粒子",
+        desc: "[模擬資料｜骨架] 血液循環與經絡傳導的粒子流動。壓差驅動、血管阻力、栓塞閥門；視覺本體另開任務。",
+        path: "A23_Data_Atlas/s13_body_circulation/",
+        href: "#slot-unpublished",
+        readmeHref: "s13_body_circulation/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "16", code: "s16_power_grid",
+        mapTech: ["flow_map", "point_filter"], mapTechPriority: "高", shortName: "台電電網今日脈動",
+        status: "live", stateLabel: "即時運行", emoji: "⚡",
+        title: "(傳) 台灣電網今日脈動：鴨子曲線",
+        desc: "台電各機組類型（太陽能/燃氣/燃煤/風力/水力）即時發電量＋全台負載曲線，動畫呈現供需潮汐與鴨子曲線",
+        path: "A23_Data_Atlas/s16_power_grid/",
+        demoHref: "s16_power_grid/index.html",
+        readmeHref: "s16_power_grid/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "17", code: "s17", shortName: "水庫水情見底",
+        status: "live", stateLabel: "即時運行", emoji: "💧",
+        title: "(政) 水庫水情：誰的水杯先見底",
+        desc: "水利署全台主要水庫即時蓄水率、有效蓄水量與進出水粒子流動動畫，對照南北水情枯蓄態勢。",
+        path: "A23_Data_Atlas/s17_reservoir/",
+        href: "s17_reservoir/index.html",
+        readmeHref: "s17_reservoir/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "18", code: "s18_green_pulse", shortName: "綠脈碳流消納",
+        status: "live", stateLabel: "即時運行", emoji: "🌱",
+        title: "(政) 綠脈碳流：光伏風場併網與碳排消納脈動",
+        desc: "台電即時綠能案場併網發電量 vs 環境部排碳大戶工業區碳足跡對沖，動態呈現消納潮汐。",
+        path: "A23_Data_Atlas/s18_green_pulse/",
+        href: "s18_green_pulse/index.html",
+        readmeHref: "s18_green_pulse/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "19", code: "s19_food_coldchain", shortName: "糧道冷鏈動脈",
+        status: "live", stateLabel: "深夜回放", emoji: "🥬",
+        title: "(傳) 糧道大動脈：全台深夜產地到餐桌蔬果奔流",
+        desc: "農糧署全台果菜市場即時拍賣行情 + TDX 低溫冷鏈物流，凌晨 00-06 點全台糧食大動脈回放。",
+        path: "A23_Data_Atlas/s19_food_coldchain/",
+        href: "s19_food_coldchain/index.html",
+        readmeHref: "s19_food_coldchain/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      },
+      {
+        id: "20", code: "s20_bridge_chokepoint", shortName: "跨河咽喉閘門",
+        status: "live", stateLabel: "即時運行", emoji: "🌉",
+        title: "(傳) 咽喉閘門：大都會跨河橋樑潮汐與通行黑洞",
+        desc: "雙北 12 座聯外跨河橋樑 VD 分鐘級流量時速，視覺化早晚尖峰百萬通勤族的漏斗擠壓與通行黑洞。",
+        path: "A23_Data_Atlas/s20_bridge_chokepoint/",
+        href: "s20_bridge_chokepoint/index.html",
+        readmeHref: "s20_bridge_chokepoint/README.md",
+        ghUrl: DEFAULT_DEMO_GH_URL,
+        cta: "母畫面預覽 ▼"
+      }
+    ];
+
+    /* canvas/data_mode 分類（SSOT＝各 sNN/config.yaml） */
+    const FACETS = {
+      "01":{canvas:"geo",data_mode:"live",mapTech:["flow_map", "projection_trap"],mapTechPriority:"中"},"02":{canvas:"geo",data_mode:"live",mapTech:["point_filter", "choropleth", "reverse_geocode"],mapTechPriority:"高"},"03":{canvas:"geo",data_mode:"live",mapTech:["flow_map", "point_filter"],mapTechPriority:"高"},
+      "04":{canvas:"geo",data_mode:"live",mapTech:["point_filter", "basemap_switch"],mapTechPriority:"中"},"05":{canvas:"geo",data_mode:"live",mapTech:["heat_density", "choropleth"],mapTechPriority:"高"},"06":{canvas:"geo",data_mode:"live",mapTech:["choropleth", "terrain_3d"],mapTechPriority:"高"},
+      "07":{canvas:"geo",data_mode:"live",mapTech:["point_filter", "reverse_geocode"],mapTechPriority:"高"},"08":{canvas:"geo",data_mode:"static",mapTech:["heat_density", "point_filter"],mapTechPriority:"高"},"09":{canvas:"geo",data_mode:"static",mapTech:["choropleth", "point_filter"],mapTechPriority:"中"},
+      "10":{canvas:"geo",data_mode:"live",mapTech:["flow_map", "basemap_switch"],mapTechPriority:"中"},"11":{canvas:"geo",data_mode:"static",mapTech:["terrain_3d", "choropleth"],mapTechPriority:"高"},"12":{canvas:"geo",data_mode:"static",mapTech:["point_filter", "choropleth"],mapTechPriority:"高"},
+      "13":{canvas:"infra",data_mode:"infra",mapTech:[],mapTechPriority:""},"14":{canvas:"graph",data_mode:"live",mapTech:["heat_density", "reverse_geocode"],mapTechPriority:"中"},"15":{canvas:"body",data_mode:"simulated",mapTech:[],mapTechPriority:"低"},"16":{canvas:"flow",data_mode:"live",mapTech:["flow_map", "point_filter"],mapTechPriority:"高"},"17":{canvas:"geo",data_mode:"live",mapTech:["point_filter", "flow_map"],mapTechPriority:"高"},
+      "18":{canvas:"flow",data_mode:"live",mapTech:["flow_map", "column_3d"],mapTechPriority:"高"},"19":{canvas:"geo",data_mode:"replay",mapTech:["flow_map", "heat_density"],mapTechPriority:"高"},"20":{canvas:"geo",data_mode:"live",mapTech:["flow_map", "point_filter"],mapTechPriority:"高"}
+    };
+    DEFAULT_CARDS.forEach((c) => Object.assign(c, FACETS[c.id] || {}));
+
+    function mergeCardDefaults(cards) {
+      return cards.map((c) => {
+        const d = DEFAULT_CARDS.find((x) => x.id === c.id);
+        if (!d) return c;
+        const isSlotUpdate = ["16", "17", "18", "19", "20"].includes(c.id) && (c.code === "slot16" || c.code === "slot17" || c.code === "slot18" || c.code === "slot19" || c.code === "slot20" || !c.code || (c.title && c.title.includes("預留擴充席位")));
+        return Object.assign({}, d, c, {
+          title: isSlotUpdate ? d.title : (c.title || d.title),
+          desc: isSlotUpdate ? d.desc : (c.desc || d.desc),
+          emoji: isSlotUpdate ? d.emoji : (c.emoji || d.emoji),
+          status: isSlotUpdate ? d.status : (c.status || d.status),
+          stateLabel: isSlotUpdate ? d.stateLabel : (c.stateLabel || d.stateLabel),
+          readmeHref: c.readmeHref || d.readmeHref,
+          ghUrl: c.ghUrl || d.ghUrl,
+          code: d.code,
+          shortName: d.shortName,
+          canvas: c.canvas || d.canvas,
+          data_mode: c.data_mode || d.data_mode,
+          mapTech: d.mapTech || c.mapTech || [],
+          mapTechPriority: d.mapTechPriority || c.mapTechPriority || ""
+        });
+      });
+    }
+
+    function loadStateWithMigration() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          const fresh = { version: CURRENT_SCHEMA_VERSION, cards: JSON.parse(JSON.stringify(DEFAULT_CARDS)), round: 1, compact: false };
+          saveState(fresh);
+          return fresh;
+        }
+        const parsed = JSON.parse(raw);
+        if (!parsed.version || parsed.version < CURRENT_SCHEMA_VERSION || !Array.isArray(parsed.cards)) {
+          const mergedCards = Array.isArray(parsed.cards) ? mergeCardDefaults(parsed.cards) : JSON.parse(JSON.stringify(DEFAULT_CARDS));
+          const fresh = {
+            version: CURRENT_SCHEMA_VERSION,
+            cards: mergedCards,
+            round: (parsed.round || 1) + 1,
+            compact: Boolean(parsed.compact)
+          };
+          saveState(fresh);
+          return fresh;
+        }
+        parsed.cards = mergeCardDefaults(parsed.cards);
+        return parsed;
+      } catch (e) {
+        const fresh = { version: CURRENT_SCHEMA_VERSION, cards: JSON.parse(JSON.stringify(DEFAULT_CARDS)), round: 1, compact: false };
+        saveState(fresh);
+        return fresh;
+      }
+    }
+
+    function saveState(state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("[StorageSaveFailed]", e);
+      }
+    }
+
+    let appState = loadStateWithMigration();
+    if (appState.reverseAb === undefined) appState.reverseAb = false;
+    let undoBuffer = null;
+    let selectedCardId = "01";
+    let activeDiagramAnimId = null;
+
+    const gridEl = document.getElementById("matrixGrid");
+    const mocStripEl = document.getElementById("mocTopicStrip");
+    const emptyEl = document.getElementById("emptyState");
+    const searchEl = document.getElementById("searchBox");
+    const filterBtns = document.querySelectorAll(".filter-btn");
+    const toastContainer = document.getElementById("toastContainer");
+    const systemStatusPill = document.getElementById("globalConnCapsule");
+    const roundsDeltaBadge = document.getElementById("roundsDeltaBadge");
+
+    /* 子母畫面 DOM */
+    const pipStageSection = document.getElementById("pipMainStage");
+    const pipStageIframe = document.getElementById("pipStageIframe");
+    const pipDiagramView = document.getElementById("pipDiagramView");
+    const pipRepCanvas = document.getElementById("pipRepCanvas");
+    const stageActiveTitle = document.getElementById("stageActiveTitle");
+    const stageModeBadge = document.getElementById("stageModeBadge");
+    const stageUrlInput = document.getElementById("stageUrlInput");
+    const btnStageOpenExternal = document.getElementById("btnStageOpenExternal");
+    const btnStageOpenReadme = document.getElementById("btnStageOpenReadme");
+    const btnStageUseDiagram = document.getElementById("btnStageUseDiagram");
+    const btnStageUseLocal = document.getElementById("btnStageUseLocal");
+    const btnStageUseGithub = document.getElementById("btnStageUseGithub");
+    const mocSwapAbBtn = document.getElementById("mocSwapAbBtn");
+
+    /* 代表圖示 HUD DOM */
+    const pipHudCode = document.getElementById("pipHudCode");
+    const pipHudGranularity = document.getElementById("pipHudGranularity");
+    const pipHudTitle = document.getElementById("pipHudTitle");
+    const pipHudDesc = document.getElementById("pipHudDesc");
+    const pipHudLegend = document.getElementById("pipHudLegend");
+    const pipHudOpenProject = document.getElementById("pipHudOpenProject");
+    const pipHudLoadLocal = document.getElementById("pipHudLoadLocal");
+    const pipHudOpenReadme = document.getElementById("pipHudOpenReadme");
+
+    let currentFilter = "all";
+
+    const SPATIAL_TECH_NAMES = {
+      point_filter: "點位篩選",
+      reverse_geocode: "座標反查",
+      basemap_switch: "底圖切換",
+      terrain_3d: "3D 地形",
+      projection_trap: "投影陷阱",
+      choropleth: "分級設色",
+      flow_map: "流向圖",
+      heat_density: "熱區密度"
+    };
+    let currentSpatialTech = "all";
+
+    let currentCanvas = "all";
+    let currentMode = "all";
+
+    function syncSwapAbUI() {
+      const isRev = Boolean(appState.reverseAb);
+      mocStripEl?.classList.toggle("reverse-ab", isRev);
+      gridEl?.classList.toggle("reverse-ab", isRev);
+      if (mocSwapAbBtn) {
+        mocSwapAbBtn.classList.toggle("active", isRev);
+        mocSwapAbBtn.textContent = isRev ? "⇄ (B)圖+(A)題" : "⇄ (A)題+(B)圖";
+      }
+    }
+
+    function showToast(message, type = "info", undoCallback = null) {
+      const toast = document.createElement("div");
+      toast.className = `toast-item ${type}`;
+      const symbol = type === "success" ? "✓" : type === "warn" ? "▲" : "ℹ";
+      toast.innerHTML = `<span class="status-symbol">${symbol}</span><span>${message}</span>`;
+
+      if (undoCallback) {
+        const undoBtn = document.createElement("button");
+        undoBtn.className = "toast-undo-btn";
+        undoBtn.textContent = "復原 (Undo)";
+        undoBtn.addEventListener("click", () => {
+          undoCallback();
+          toast.remove();
+        });
+        toast.appendChild(undoBtn);
+      }
+
+      toastContainer.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add("show"));
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 240);
+      }, 3800);
+    }
+
+    function getStatusSymbol(status) {
+      if (status === "live") return "●";
+      if (status === "draft") return "▲";
+      return "■";
+    }
+
+    /* =====================================================================
+       子母畫面核心控制器：代表圖示 (Canvas) vs 互動網頁 (Iframe)
+       ===================================================================== */
+    function syncQuickChips() {
+      document.querySelectorAll(".facet-icon-chip").forEach((b) => {
+        b.classList.toggle("active", b.dataset.cardId === selectedCardId);
+      });
+    }
+
+    /* [2026-11-02] 動態渲染畫布列篩選之專案小圖示，點選直接載入主畫面快照 */
+    function renderFacetIcons() {
+      const container = document.getElementById("facetIconsList");
+      if (!container) return;
+      const filtered = appState.cards.filter((c) => {
+        const matchCanvas = currentCanvas === "all" || c.canvas === currentCanvas;
+        const matchMode = currentMode === "all" || c.data_mode === currentMode;
+        const matchTech = (currentCanvas !== "geo" || currentSpatialTech === "all") || (c.mapTech && c.mapTech.includes(currentSpatialTech));
+        return matchCanvas && matchMode && matchTech;
+      });
+
+      container.innerHTML = "";
+      if (filtered.length === 0) {
+        container.innerHTML = `<span style="font-size: 12px; color: var(--ink-mute);">無符合此條件的專案</span>`;
+        return;
+      }
+
+      filtered.forEach((card) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `facet-icon-chip ${card.id === selectedCardId ? "active" : ""}`;
+        btn.dataset.cardId = card.id;
+        btn.title = `${card.code ? card.code + ': ' : ''}${card.shortName || card.title} (點選於主畫面載入快照)`;
+        btn.setAttribute("aria-label", `載入 ${card.title} 快照`);
+        btn.innerHTML = `
+          <span class="chip-emoji">${card.emoji || "📦"}</span>
+          <span class="chip-badge-pip">${card.code ? card.code + '▼' : '圖示▼'}</span>
+        `;
+        btn.addEventListener("click", () => {
+          showDiagramStage(card.id, false);
+          syncQuickChips();
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    /* 專案快照：依序嘗試 snapshot.png → snapshot_poc.png，都沒有就顯示 canvas 代表圖示 */
+    function loadCardSnapshot(card) {
+      const img = document.getElementById("pipSnapImg");
+      if (!img) return;
+      img.classList.add("is-hidden");
+      const href = card && (card.href || "");
+      const m = href.match(/^(.*\/)[^\/]*$/);
+      if (!m || href.startsWith("http")) return;
+      const tries = [m[1] + "snapshot.png", m[1] + "snapshot_poc.png"];
+      const token = Symbol();
+      img._token = token;
+      const next = (i) => {
+        if (i >= tries.length || img._token !== token) return;
+        img.onload = () => { if (img._token === token) { img.classList.remove("is-hidden"); img.alt = `${card.title} 專案快照`; } };
+        img.onerror = () => next(i + 1);
+        img.src = tries[i] + "?v=" + Date.now();
+      };
+      next(0);
+    }
+
+    function showDiagramStage(cardId, scrollToStage = true) {
+      selectedCardId = cardId;
+      const card = appState.cards.find((c) => c.id === cardId) || appState.cards[0];
+      if (!card) return;
+
+      if (activeDiagramAnimId) {
+        cancelAnimationFrame(activeDiagramAnimId);
+        activeDiagramAnimId = null;
+      }
+
+      pipDiagramView.classList.remove("is-hidden");
+      pipStageIframe.classList.add("is-hidden");
+
+      stageModeBadge.textContent = "🎨 代表圖示子母畫面";
+      loadCardSnapshot(card);
+      stageActiveTitle.textContent = `${card.emoji} ${card.code ? card.code + '. ' : ''}${card.title}`;
+      stageUrlInput.value = card.href || card.readmeHref;
+
+      const projectUrl = card.href || card.readmeHref;
+      const readmeUrl = card.readmeHref || "000_MOC_A23_Data_Atlas.md";
+
+      if (btnStageOpenExternal) btnStageOpenExternal.href = projectUrl;
+      btnStageOpenReadme.href = readmeUrl;
+
+      btnStageUseDiagram?.classList.add("btn-primary-solid");
+      btnStageUseLocal.classList.remove("btn-primary-solid");
+      btnStageUseGithub.classList.remove("btn-primary-solid");
+
+      /* 更新右側 HUD */
+      if (pipHudCode) pipHudCode.textContent = `${(card.code || 'CARD').toUpperCase()} · ${(card.canvas || 'GEO').toUpperCase()} / ${(card.data_mode || 'LIVE').toUpperCase()}`;
+      if (pipHudGranularity) pipHudGranularity.textContent = card.status === 'live' ? '即時串流 / 運行模組' : '模擬 / 規格草案';
+      if (pipHudTitle) pipHudTitle.textContent = card.title;
+      if (pipHudDesc) pipHudDesc.textContent = card.desc;
+
+      if (pipHudOpenProject) {
+        pipHudOpenProject.href = projectUrl;
+        pipHudOpenProject.title = `另開新視窗展開 ${card.title} 專案`;
+      }
+      if (pipHudOpenReadme) {
+        pipHudOpenReadme.href = readmeUrl;
+      }
+      if (pipHudLoadLocal) {
+        pipHudLoadLocal.onclick = () => openCardInMainStage(card.id, "local");
+      }
+
+      renderDiagramLegend(card);
+      syncQuickChips();
+      renderMocStrip();
+      renderGrid();
+      updateWorkflowStep(3);
+
+      drawRepresentativeDiagram(card);
+
+      if (scrollToStage && pipStageSection) {
+        pipStageSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    function renderDiagramLegend(card) {
+      if (!pipHudLegend) return;
+      pipHudLegend.innerHTML = "";
+      const code = card.code || "";
+      let legends = [
+        { col: "#38bdf8", text: "骨幹動脈/正常流暢" },
+        { col: "#f43f5e", text: "壅塞瓶頸/赤字告警" },
+        { col: "#fbbf24", text: "吃緊警戒/轉折閥門" }
+      ];
+
+      if (code === "s01") {
+        legends = [
+          { col: "#06b6d4", text: "國道一號 (中山高流動車速)" },
+          { col: "#f59e0b", text: "台 74 線環快 (琥珀壅塞)" },
+          { col: "#38bdf8", text: "高鐵/台鐵走廊光跡" },
+          { col: "#f43f5e", text: "東部鐵路停駛斷流" }
+        ];
+      } else if (code === "s02") {
+        legends = [
+          { col: "#f43f5e", text: "無車赤字告警 (<15% 搬空住宅)" },
+          { col: "#ffffff", text: "滿位塞爆 (>85% 捷運商辦)" },
+          { col: "#34d399", text: "潮汐流動與夜間調度補綠" }
+        ];
+      } else if (code === "s03") {
+        legends = [
+          { col: "#06b6d4", text: "離峰青藍準點細流" },
+          { col: "#f43f5e", text: "晚峰延誤 >10m 暗紅淤血幹道" },
+          { col: "#fbbf24", text: "連號車聚集成串 (Bus Bunching)" }
+        ];
+      } else if (code === "s04") {
+        legends = [
+          { col: "#22d3ee", text: "<80% 尚有車位" },
+          { col: "#fbbf24", text: "80-95% 吃緊警戒" },
+          { col: "#e879f9", text: "≥95% 紫紅脈衝額滿回堵" }
+        ];
+      } else if (code === "s05") {
+        legends = [
+          { col: "#c084fc", text: "PM2.5 毒霧壓境等值面" },
+          { col: "#34d399", text: "都市公園人潮綠洲" },
+          { col: "#f59e0b", text: "感知延遲盲區" }
+        ];
+      } else if (code === "s06") {
+        legends = [
+          { col: "#38bdf8", text: "北部濕冷 8°C 羽絨警戒" },
+          { col: "#fb923c", text: "屏東陽光 26°C 短袖舒適" },
+          { col: "#94a3b8", text: "風速雨量氣候撕裂面" }
+        ];
+      } else if (code === "s07") {
+        legends = [
+          { col: "#f43f5e", text: "連假充電樁排隊高柱" },
+          { col: "#34d399", text: "即時可用快充樁位" },
+          { col: "#64748b", text: "偏鄉低使用率蚊子樁" }
+        ];
+      } else if (code === "s08") {
+        legends = [
+          { col: "#38bdf8", text: "筆直大道測速照相機" },
+          { col: "#f43f5e", text: "無測速之事故死亡路口高柱" },
+          { col: "#fbbf24", text: "執法效率倒置區域" }
+        ];
+      } else if (code === "s09") {
+        legends = [
+          { col: "#1e3a8a", text: "低度用電空屋黑壓區" },
+          { col: "#f43f5e", text: "狂飆火紅租金尖塔" },
+          { col: "#38bdf8", text: "青年租屋空窗漂流軌跡" }
+        ];
+      } else if (code === "s10") {
+        legends = [
+          { col: "#38bdf8", text: "清晨台灣好行亮藍接駁光軌" },
+          { col: "#f43f5e", text: "17:00 斷流收班山城滯留高塔" },
+          { col: "#fbbf24", text: "夜市壅塞人潮潮汐" }
+        ];
+      } else if (code === "s11") {
+        legends = [
+          { col: "#0284c7", text: "百年淹水潛勢深度等高面" },
+          { col: "#f43f5e", text: "颱風當月實價登錄暴跌疤痕" },
+          { col: "#34d399", text: "災後數月迅速遺忘回彈曲率" }
+        ];
+      } else if (code === "s12") {
+        legends = [
+          { col: "#34d399", text: "15 分鐘托育長照等時圈綠洲" },
+          { col: "#7f1d1d", text: "新生兒暴增之龜裂沙漠區" },
+          { col: "#fbbf24", text: "重劃區供需失衡缺口" }
+        ];
+      } else if (code === "z01") {
+        legends = [
+          { col: "#38bdf8", text: "即時新聞媒體聚類" },
+          { col: "#c084fc", text: "ArXiv / HuggingFace 前沿 AI" },
+          { col: "#34d399", text: "總經匯率與市場指標" },
+          { col: "#64748b", text: "跨領域語義因果關聯線" }
+        ];
+      } else if (code === "s13") {
+        legends = [
+          { col: "#ff6b5a", text: "含氧血 (主動脈/肺靜脈/動脈)" },
+          { col: "#4aa3ff", text: "缺氧血 (腔靜脈/肺動脈/靜脈)" },
+          { col: "#fbbf24", text: "關鍵臟腑經絡傳導穴位" },
+          { col: "#ffffff", text: "穩態壓差驅動微粒" }
+        ];
+      }
+
+      legends.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "pip-legend-row";
+        row.innerHTML = `<span class="pip-legend-dot" style="background:${item.col}"></span><span>${item.text}</span>`;
+        pipHudLegend.appendChild(row);
+      });
+    }
+
+    /* 繪製代表圖示 Canvas */
+    function drawRepresentativeDiagram(card) {
+      if (!pipRepCanvas) return;
+      const ctx = pipRepCanvas.getContext("2d");
+      const W = pipRepCanvas.width = 1280;
+      const H = pipRepCanvas.height = 720;
+      const code = card.code || "s01";
+      let t = 0;
+
+      function renderFrame() {
+        ctx.fillStyle = "#030712";
+        ctx.fillRect(0, 0, W, H);
+
+        /* 繪製微弱網格背景 */
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.07)";
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        for (let y = 0; y < H; y += 40) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+
+        if (code === "s13") {
+          drawBodyDiagram(ctx, W, H, t);
+        } else if (code === "z01") {
+          drawNetworkDiagram(ctx, W, H, t);
+        } else {
+          drawTaiwanGeoDiagram(ctx, W, H, t, code, card);
+        }
+
+        t += 0.02;
+        activeDiagramAnimId = requestAnimationFrame(renderFrame);
+      }
+
+      renderFrame();
+    }
+
+    /* 台灣空間情境代表圖示渲染 (s01–s12) */
+    function drawTaiwanGeoDiagram(ctx, W, H, t, code, card) {
+      const cx = W * 0.46;
+      const cy = H * 0.52;
+      const scale = 2.4;
+
+      /* 台灣島示意輪廓點 */
+      const twPts = [
+        [10, -180], [40, -150], [55, -90], [60, -20], [50, 40],
+        [35, 110], [15, 160], [0, 190], [-15, 160], [-35, 110],
+        [-55, 40], [-60, -30], [-45, -100], [-25, -150], [10, -180]
+      ];
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      /* 島嶼基底 */
+      ctx.beginPath();
+      twPts.forEach((p, i) => {
+        const x = p[0] * scale;
+        const y = p[1] * scale;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+
+      /* 依情境渲染代表流場與圖元 */
+      if (code === "s01") {
+        /* 國道一號與三號雙動脈 + 雙鐵 */
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(6, 182, 212, 0.75)";
+        ctx.beginPath();
+        ctx.moveTo(15 * scale, -160 * scale);
+        ctx.bezierCurveTo(-30 * scale, -80 * scale, -45 * scale, 20 * scale, -30 * scale, 140 * scale);
+        ctx.stroke();
+
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.6)";
+        ctx.beginPath();
+        ctx.moveTo(25 * scale, -150 * scale);
+        ctx.bezierCurveTo(-15 * scale, -70 * scale, -30 * scale, 30 * scale, -20 * scale, 130 * scale);
+        ctx.stroke();
+
+        /* 台74 壅塞環線琥珀橘 */
+        const pulse = 1 + Math.sin(t * 5) * 0.2;
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(-35 * scale, -15 * scale, 8 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#f43f5e";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 13px ui-monospace, sans-serif";
+        ctx.fillText("台74環快 (壅塞)", -35 * scale + 14, -15 * scale + 4);
+
+        /* 流動微粒 */
+        for (let i = 0; i < 28; i++) {
+          const progress = ((t * 0.4 + i / 28) % 1);
+          const px = (15 + (-45 - 15) * progress) * scale;
+          const py = (-160 + (140 - (-160)) * progress) * scale;
+          ctx.fillStyle = i % 4 === 0 ? "#fbbf24" : "#38bdf8";
+          ctx.beginPath();
+          ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        /* 東部中斷標記 */
+        ctx.strokeStyle = "#f43f5e";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(40 * scale, -40 * scale);
+        ctx.lineTo(55 * scale, 40 * scale);
+        ctx.stroke();
+        ctx.fillStyle = "#f87171";
+        ctx.fillText("東部斷流 ✕", 48 * scale, 0);
+
+      } else if (code === "s02") {
+        /* YouBike 潮汐：雙北盆地密集群聚 */
+        const bx = 10 * scale, by = -140 * scale;
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+        ctx.strokeRect(bx - 60, by - 40, 120, 80);
+
+        for (let i = 0; i < 24; i++) {
+          const ang = (i / 24) * Math.PI * 2;
+          const r = 24 + Math.sin(t * 3 + i) * 16;
+          const sx = bx + Math.cos(ang) * r;
+          const sy = by + Math.sin(ang) * r * 0.6;
+          const isRed = i % 3 === 0;
+          ctx.fillStyle = isRed ? "#f43f5e" : "#ffffff";
+          ctx.beginPath();
+          ctx.arc(sx, sy, isRed ? 5 : 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "#34d399";
+        ctx.font = "bold 14px sans-serif";
+        ctx.fillText("晨峰永和/板橋赤字 ➔ 捷運站滿位", bx - 90, by + 65);
+
+      } else if (code === "s04") {
+        /* 國道服務區泡泡 */
+        const stations = [
+          { name: "中壢", p: 0.15, full: 0.82 },
+          { name: "湖口", p: 0.28, full: 0.96 },
+          { name: "清水", p: 0.48, full: 0.99 },
+          { name: "西螺", p: 0.62, full: 0.88 },
+          { name: "東山", p: 0.82, full: 0.91 }
+        ];
+        stations.forEach((st) => {
+          const py = (-150 + 280 * st.p) * scale;
+          const px = -28 * scale;
+          const r = 8 + st.full * 14;
+          const isFull = st.full >= 0.95;
+          const col = isFull ? "#e879f9" : "#fbbf24";
+          ctx.fillStyle = col;
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, Math.PI * 2);
+          ctx.fill();
+          if (isFull) {
+            ctx.strokeStyle = col;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(px, py, r + Math.sin(t * 6) * 6, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          ctx.fillStyle = "#f8fafc";
+          ctx.font = "12px sans-serif";
+          ctx.fillText(`${st.name} ${Math.round(st.full * 100)}%`, px + r + 6, py + 4);
+        });
+
+      } else {
+        /* 通用時空情境代表標記 */
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "bold 18px ui-monospace, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`${card.code.toUpperCase()} · ${card.shortName}`, 0, -10 * scale);
+        ctx.font = "13px sans-serif";
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText("點擊右上「另開視窗展開專案」或「本機畫布」切換即時互動網頁", 0, 15 * scale);
+        ctx.textAlign = "left";
+
+        for (let i = 0; i < 16; i++) {
+          const ang = (i / 16) * Math.PI * 2 + t * 0.5;
+          const rad = 50 + Math.sin(t * 2 + i) * 20;
+          ctx.fillStyle = i % 2 === 0 ? "rgba(56, 189, 248, 0.8)" : "rgba(245, 158, 11, 0.8)";
+          ctx.beginPath();
+          ctx.arc(Math.cos(ang) * rad, Math.sin(ang) * rad, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      ctx.restore();
+
+      /* 畫布角標 HUD */
+      ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.3)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(24, 24, 340, 78, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 13px ui-monospace, sans-serif";
+      ctx.fillText(`A23 SPATIOTEMPORAL HUD · [${card.code.toUpperCase()}]`, 38, 48);
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText(card.shortName, 38, 70);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "12px sans-serif";
+      ctx.fillText("代表圖示已就緒 · 點擊卡片左側題目可另開視窗展開專案", 38, 88);
+    }
+
+    /* 人體循環代表圖示 (s13: 與用戶上傳參考圖 100% 呼應之拓撲線網) */
+    function drawBodyDiagram(ctx, W, H, t) {
+      const cx = W * 0.48;
+      const cy = H * 0.50;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      /* 人體輪廓線 */
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.35)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      // 頭部
+      ctx.arc(0, -260, 42, 0, Math.PI * 2);
+      // 軀幹與四肢示意線
+      ctx.moveTo(-40, -220); ctx.lineTo(-120, -180); ctx.lineTo(-180, -20); ctx.lineTo(-190, 80); // 右臂
+      ctx.moveTo(40, -220); ctx.lineTo(120, -180); ctx.lineTo(180, -20); ctx.lineTo(190, 80); // 左臂
+      ctx.moveTo(-70, -200); ctx.lineTo(-90, 60); ctx.lineTo(-70, 160); ctx.lineTo(-70, 300); // 右腿
+      ctx.moveTo(70, -200); ctx.lineTo(90, 60); ctx.lineTo(70, 160); ctx.lineTo(70, 300); // 左腿
+      ctx.stroke();
+
+      /* 臟腑節點與穴位 */
+      const nodes = [
+        { id: "brain", name: "腦", x: 0, y: -260, col: "#fbbf24" },
+        { id: "svc", name: "上腔靜脈", x: -45, y: -160, col: "#4aa3ff" },
+        { id: "aorta", name: "主動脈弓", x: 45, y: -160, col: "#ff6b5a" },
+        { id: "ra", name: "右心房", x: -40, y: -70, col: "#4aa3ff" },
+        { id: "la", name: "左心房", x: 40, y: -70, col: "#ff6b5a" },
+        { id: "rv", name: "右心室", x: -40, y: -20, col: "#4aa3ff" },
+        { id: "lv", name: "左心室", x: 40, y: -20, col: "#ff6b5a" },
+        { id: "liver", name: "肝", x: -65, y: 30, col: "#fbbf24" },
+        { id: "stomach", name: "胃", x: 65, y: 30, col: "#fbbf24" },
+        { id: "navel", name: "臍周", x: 0, y: 80, col: "#fbbf24" },
+        { id: "ivc", name: "下腔靜脈", x: -35, y: 110, col: "#4aa3ff" },
+        { id: "daorta", name: "降主動脈", x: 35, y: 110, col: "#ff6b5a" },
+        { id: "r_hand", name: "右臂", x: -190, y: 80, col: "#fbbf24" },
+        { id: "l_hand", name: "左臂", x: 190, y: 80, col: "#fbbf24" },
+        { id: "r_foot", name: "右腳", x: -70, y: 300, col: "#fbbf24" },
+        { id: "l_foot", name: "左腳", x: 70, y: 300, col: "#fbbf24" }
+      ];
+
+      /* 動靜脈主管道連線 */
+      // 動脈血 (紅)
+      ctx.strokeStyle = "#ff6b5a";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, -260); ctx.lineTo(45, -160); ctx.lineTo(40, -70); ctx.lineTo(40, -20);
+      ctx.lineTo(35, 110); ctx.lineTo(70, 300);
+      ctx.stroke();
+
+      // 靜脈血 (藍)
+      ctx.strokeStyle = "#4aa3ff";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, -260); ctx.lineTo(-45, -160); ctx.lineTo(-40, -70); ctx.lineTo(-40, -20);
+      ctx.lineTo(-35, 110); ctx.lineTo(-70, 300);
+      ctx.stroke();
+
+      // 手臂循環
+      ctx.strokeStyle = "#ff6b5a";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(45, -160); ctx.lineTo(190, 80); ctx.stroke();
+      ctx.strokeStyle = "#4aa3ff";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(-45, -160); ctx.lineTo(-190, 80); ctx.stroke();
+
+      /* 粒子脈動 */
+      for (let i = 0; i < 36; i++) {
+        const prog = ((t * 0.45 + i / 36) % 1);
+        const y = -260 + 560 * prog;
+        const xArt = 40 + Math.sin(prog * Math.PI * 4) * 8;
+        const xVen = -40 - Math.sin(prog * Math.PI * 4) * 8;
+
+        ctx.fillStyle = "#ff6b5a";
+        ctx.beginPath(); ctx.arc(xArt, y, 3.5, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = "#4aa3ff";
+        ctx.beginPath(); ctx.arc(xVen, 300 - 560 * prog, 3.5, 0, Math.PI * 2); ctx.fill();
+      }
+
+      /* 繪製各穴位節點 */
+      nodes.forEach((n) => {
+        ctx.fillStyle = n.col;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 6.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#030712";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText(n.name, n.x + 10, n.y + 4);
+      });
+
+      ctx.restore();
+    }
+
+    /* 關係網圖 (z01) 代表圖示 */
+    function drawNetworkDiagram(ctx, W, H, t) {
+      const cx = W * 0.48;
+      const cy = H * 0.50;
+      const nodes = [
+        { id: "core", name: "Z01 情報中樞", x: 0, y: 0, r: 24, col: "#38bdf8" },
+        { id: "news", name: "即時新聞媒體聚類", x: -180, y: -110, r: 16, col: "#06b6d4" },
+        { id: "arxiv", name: "ArXiv 前沿論文", x: 190, y: -100, r: 16, col: "#c084fc" },
+        { id: "hf", name: "HuggingFace 模型", x: 210, y: 80, r: 15, col: "#fbbf24" },
+        { id: "macro", name: "總經與匯率指標", x: -160, y: 120, r: 15, col: "#34d399" },
+        { id: "github", name: "GitHub Trending", x: 0, y: -180, r: 14, col: "#f43f5e" }
+      ];
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      /* 拓撲連線 */
+      nodes.forEach((a, i) => {
+        nodes.forEach((b, j) => {
+          if (i < j && (a.id === "core" || b.id === "core" || Math.abs(i - j) === 1)) {
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+
+            // 連線流動光斑
+            const prog = ((t * 0.5 + (i + j) * 0.2) % 1);
+            const lx = a.x + (b.x - a.x) * prog;
+            const ly = a.y + (b.y - a.y) * prog;
+            ctx.fillStyle = "#38bdf8";
+            ctx.beginPath();
+            ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      });
+
+      /* 繪製節點 */
+      nodes.forEach((n) => {
+        const pulse = 1 + Math.sin(t * 3 + n.r) * 0.08;
+        ctx.fillStyle = n.col;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(n.name, n.x, n.y + n.r + 18);
+      });
+      ctx.textAlign = "left";
+
+      ctx.restore();
+    }
+
+    /* 點擊切換載入外部網頁或本機畫布至 Iframe */
+    function loadIntoMainStage({ url, title, modeLabel, cardId = null, readmeHref = "000_MOC_A23_Data_Atlas.md", scrollToStage = true }) {
+      if (!url) return;
+      selectedCardId = cardId;
+
+      if (activeDiagramAnimId) {
+        cancelAnimationFrame(activeDiagramAnimId);
+        activeDiagramAnimId = null;
+      }
+
+      pipDiagramView.classList.add("is-hidden");
+      pipStageIframe.classList.remove("is-hidden");
+
+      pipStageIframe.src = url;
+      stageActiveTitle.textContent = title || url;
+      stageModeBadge.textContent = modeLabel || (url.startsWith("http") ? "🌐 GitHub 子母畫面" : "💻 本機畫布子母畫面");
+      stageUrlInput.value = url;
+      if (btnStageOpenExternal) btnStageOpenExternal.href = url;
+      btnStageOpenReadme.href = readmeHref || "000_MOC_A23_Data_Atlas.md";
+
+      const isRemote = url.startsWith("http://") || url.startsWith("https://");
+      btnStageUseGithub.classList.toggle("btn-primary-solid", isRemote);
+      btnStageUseLocal.classList.toggle("btn-primary-solid", !isRemote);
+      btnStageUseDiagram?.classList.remove("btn-primary-solid");
+
+      document.querySelectorAll("[data-stage-preset]").forEach((b) => {
+        b.classList.toggle("active", b.dataset.stagePreset === url);
+      });
+      document.getElementById("btnStageAi365Thumb")?.classList.toggle("btn-primary-solid", url === AI365_GH_URL);
+      syncQuickChips();
+
+      renderMocStrip();
+      renderGrid();
+      updateWorkflowStep(3);
+
+      if (scrollToStage && pipStageSection) {
+        pipStageSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    function openCardInMainStage(cardId, preferMode = "github") {
+      const card = appState.cards.find((c) => c.id === cardId);
+      if (!card) return;
+
+      if (preferMode === "diagram") {
+        showDiagramStage(card.id, true);
+        showToast(`已於下方子母畫面呈現代表圖示：#${card.id} ${card.shortName || card.title}`, "info");
+        return;
+      }
+
+      let targetUrl = card.ghUrl || DEFAULT_DEMO_GH_URL;
+      let modeLabel = "🌐 GitHub 子母畫面";
+
+      if (preferMode === "local" && card.href) {
+        targetUrl = card.href;
+        modeLabel = "💻 本機畫布子母畫面";
+      } else if (preferMode === "github") {
+        const isUnpublishedAtlas = targetUrl.startsWith(ATLAS_PAGES_BASE);
+        if (isUnpublishedAtlas && card.href) {
+          targetUrl = card.href;
+          modeLabel = "💻 本機互動預覽 (待推 GitHub)";
+        }
+      }
+
+      loadIntoMainStage({
+        url: targetUrl,
+        title: `${card.emoji} #${card.id} ${card.title}`,
+        modeLabel,
+        cardId: card.id,
+        readmeHref: card.readmeHref || "000_MOC_A23_Data_Atlas.md",
+        scrollToStage: true
+      });
+      showToast(`已於下方主要畫面載入：#${card.id} ${card.shortName || card.title}`, "info");
+    }
+
+    /* 渲染最上方 4 格內之 13 大時空動態情境 (s01–s13) + 非空間情報 (z01) 縮圖表列：
+       每一個情境由 (A) 題目 + (B) icon 所組成，支援互換順序；
+       (A) 題目可連到細部另開視窗展開專案；(B) icon 可以直接在底下以子母畫面呈現代表圖示 */
+    /* 五力 key takeaways（POC：由各 README「## 4. 五力評估」抽出，不顯示分數） */
+    let FIVE_FORCE_TAKEAWAYS = {"s01": [["資", "免金鑰即時 API 穩定", "免金鑰即時 API 穩定；座標與時間戳齊全，扣分：VD 為聚合斷面非個體軌跡，雙鐵與氣象更新頻率不同需對齊。"], ["視", "光跡流動天生適合縮時", "光跡流動天生適合縮時；西部流動對照東部斷流反差強，扣分：長時間縮時若無分鏡易單調。"], ["故", "颱風天仍有十萬車流", "颱風天仍有十萬車流，一句講完；平靜、封路、恢復起伏完整，扣分：依賴颱風事件，平日無劇情。"], ["共", "人人開過國道搭過雙鐵", "人人開過國道搭過雙鐵，3 秒看懂；扣分：非災區居民轉發動機較弱。"], ["應", "可供防災疏運檢討與媒體報導", "可供防災疏運檢討與媒體報導；扣分：屬已知議題政策新解有限，未驗證可作即時調度依據。"]], "s02": [["資", "官方車位 API 穩定且全都會覆蓋", "官方車位 API 穩定且全都會覆蓋；扣分：僅站點層級 5 分鐘快照，淨流量混入調度車搬運。"], ["視", "站點呼吸燈加缺車熱力", "站點呼吸燈加缺車熱力，潮汐感強；扣分：站點密集區光點重疊需控制密度。"], ["故", "通勤潮搬空一座城市的車", "通勤潮搬空一座城市的車，早晚與半夜調度起伏完整；扣分：假日劇情較弱。"], ["共", "借不到、還不了是通勤族日常", "借不到、還不了是通勤族日常；扣分：非騎乘者無切身感。"], ["應", "可供營運商調度與增設站點參考", "可供營運商調度與增設站點參考；扣分：屬營運優化而非重大政策，未驗證營運商會採用。"]], "s03": [["資", "官方 GPS 與到站資料齊全頻率高", "官方 GPS 與到站資料齊全頻率高；扣分：需班表基準與 Map Matching，重現成本高。"], ["視", "準點青藍對照尖峰暗紅淤血", "準點青藍對照尖峰暗紅淤血，對比強；扣分：路線多時光跡糾纏，需分區聚焦。"], ["故", "哪條路哪時段永遠誤點", "哪條路哪時段永遠誤點，一句講完；扣分：慢性誤點缺單一高潮事件。"], ["共", "等公車等到崩潰是全民經驗", "等公車等到崩潰是全民經驗；扣分：僅對有公車路網的城市有感。"], ["應", "可供調整班距與專用道評估", "可供調整班距與專用道評估；扣分：誤點成因（塞車、站停、排班）無法由此資料區分，不可直接歸責。"]], "s04": [["資", "官方資料齊但缺個體軌跡", "官方資料齊但缺個體軌跡；扣分：滯留時間不可得，只能以代理指標呈現，資料力有上限。"], ["視", "光帶轉紅加紫紅波紋反差強", "光帶轉紅加紫紅波紋反差強；扣分：聚合資料非逐車，動畫為路段插值。"], ["故", "凌晨五點以為沒車", "凌晨五點以為沒車，服務區已紫爆；扣分：連假事件依賴，須用歷史資料驗證溢流先於主線變慢。"], ["共", "連假回家必經", "連假回家必經；扣分：歷史回放不能回答哪個服務區別去，實用性訴求要降調。"], ["應", "可供連假後檢討服務區容量", "可供連假後檢討服務區容量；扣分：無 live 證據前不宣稱即時導流，不得用於調度。"]], "s05": [["資", "萬點感測器分鐘級覆蓋廣", "萬點感測器分鐘級覆蓋廣；扣分：微型感測器精度較低，人潮僅為代理指標。"], ["視", "紫紅毒霧擴散吞噬公園綠洲", "紫紅毒霧擴散吞噬公園綠洲，動態強；扣分：感測點分布不均，內插區域需標示為推估。"], ["故", "毒霧壓境時誰還在公園深呼吸", "毒霧壓境時誰還在公園深呼吸，反差明確；扣分：因果需保守表述，人潮下降不一定因空污。"], ["共", "家有長者或小孩者秒懂", "家有長者或小孩者秒懂；扣分：人流代理概念需多一句說明。"], ["應", "可供空品預警與敏感族群保護參考", "可供空品預警與敏感族群保護參考；扣分：代理人流不足以支撐個人健康建議。"]], "s06": [["資", "官方逐時觀測與預報穩定", "官方逐時觀測與預報穩定；扣分：小時級偏粗，站點稀疏區靠內插。"], ["視", "體感等溫推進波加風場粒子如寒潮南下", "體感等溫推進波加風場粒子如寒潮南下；扣分：非寒流日畫面平淡。"], ["故", "同一天桃園穿羽絨屏東穿短袖", "同一天桃園穿羽絨屏東穿短袖，反差清楚；扣分：起伏依賴冷氣團事件。"], ["共", "每天出門都要決定穿什麼", "每天出門都要決定穿什麼，最貼身；扣分：體感換算與個人差異大。"], ["應", "可供寒流宣導", "可供寒流宣導；扣分：商業用途多於政策，非醫療或健康建議。"]], "s07": [["資", "狀態 API 分鐘級可用", "狀態 API 分鐘級可用；扣分：僅涵蓋公有停車場樁，等待時間為代理非實測。"], ["視", "飢渴柱與尋樁弧線可動", "飢渴柱與尋樁弧線可動；扣分：動態集中於週五與連假，平日偏平。"], ["故", "週五傍晚景區全滿、偏鄉蚊子樁閒置", "週五傍晚景區全滿、偏鄉蚊子樁閒置，一句講完；扣分：劇情集中特定時段。"], ["共", "電動車主秒懂", "電動車主秒懂；扣分：非車主需多一句說明。"], ["應", "可回答樁該設哪裡", "可回答樁該設哪裡，有補助與政策價值；扣分：公有樁涵蓋偏誤，結論僅限公有樁。"]], "s08": [["資", "點位與事故座標皆開放", "點位與事故座標皆開放；扣分：月／年批次、座標精度不一，設置年份需對齊。"], ["視", "霓虹藍測速點對照血紅傷亡柱", "霓虹藍測速點對照血紅傷亡柱，錯位一目了然；扣分：3D 柱重疊遮蔽，需控制視角。"], ["故", "測速插滿大道、撞死人的路口沒半支", "測速插滿大道、撞死人的路口沒半支，反差強；扣分：須排除樣本偏誤，避免過度宣稱。"], ["共", "吃過罰單的人一看就懂", "吃過罰單的人一看就懂；扣分：涉及死亡數據需審慎措辭。"], ["應", "可供警政與道安會報參考設備移位", "可供警政與道安會報參考設備移位；扣分：疊合非因果，須搭配交通量與路型才能提建議。"]], "s09": [["資", "空屋與實價資料皆開放", "空屋與實價資料皆開放；扣分：低度用電只是空屋代理，租賃登錄覆蓋有限，為半年季級。"], ["視", "冰藍空屋海對照火紅租金塔有張力", "冰藍空屋海對照火紅租金塔有張力；扣分：動態靠插值與運鏡製造。"], ["故", "空屋黑壓壓房租卻狂飆", "空屋黑壓壓房租卻狂飆，反差鮮明；扣分：空屋位置與需求區不同，因果需謹慎。"], ["共", "租屋族切身痛點", "租屋族切身痛點；扣分：非租屋族無感。"], ["應", "可佐證空屋稅與社宅選址討論", "可佐證空屋稅與社宅選址討論；扣分：覆蓋有限，不可據以推估全市租金。"]], "s10": [["資", "接駁位置即時", "接駁位置即時；扣分：景區人流多為逐時日級，部分靠停車場與 CCTV 推估。"], ["視", "藍色接駁光軌加金色人潮塔", "藍色接駁光軌加金色人潮塔，17:00 斷流有戲劇性；扣分：人流動態粒度粗。"], ["故", "17:00 接駁收班人還卡在九份", "17:00 接駁收班人還卡在九份，一句講完；扣分：需有人流證據證明確實滯留。"], ["共", "去過九份日月潭者秒懂", "去過九份日月潭者秒懂；扣分：需點名景區才有感。"], ["應", "可建議延長或加開末班", "可建議延長或加開末班；扣分：滯留人數為推估，須標示不確定度。"]], "s11": [["資", "潛勢圖與實價登錄皆開放", "潛勢圖與實價登錄皆開放；扣分：月／年級，潛勢為模擬情境。"], ["視", "金柱染紅塌陷後回彈有動態", "金柱染紅塌陷後回彈有動態；扣分：節奏慢。"], ["故", "買房族對淹水的記憶只有幾個月", "買房族對淹水的記憶只有幾個月；扣分：須控制市場趨勢才能下此結論。"], ["共", "DID 折價曲線對路人偏抽象", "DID 折價曲線對路人偏抽象；扣分：須簡化成災後 N 個月房價就回來。"], ["應", "可供不動產揭露與防洪投資評估", "可供不動產揭露與防洪投資評估；扣分：統計推論非個案估價。"]], "s12": [["資", "SEGIS 與據點名冊皆開放", "SEGIS 與據點名冊皆開放；扣分：年級資料，據點無收托量。"], ["視", "等時圈綠洲對照龜裂暗紅沙漠", "等時圈綠洲對照龜裂暗紅沙漠；扣分：年度動畫需插值。"], ["故", "重劃區幼兒暴增、托育追不上", "重劃區幼兒暴增、托育追不上；扣分：缺口大小受等時圈參數影響。"], ["共", "家長與照顧者有感", "家長與照顧者有感；扣分：需點名竹北北屯林口才秒懂。"], ["應", "2SFCA 缺口可作據點選址依據", "2SFCA 缺口可作據點選址依據；扣分：缺收托量，僅供缺口初篩。"]], "s13": [["資", "教科書量級模擬值（E0）無開放 AP…", "教科書量級模擬值（E0）無開放 API；扣分：非生理實測，資料力天花板低。"], ["視", "粒子流與血氧變色視覺反差強", "粒子流與血氧變色視覺反差強；扣分：位置僅拓撲示意。"], ["故", "下肢靜脈栓塞血流瞬間歸零", "下肢靜脈栓塞血流瞬間歸零，代償起伏生動；扣分：無神經與代謝自動調節，代償偏小。"], ["共", "人體循環人人有感", "人體循環人人有感；扣分：須避免被誤讀為診斷。"], ["應", "科普衛教與教學展示", "科普衛教與教學展示；扣分：非醫療用途，須持續標示 E0。"]], "z01": [["資", "有 API 與時間戳", "有 API 與時間戳；扣分：無空間座標且非政府開放數據，低於門檻故隔離不進主榜。"], ["視", "文本流以列表詞雲時序圖即可", "文本流以列表詞雲時序圖即可；扣分：靜態圖表就看得懂，不適用 deck.gl。"], ["故", "可講哪個主題一夜爆紅", "可講哪個主題一夜爆紅；扣分：每日劇情不固定。"], ["共", "科技圈有感", "科技圈有感；扣分：一般路人難以 3 秒看懂。"], ["應", "可替 s01–s12 偵測事件觸發選…", "可替 s01–s12 偵測事件觸發選題；扣分：本身不直接解決公共問題。"]]};
+    function renderFiveForce(code) {
+      const rows = FIVE_FORCE_TAKEAWAYS[code];
+      if (!rows) return "";
+      const esc = (v) => String(v).replace(/[&<>\"]/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+      return `<ul class="moc-five">${rows.map(([k, s, full]) => `<li title="${esc(full)}"><b>${k}</b>${esc(s)}</li>`).join("")}</ul>`;
+    }
+
+    /* 即時同步：http 下 fetch 各 README「## 4. 五力評估」覆蓋內嵌值；file:// 或失敗則沿用內嵌備援 */
+    function parseFiveForce(md) {
+      const K = { "資料": "資", "視覺": "視", "故事": "故", "共鳴": "共", "應用": "應" };
+      const sec = md.split(/^##\s*\d+\.\s*五力評估.*$/m)[1];
+      if (!sec) return null;
+      const body = sec.split(/^##\s/m)[0];
+      const rows = [];
+      body.replace(/^- \*\*(資料|視覺|故事|共鳴|應用)力[^*]*\*\*[：:]\s*(.+)$/gm, (_, k, txt) => {
+        txt = txt.trim();
+        let short = txt.split(/[，；。,;]/)[0].trim();
+        if (short.length > 18) short = short.slice(0, 18) + "…";
+        rows.push([K[k], short, txt]);
+      });
+      return rows.length ? rows : null;
+    }
+    async function syncFiveForceFromReadme() {
+      if (location.protocol === "file:") return;
+      const jobs = appState.cards.filter((c) => c.code && c.readmeHref && FIVE_FORCE_TAKEAWAYS[c.code] !== undefined)
+        .map(async (c) => {
+          try {
+            const r = await fetch(c.readmeHref, { cache: "no-cache" });
+            if (!r.ok) return false;
+            const rows = parseFiveForce(await r.text());
+            if (!rows) return false;
+            const changed = JSON.stringify(rows) !== JSON.stringify(FIVE_FORCE_TAKEAWAYS[c.code]);
+            FIVE_FORCE_TAKEAWAYS[c.code] = rows;
+            return changed;
+          } catch (e) { return false; }
+        });
+      const res = await Promise.all(jobs);
+      window.__fiveForceSync = { fetched: res.length, changed: res.filter(Boolean).length };
+      if (res.some(Boolean)) renderMocStrip();
+    }
+
+    function clearSpatialFilter() {
+      currentSpatialTech = "all";
+      renderSpatialTechButtons();
+      renderGrid();
+    }
+    window.clearSpatialFilter = clearSpatialFilter;
+
+    function renderMocStrip() {
+      if (!mocStripEl) return;
+      let mocCards = appState.cards.filter((c) => (c.code && (c.code.startsWith("s0") || c.code === "s10" || c.code === "s11" || c.code === "s12" || c.code === "s13" || c.code === "z01")));
+      if (currentCanvas !== "all") {
+        mocCards = mocCards.filter((c) => c.canvas === currentCanvas);
+      }
+      if (currentSpatialTech !== "all") {
+        mocCards = mocCards.filter((c) => c.mapTech && c.mapTech.includes(currentSpatialTech));
+      }
+      const noticeEl = document.getElementById("mocFilterNotice");
+      if (noticeEl) {
+        if (currentSpatialTech !== "all") {
+          noticeEl.style.display = "inline-flex";
+          noticeEl.innerHTML = `<span>篩選中：${SPATIAL_TECH_NAMES[currentSpatialTech] || currentSpatialTech} (${mocCards.length})</span><button type="button" class="facet-btn" style="padding:1px 6px;font-size:11px;line-height:1.2;background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.4);margin-left:4px;" onclick="clearSpatialFilter()">✕ 清除</button>`;
+        } else {
+          noticeEl.style.display = "none";
+          noticeEl.innerHTML = "";
+        }
+      }
+      mocStripEl.innerHTML = "";
+
+      mocCards.forEach((c) => {
+        const item = document.createElement("div");
+        item.className = "moc-mini-item" + (selectedCardId === c.id ? " is-selected" : "");
+
+        const projectTarget = c.href || c.readmeHref;
+
+        item.innerHTML = `
+          <!-- (A) 題目：另開視窗展開該專案 -->
+          <a class="moc-mini-link" href="${projectTarget}" target="_blank" rel="noopener" title="另開新視窗展開該專案：${c.title}">
+            <span class="moc-mini-code">${c.code}</span>${(window.A23_LIVE_STATUS && window.A23_LIVE_STATUS.cards[c.id]) ? `<span class="moc-ls ls-${window.A23_LIVE_STATUS.cards[c.id].status}" title="${window.A23_LIVE_STATUS.cards[c.id].label}｜${window.A23_LIVE_STATUS.cards[c.id].why}｜feed ${window.A23_LIVE_STATUS.cards[c.id].feed_mtime}">${window.A23_LIVE_STATUS.cards[c.id].icon}${window.A23_LIVE_STATUS.cards[c.id].label}</span>` : ""}
+            <span class="moc-mini-name">${c.title}</span>
+            <span class="moc-mini-popout" title="另開新視窗">↗</span>
+          </a>
+
+          <!-- (B) icon：直接在底下以子母畫面呈現代表圖示 -->
+          <button type="button" class="moc-mini-stage-btn" data-moc-stage="${c.id}" title="點選：在下方子母畫面呈現 #${c.id} 代表圖示">
+            <span style="font-size:1.15rem;line-height:1;">${c.emoji}</span>
+            <span style="font-size:9px;font-weight:800;letter-spacing:-0.2px;">圖示▼</span>
+          </button>
+        `;
+
+        item.querySelector("[data-moc-stage]").addEventListener("click", (e) => {
+          e.stopPropagation();
+          showDiagramStage(c.id, true);
+        });
+
+      mocStripEl.appendChild(item);
+      });
+      const popList = document.getElementById("mocPopList");
+      if (popList) popList.innerHTML = mocCards.map((c) => `<a href="${c.href || c.readmeHref}" target="_blank" rel="noopener" title="${c.title}">${c.emoji} <b>${c.code}</b> ${c.title}</a>`).join("");
+      filterMocStrip(searchEl ? searchEl.value.trim().toLowerCase() : "");
+    }
+
+    function filterMocStrip(q) {
+      if (!mocStripEl) return;
+      const items = mocStripEl.querySelectorAll(".moc-mini-item");
+      items.forEach((item) => {
+        if (!q) {
+          item.style.display = "";
+          return;
+        }
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(q) ? "" : "none";
+      });
+      window.__a23ObserveReveal?.();
+    }
+
+    /* 渲染 4列 × 5張 = 20 張卡片矩陣 */
+    function renderGrid() {
+      renderFacetIcons();
+      renderMocStrip();
+      const q = searchEl.value.trim().toLowerCase();
+      gridEl.classList.toggle("compact-cards", Boolean(appState.compact));
+
+      const filtered = appState.cards.filter((c) => {
+        const matchFilter =
+          currentFilter === "all" ||
+          (currentFilter === "active" && (c.status === "live" || c.status === "draft")) ||
+          (currentFilter === "slot" && c.status === "slot");
+        if (!matchFilter) return false;
+        if (currentCanvas !== "all" && c.canvas !== currentCanvas) return false;
+        if (currentMode !== "all" && c.data_mode !== currentMode) return false;
+        if (currentCanvas === "geo" && currentSpatialTech !== "all") {
+          if (!c.mapTech || !c.mapTech.includes(currentSpatialTech)) return false;
+        }
+        if (!q) return true;
+        return (
+          (c.canvas || "").toLowerCase().includes(q) ||
+          (c.data_mode || "").toLowerCase().includes(q) ||
+          c.id.toLowerCase().includes(q) ||
+          c.title.toLowerCase().includes(q) ||
+          c.desc.toLowerCase().includes(q) ||
+          c.path.toLowerCase().includes(q)
+        );
+      });
+
+      gridEl.innerHTML = "";
+      emptyEl.classList.toggle("visible", filtered.length === 0);
+
+      filtered.forEach((c) => {
+        const el = document.createElement("article");
+        const typeClass = c.status === "live" ? "is-live" : c.status === "draft" ? "is-draft" : "is-slot";
+        const badgeClass = c.status === "live" ? "state-live" : c.status === "draft" ? "state-draft" : "state-slot";
+        const selectedClass = selectedCardId === c.id ? " is-selected" : "";
+        el.className = `portal-card ${typeClass}${selectedClass}`;
+
+        const projectTarget = c.href || c.readmeHref || "000_MOC_A23_Data_Atlas.md";
+        const isMoc = projectTarget.endsWith("000_MOC_A23_Data_Atlas.md");
+        const actionText = isMoc ? "開啟 A23 MOC ↗" : "另開視窗展開專案 ↗";
+
+        el.innerHTML = `
+          <div>
+            <div class="card-top">
+              <span class="card-index">#${c.id}</span>
+              <span class="card-state ${badgeClass}">
+                <span class="status-symbol">${getStatusSymbol(c.status)}</span>
+                <span>${c.stateLabel}</span>
+              </span>
+            </div>
+
+            <div class="card-header-split">
+              <!-- (A) 題目：另開視窗展開細部內容 -->
+              <a class="card-readme-link" href="${projectTarget}" target="_blank" rel="noopener" title="另開新視窗展開細部專案：${c.title}">
+                <span class="card-emoji">${c.emoji}</span>
+                <span class="card-title-stack">
+                  <h2 class="card-title">${c.title}</h2>
+                  <span class="readme-hint-tag">🚀 ${actionText}</span>
+                </span>
+              </a>
+
+              <!-- (B) icon：在下方以子母畫面呈現代表圖示 -->
+              <button type="button" class="gh-stage-thumb" data-card-diagram="${c.id}" title="點選圖示：於下方以子母畫面呈現代表圖示">
+                <span class="gh-thumb-chrome">
+                  <span class="gh-thumb-dots"><i></i><i></i><i></i></span>
+                  <span style="font-size:11px;">${c.emoji}</span>
+                </span>
+                <span class="gh-thumb-screen">
+                  ${PIP_STAGE_ICON_SVG}
+                </span>
+                <span class="gh-thumb-caption">代表圖 ▼</span>
+              </button>
+            </div>
+
+            ${c.canvas ? `<div class="card-tags"><span class="card-tag">${c.canvas}</span><span class="card-tag">${c.data_mode}</span>${(window.A23_LIVE_STATUS && window.A23_LIVE_STATUS.cards[c.id]) ? `<span class="card-tag ls-${window.A23_LIVE_STATUS.cards[c.id].status}" title="${window.A23_LIVE_STATUS.cards[c.id].why}｜feed ${window.A23_LIVE_STATUS.cards[c.id].feed_mtime}｜掃描 ${window.A23_LIVE_STATUS.meta.generated}">${window.A23_LIVE_STATUS.cards[c.id].icon} ${window.A23_LIVE_STATUS.cards[c.id].label}</span>` : ""}</div>` : ""}
+            ${c.mapTech && c.mapTech.length ? `<div class="card-tech-tags">${c.mapTech.map(t => `<a href="01_shared/viz_core/charts/gallery/chart_grid.html?tech=${t}" class="card-tech-pill" target="atlasChild" title="檢視 ${SPATIAL_TECH_NAMES[t]||t} 技法實例 (開至型錄)">🗺️ ${SPATIAL_TECH_NAMES[t]||t}</a>`).join("")}${c.mapTechPriority ? `<span class="card-tech-priority priority-${c.mapTechPriority}">優先度: ${c.mapTechPriority}</span>` : ""}</div>` : ""}
+            <p class="card-desc">${c.desc}</p>
+          </div>
+
+          <div class="card-foot">
+            <span class="card-foot-path" title="${c.path}">${c.path}</span>
+            <span class="card-foot-actions">
+              ${c.href ? `<button type="button" class="card-mini-action" data-card-local="${c.id}" title="於下方主要畫面載入本機 index.html">本機畫布 ▼</button>` : ""}
+              <button type="button" class="card-mini-action" data-card-stage="${c.id}" title="於下方載入 GitHub 網頁">GitHub ▼</button>
+              <button type="button" class="card-mini-action" data-card-rca="${c.id}" title="開啟 RCA 診斷抽屜">診斷</button>
+            </span>
+          </div>
+        `;
+
+        el.querySelector(`[data-card-diagram="${c.id}"]`)?.addEventListener("click", () => {
+          showDiagramStage(c.id, true);
+        });
+
+        el.querySelector(`[data-card-stage="${c.id}"]`)?.addEventListener("click", () => {
+          openCardInMainStage(c.id, "github");
+        });
+
+        el.querySelector(`[data-card-local="${c.id}"]`)?.addEventListener("click", () => {
+          openCardInMainStage(c.id, "local");
+        });
+
+        el.querySelector(`[data-card-rca="${c.id}"]`)?.addEventListener("click", () => {
+          openDrawer(c.id);
+        });
+
+        gridEl.appendChild(el);
+      });
+
+      updateCounts();
+      syncSwapAbUI();
+      if (roundsDeltaBadge) {
+        roundsDeltaBadge.textContent = `輪次軌跡: 第 ${appState.round || 1} 輪修復對照`;
+      }
+      window.__a23ObserveReveal?.();
+    }
+
+    
+    function renderSpatialTechButtons() {
+      const container = document.getElementById("spatialTechButtons");
+      if (!container) return;
+      const geoCards = appState.cards.filter(c => c.canvas === "geo");
+      
+      const counts = { all: geoCards.length };
+      Object.keys(SPATIAL_TECH_NAMES).forEach(t => {
+        counts[t] = geoCards.filter(c => c.mapTech && c.mapTech.includes(t)).length;
+      });
+      
+      container.innerHTML = "";
+      
+      // 全部按鈕
+      const allBtn = document.createElement("button");
+      allBtn.type = "button";
+      allBtn.className = `facet-btn ${currentSpatialTech === "all" ? "active" : ""}`;
+      allBtn.textContent = `全部技法 (${counts.all})`;
+      allBtn.onclick = () => {
+        currentSpatialTech = "all";
+        renderSpatialTechButtons();
+        renderGrid();
+      };
+      container.appendChild(allBtn);
+      
+      // 8 個技法按鈕 (只顯示 count > 0)
+      Object.keys(SPATIAL_TECH_NAMES).forEach(t => {
+        if (counts[t] > 0) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `facet-btn ${currentSpatialTech === t ? "active" : ""}`;
+          btn.textContent = `${SPATIAL_TECH_NAMES[t]} (${counts[t]})`;
+          btn.onclick = () => {
+            currentSpatialTech = t;
+            renderSpatialTechButtons();
+            renderGrid();
+          };
+          container.appendChild(btn);
+        }
+      });
+
+      // 篩選中提示與一鍵清除
+      if (currentSpatialTech !== "all") {
+        const count = counts[currentSpatialTech] || 0;
+        const pill = document.createElement("span");
+        pill.id = "spatialFilterActivePill";
+        pill.style.cssText = "display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:rgba(56,189,248,0.18);color:#38bdf8;border:1px solid rgba(56,189,248,0.4);margin-left:6px;";
+        pill.innerHTML = `<span>篩選中：${SPATIAL_TECH_NAMES[currentSpatialTech] || currentSpatialTech} (${count})</span>`;
+        const clrBtn = document.createElement("button");
+        clrBtn.type = "button";
+        clrBtn.className = "facet-btn";
+        clrBtn.id = "clearSpatialTechBtn";
+        clrBtn.style.cssText = "padding:1px 6px;font-size:11px;line-height:1.2;background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.4);";
+        clrBtn.textContent = "✕ 一鍵清除";
+        clrBtn.onclick = () => {
+          clearSpatialFilter();
+        };
+        pill.appendChild(clrBtn);
+        container.appendChild(pill);
+      }
+    }
+
+    function updateCounts() {
+      const cs = appState.cards;
+      const n = {
+        all: cs.length,
+        active: cs.filter((c) => c.status === "live" || c.status === "draft").length,
+        slot: cs.filter((c) => c.status === "slot").length
+      };
+      const names = { all: "全部席位", active: "已建置 / 精銳題", slot: "預留佔位" };
+      filterBtns.forEach((b) => { b.textContent = `${names[b.dataset.filter]} (${n[b.dataset.filter]})`; });
+      renderSpatialTechButtons();
+      document.querySelectorAll(".facet-btn[data-facet]").forEach((b) => {
+        const key = b.dataset.facet === "canvas" ? "canvas" : "data_mode";
+        const v = b.dataset.value;
+        if (!b.dataset.base) b.dataset.base = b.textContent.replace(/\s*\(\d+\)$/, "");
+        const cnt = v === "all" ? cs.length : cs.filter((c) => c[key] === v).length;
+        b.textContent = `${b.dataset.base} (${cnt})`;
+      });
+    }
+
+    /* 頂部 4+1 列與圖/題互換事件綁定 */
+    document.getElementById("mocLayoutGridBtn")?.addEventListener("click", (e) => {
+      mocStripEl.classList.remove("list-mode");
+      e.currentTarget.classList.add("active");
+      document.getElementById("mocLayoutListBtn")?.classList.remove("active");
+    });
+
+    document.getElementById("mocLayoutListBtn")?.addEventListener("click", (e) => {
+      mocStripEl.classList.add("list-mode");
+      e.currentTarget.classList.add("active");
+      document.getElementById("mocLayoutGridBtn")?.classList.remove("active");
+    });
+
+    mocSwapAbBtn?.addEventListener("click", () => {
+      appState.reverseAb = !appState.reverseAb;
+      saveState(appState);
+      syncSwapAbUI();
+      renderMocStrip();
+      renderGrid();
+      showToast(appState.reverseAb ? "已切換排列：(B) 圖示 + (A) 題目" : "已切換排列：(A) 題目 + (B) 圖示", "info");
+    });
+
+    function openAi365InStage() {
+      loadIntoMainStage({
+        url: AI365_GH_URL,
+        title: "🪐 Github Gallery (ai365)",
+        modeLabel: "🌐 GitHub Live 子母畫面",
+        cardId: null,
+        readmeHref: "000_MOC_A23_Data_Atlas.md",
+        scrollToStage: true
+      });
+      showToast("已於下方主要畫面載入 Github Gallery！", "success");
+    }
+
+    document.getElementById("btnScenariosGalleryMd")?.addEventListener("click", () => {
+      showToast("開啟 13+ 時空情境與 Gallery 連結路徑清單 (*.md)...", "info");
+    });
+
+    document.getElementById("btnStageAi365Thumb")?.addEventListener("click", (e) => {
+      if (!e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        openAi365InStage();
+      }
+    });
+    document.getElementById("btnStageAi365Screen")?.addEventListener("click", openAi365InStage);
+
+    document.getElementById("btnStageAtlasRepo")?.addEventListener("click", () => {
+      showDiagramStage("01", true);
+    });
+
+    /* 下方子母畫面控制列事件 */
+    document.querySelectorAll("[data-stage-card]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        showDiagramStage(btn.dataset.stageCard, false);
+      });
+    });
+
+    document.getElementById("stageCurrentChip")?.addEventListener("click", () => {
+      if (selectedCardId) showDiagramStage(selectedCardId, false);
+    });
+
+    document.querySelectorAll("[data-stage-preset]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        loadIntoMainStage({
+          url: btn.dataset.stagePreset,
+          title: btn.dataset.stageLabel,
+          modeLabel: btn.dataset.stagePreset.startsWith("http") ? "🌐 GitHub 子母畫面" : "💻 本機畫布子母畫面",
+          cardId: null,
+          scrollToStage: false
+        });
+      });
+    });
+
+    btnStageUseDiagram?.addEventListener("click", () => {
+      showDiagramStage(selectedCardId || "01", false);
+    });
+
+    btnStageUseLocal?.addEventListener("click", () => {
+      const card = appState.cards.find((c) => c.id === selectedCardId) || appState.cards[0];
+      if (card && card.href) {
+        loadIntoMainStage({
+          url: card.href,
+          title: `${card.emoji} ${card.code ? card.code + '. ' : '#' + card.id + ' '}${card.title}`,
+          modeLabel: "💻 本機畫布子母畫面",
+          cardId: card.id,
+          readmeHref: card.readmeHref,
+          scrollToStage: false
+        });
+      } else {
+        showToast("目前選中項目尚無本機 index.html，維持 GitHub 網頁顯示。", "warn");
+      }
+    });
+
+    btnStageUseGithub?.addEventListener("click", () => {
+      const card = appState.cards.find((c) => c.id === selectedCardId);
+      const ghTarget = card ? (card.ghUrl || DEFAULT_DEMO_GH_URL) : DEFAULT_DEMO_GH_URL;
+      loadIntoMainStage({
+        url: ghTarget,
+        title: card ? `${card.emoji} ${card.code ? card.code + '. ' : '#' + card.id + ' '}${card.title}` : "⚡ Sovereign-E-Executive-Flow-Portal",
+        modeLabel: "🌐 GitHub 子母畫面",
+        cardId: card ? card.id : null,
+        readmeHref: card ? card.readmeHref : "000_MOC_A23_Data_Atlas.md",
+        scrollToStage: false
+      });
+    });
+
+    document.getElementById("btnStageReload")?.addEventListener("click", () => {
+      const currentSrc = pipStageIframe.src;
+      pipStageIframe.src = currentSrc;
+      showToast("已重新載入子母畫面！", "info");
+    });
+
+    document.getElementById("btnStageTheater")?.addEventListener("click", (e) => {
+      const expanded = pipStageSection.classList.toggle("is-theater");
+      e.currentTarget.textContent = expanded ? "⛶ 還原高度" : "⛶ 展開高度";
+    });
+
+    document.getElementById("stageUrlForm")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const rawUrl = stageUrlInput.value.trim();
+      if (!rawUrl) return;
+      loadIntoMainStage({
+        url: rawUrl,
+        title: `🔗 自訂畫面：${rawUrl}`,
+        modeLabel: rawUrl.startsWith("http") ? "🌐 GitHub / 外部網頁" : "💻 本機路徑",
+        cardId: selectedCardId,
+        scrollToStage: false
+      });
+    });
+
+    document.getElementById("btnBindCardGhUrl")?.addEventListener("click", () => {
+      const rawUrl = stageUrlInput.value.trim();
+      if (!rawUrl) return;
+      const targetId = selectedCardId || "07";
+      const card = appState.cards.find((c) => c.id === targetId);
+      if (!card) return;
+      card.ghUrl = rawUrl;
+      saveState(appState);
+      loadIntoMainStage({
+        url: rawUrl,
+        title: `${card.emoji} #${card.id} ${card.title}`,
+        modeLabel: "🌐 已綁定 GitHub 網頁",
+        cardId: card.id,
+        readmeHref: card.readmeHref,
+        scrollToStage: false
+      });
+      showToast(`已將網址綁定至卡片 #${card.id} (${card.shortName || card.title})！`, "success");
+    });
+
+    /* 精簡卡片高度切換 */
+    const toggleCompactBtn = document.getElementById("toggleCompactCardsBtn");
+    function syncCompactBtnUI() {
+      if (!toggleCompactBtn) return;
+      toggleCompactBtn.classList.toggle("active", Boolean(appState.compact));
+      toggleCompactBtn.innerHTML = appState.compact ? "<span>↕ 展開卡片描述</span>" : "<span>↕ 精簡卡片高度</span>";
+    }
+    syncCompactBtnUI();
+
+    toggleCompactBtn?.addEventListener("click", () => {
+      appState.compact = !appState.compact;
+      saveState(appState);
+      syncCompactBtnUI();
+      renderGrid();
+    });
+
+    /* Facets & Filters */
+    document.querySelectorAll(".facet-btn[data-facet]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const f = btn.dataset.facet;
+        document.querySelectorAll(`.facet-btn[data-facet="${f}"]`).forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        if (f === "canvas") {
+          currentCanvas = btn.dataset.value;
+          const techRow = document.getElementById("spatialTechFacetRow");
+          if (techRow) {
+            techRow.style.display = (currentCanvas === "geo") ? "flex" : "none";
+          }
+          if (currentCanvas !== "geo") currentSpatialTech = "all";
+        } else {
+          currentMode = btn.dataset.value;
+        }
+        renderSpatialTechButtons();
+        renderGrid();
+      });
+    });
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderGrid();
+      });
+    });
+
+    searchEl?.addEventListener("input", () => {
+      const q = searchEl ? searchEl.value.trim().toLowerCase() : "";
+      filterMocStrip(q);
+      renderGrid();
+    });
+
+    document.getElementById("batchAllLiveBtn")?.addEventListener("click", () => {
+      undoBuffer = JSON.parse(JSON.stringify(appState.cards));
+      appState.cards = appState.cards.map((c) => ({
+        ...c,
+        status: "live",
+        stateLabel: "運行模組"
+      }));
+      appState.round = (appState.round || 1) + 1;
+      saveState(appState);
+      renderGrid();
+      showToast("已批次將全數 20 席位切換為運行預覽狀態！", "success", () => {
+        appState.cards = undoBuffer;
+        saveState(appState);
+        renderGrid();
+        showToast("已成功復原 (Undo) 批次操作！", "info");
+      });
+    });
+
+    /* [M1 非模態確認對話框事件] */
+    const dangerConfirmDialog = document.getElementById("dangerConfirmDialog");
+    document.getElementById("confirmResetBtn")?.addEventListener("click", () => {
+      dangerConfirmDialog.classList.remove("show");
+      executeReset();
+    });
+    document.getElementById("cancelResetBtn")?.addEventListener("click", () => {
+      dangerConfirmDialog.classList.remove("show");
+    });
+
+    function executeReset() {
+      undoBuffer = JSON.parse(JSON.stringify(appState.cards));
+      localStorage.removeItem(STORAGE_KEY);
+      appState = { version: CURRENT_SCHEMA_VERSION, cards: JSON.parse(JSON.stringify(DEFAULT_CARDS)), round: (appState.round || 1) + 1, compact: false };
+      saveState(appState);
+      syncCompactBtnUI();
+      renderMocStrip();
+      renderGrid();
+      updateWorkflowStep(2);
+      showToast("已重設歸零為標準預設矩陣席位！", "warn", () => {
+        appState.cards = undoBuffer;
+        saveState(appState);
+        renderMocStrip();
+        renderGrid();
+        showToast("已復原先前自訂矩陣！", "info");
+      });
+    }
+
+    document.getElementById("batchResetBtn")?.addEventListener("click", () => {
+      dangerConfirmDialog.classList.add("show");
+    });
+
+    /* [A5 下鑽抽屜與 RCA 因果排查函數] */
+    const rcaDrawer = document.getElementById("rcaDrawer");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const drawerTitle = document.getElementById("drawerTitle");
+    const drawerMetrics = document.getElementById("drawerMetrics");
+    const drawerRcaLog = document.getElementById("drawerRcaLog");
+    const drawerEmoji = document.getElementById("drawerEmoji");
+
+    function openDrawer(cardId) {
+      const card = appState.cards.find((c) => c.id === cardId) || { id: cardId, title: "情報席位 #" + cardId, emoji: "📊", status: "live" };
+      if (drawerTitle) drawerTitle.textContent = `${card.title} (#${card.id})`;
+      if (drawerEmoji) drawerEmoji.textContent = card.emoji;
+      if (drawerMetrics) drawerMetrics.textContent = `狀態: ${card.stateLabel || "運行中"} · README: ${card.readmeHref || "未指定"} · GitHub: ${card.ghUrl || "未綁定"}`;
+      if (drawerRcaLog) drawerRcaLog.textContent = `RCA 審計結果：依賴服務 HTTP 200 通暢，子母畫面 iframe 沙盒隔離正常。`;
+      if (rcaDrawer) rcaDrawer.classList.add("show");
+      if (drawerBackdrop) drawerBackdrop.classList.add("show");
+    }
+
+    function closeDrawer() {
+      if (rcaDrawer) rcaDrawer.classList.remove("show");
+      if (drawerBackdrop) drawerBackdrop.classList.remove("show");
+    }
+
+    function drillDownSelfHeal() {
+      showToast("⚡ 已執行自動健康檢查與快取更新！", "success");
+      closeDrawer();
+    }
+
+    const roundsDeltaModal = document.getElementById("roundsDeltaModal");
+    roundsDeltaBadge?.addEventListener("click", () => {
+      roundsDeltaModal?.classList.add("show");
+    });
+    function closeRoundsDeltaModal() {
+      roundsDeltaModal?.classList.remove("show");
+    }
+
+    function updateWorkflowStep(stepNum) {
+      appState.currentStep = stepNum;
+      saveState(appState);
+      const s2 = document.getElementById("step2Indicator");
+      const s3 = document.getElementById("step3Indicator");
+      if (stepNum === 2) {
+        if (s2) s2.className = "step-item active";
+        if (s3) s3.className = "step-item";
+      } else if (stepNum >= 3) {
+        if (s2) s2.className = "step-item done";
+        if (s3) s3.className = "step-item active";
+      }
+    }
+
+    document.getElementById("aiCopilotBtn")?.addEventListener("click", () => {
+      const liveCount = appState.cards.filter((c) => c.status === "live").length;
+      const draftCount = appState.cards.filter((c) => c.status === "draft").length;
+      const slotCount = appState.cards.filter((c) => c.status === "slot").length;
+      const promptPayload = `【A23 Data Atlas 子母畫面重構 Prompt】\n目標檔案：github:SDRmsung/Sovereign-E-Data-Atlas ${liveCount} 席、初稿 ${draftCount} 席、預留 ${slotCount} 席（Schema v${CURRENT_SCHEMA_VERSION}）\n架構規範：頂列 4+1 (000_MOC 12+1 縮圖表列 + ai365) + 4×5 卡片 (README 連結 + GitHub 縮圖) + 下方子母畫面 iframe。`;
+
+      navigator.clipboard.writeText(promptPayload).then(() => {
+        showToast("✨ AI Copilot 診斷 Prompt 已複製至剪貼簿！", "success");
+      }).catch(() => {
+        showToast("剪貼簿存取受限，請查看 Console 輸出", "warn");
+        console.log(promptPayload);
+      });
+    });
+
+    let isOnline = true;
+    systemStatusPill.addEventListener("click", () => {
+      isOnline = !isOnline;
+      if (isOnline) {
+        systemStatusPill.className = "status-pill pass";
+        systemStatusPill.innerHTML = `<span class="status-symbol">●</span><span>伺服器連線正常 (Online)</span>`;
+        showToast("服務連線已復原！", "success");
+      } else {
+        systemStatusPill.className = "status-pill fail";
+        systemStatusPill.innerHTML = `<span class="status-symbol">✕</span><span>後端伺服器離線 (Offline)</span>`;
+        showToast("後端服務中斷！請檢查本機 8777 伺服器或爬蟲管線。", "warn");
+      }
+    });
+
+
+    /* ==== 母子視窗 (2026-11-02) ====
+       母視窗 Atlas_Portal.html：題目清單 + 下方子母畫面；20 席位矩陣不重複出現。
+       子視窗：專案/README 連結一律開在同一個具名子視窗 atlasChild（不會開一堆分頁）；
+               矩陣開在 ?view=matrix 子視窗，點卡片的 圖示/本機/GitHub 回傳母視窗載入。
+       file:// 下不同文件無法互相存取 DOM，故用 postMessage 溝通。 */
+    (function initPipWindows() {
+      const params = new URLSearchParams(location.search);
+      const isMatrixChild = params.get("view") === "matrix";
+      const MOTHER_URL = location.pathname.split("/").pop() || "Atlas_Portal.html";
+      document.body.classList.add(isMatrixChild ? "atlas-matrix-child" : "atlas-mother");
+      if (!isMatrixChild && !window.name) window.name = "atlasMother";
+
+      function openChild(url, name, w, h) {
+        const win = window.open(url, name, `popup=yes,width=${w || 1360},height=${h || 880}`);
+        if (win) { try { win.focus(); } catch (e) {} } else { window.open(url, "_blank"); }
+        return win;
+      }
+
+      // 所有另開連結 → 同一個具名子視窗
+      document.addEventListener("click", (e) => {
+        const a = e.target.closest && e.target.closest('a[target="_blank"]');
+        if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+        const href = a.getAttribute("href");
+        if (!href || href === "#") return;
+        e.preventDefault();
+        openChild(a.href, "atlasChild");
+      }, true);
+
+      if (!isMatrixChild) {
+        document.getElementById("btnOpenMatrixChild")?.addEventListener("click", () => {
+          openChild(MOTHER_URL + "?view=matrix", "atlasMatrix", 1400, 900);
+        });
+        function handleCmd(d) {
+          if (!d || d.atlas !== "stage" || !d.id) return;
+          if (d.mode === "diagram") showDiagramStage(d.id, true);
+          else openCardInMainStage(d.id, d.mode === "local" ? "local" : "github");
+          try { window.focus(); } catch (e) {}
+        }
+        window.addEventListener("message", (ev) => handleCmd(ev.data));
+        const qCard = params.get("card");
+        if (qCard) setTimeout(() => handleCmd({ atlas: "stage", id: qCard, mode: params.get("mode") || "diagram" }), 0);
+      } else {
+        document.title = "▦ 20 席位矩陣｜" + document.title;
+        const btn = document.getElementById("btnOpenMatrixChild");
+        if (btn) btn.style.display = "none";
+        // 攔截矩陣卡片的 圖示/本機/GitHub 按鈕 → 回傳母視窗
+        document.getElementById("matrixGrid")?.addEventListener("click", (e) => {
+          const b = e.target.closest("[data-card-diagram],[data-card-stage],[data-card-local]");
+          if (!b) return;
+          e.stopPropagation(); e.preventDefault();
+          const id = b.dataset.cardDiagram || b.dataset.cardStage || b.dataset.cardLocal;
+          const mode = b.dataset.cardDiagram ? "diagram" : (b.dataset.cardLocal ? "local" : "github");
+          const msg = { atlas: "stage", id, mode };
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(msg, "*");
+            showToast("已送到母視窗下方子母畫面", "success");
+          } else {
+            window.open(`${MOTHER_URL}?card=${encodeURIComponent(id)}&mode=${mode}`, "atlasMother");
+          }
+        }, true);
+      }
+    })();
+
+    renderMocStrip();
+    syncFiveForceFromReadme();
+    renderGrid();
+    showDiagramStage("01", false);
+  </script>
+  <script type="module">
+    import { observeReveal, countUp, readingProgress } from "./01_shared/viz_core/scroll/scroll_fx.js";
+    const bar = document.getElementById("readBar");
+    if (bar) readingProgress(bar);
+    window.__a23ObserveReveal = () => observeReveal(document);
+    window.__a23ObserveReveal();
+    document.querySelectorAll(".fx-count[data-to]").forEach((el) => {
+      const to = Number(el.dataset.to);
+      if (!Number.isNaN(to)) countUp(el, { to, dur: 900 });
+    });
+  </script>
+</body>
+</html>

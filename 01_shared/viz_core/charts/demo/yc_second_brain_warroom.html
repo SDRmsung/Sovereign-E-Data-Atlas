@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YC CEO'S BRAIN × AI-TRIZ Portal · 6 合 1 第二大腦與八維指揮艙概念圖</title>
+<style>
+:root {
+  --bg: #050912;
+  --card: #0b1220;
+  --card-2: #070d1a;
+  --line: #1e293b;
+  --ink: #e2e8f0;
+  --dim: #94a3b8;
+  --muted: #64748b;
+  --acc: #38bdf8;
+  --ok: #10b981;
+  --warn: #f97316;
+  --yellow: #eab308;
+  --rose: #f43f5e;
+  --violet: #a78bfa;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Microsoft JhengHei', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace, system-ui, sans-serif;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(5, 9, 18, 0.94);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 16px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.yc-badge {
+  background: var(--warn);
+  color: #050912;
+  font-weight: 900;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+.yc-badge small {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+.title-col h1 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+.title-col p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--dim);
+}
+.kpi-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.kpi-box {
+  text-align: center;
+  min-width: 48px;
+}
+.kpi-box span {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+}
+.kpi-box b {
+  font-size: 18px;
+  font-weight: 800;
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nav-links a {
+  font-size: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: var(--card);
+}
+.nav-links a:hover { border-color: var(--acc); color: var(--acc); }
+.wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Portal 8-Tab Switcher Bar (matching user screenshot) */
+.portal-bar {
+  background: #070d1a;
+  border: 1px solid #1e3a8a;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.portal-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.p-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--dim);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.p-tab:hover { color: var(--ink); border-color: var(--line); }
+.p-tab.active {
+  background: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(29, 78, 216, 0.55);
+}
+.p-tab.t-unit { color: #38bdf8; }
+.p-tab.t-edge { color: #10b981; }
+.p-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+}
+.mode-switch {
+  display: flex;
+  gap: 8px;
+}
+.mode-btn {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--dim);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+}
+.mode-btn.on {
+  border-color: var(--warn);
+  color: var(--warn);
+  background: rgba(249, 115, 22, 0.14);
+}
+/* Bento Grid replicating YC CEO's Brain layout: 1 Hero + 2 Mid + 3 Bottom */
+.bento-hero {
+  background: var(--card-2);
+  border: 1px solid var(--warn);
+  border-radius: 10px;
+  padding: 12px;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.bento-mid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.bento-bot {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.panel {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.2s, transform 0.2s, border-color 0.2s;
+}
+.panel.dimmed, .bento-hero.dimmed {
+  opacity: 0.22;
+}
+.panel.highlighted, .bento-hero.highlighted {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 1px var(--acc);
+}
+.panel-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+.panel-hd .idx {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+  color: #050912;
+}
+.panel-hd b { color: var(--ink); }
+.panel-hd .portal-map-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--acc);
+}
+.cv-hero {
+  width: 100%;
+  height: 360px;
+  display: block;
+  border-radius: 6px;
+  background: var(--card);
+}
+.cv-mid {
+  width: 100%;
+  height: 240px;
+  display: block;
+  border-radius: 6px;
+  background: var(--card);
+}
+.cv-bot {
+  width: 100%;
+  height: 220px;
+  display: block;
+  border-radius: 6px;
+  background: var(--card);
+}
+.eval-table-card {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+}
+.eval-table-card h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--acc);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+th, td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+th { color: var(--dim); }
+@media (max-width: 960px) {
+  .bento-mid, .bento-bot { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand-wrap">
+    <div class="yc-badge">YC CEO'S BRAIN<small>+ AI-TRIZ PORTAL</small></div>
+    <div class="title-col">
+      <h1>8 SECOND BRAIN REPOS × PORTAL.HTML 八維導覽概念合成頁</h1>
+      <p>sources kept · agents share memory · voice notes · nightly rules · team vaults · #31–#36 全動態 Canvas</p>
+    </div>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi-box"><span>REPOS</span><b style="color:var(--warn)">8</b></div>
+    <div class="kpi-box"><span>STARS</span><b style="color:var(--acc)">33</b></div>
+    <div class="kpi-box"><span>FORKS</span><b style="color:var(--violet)">10</b></div>
+    <div class="kpi-box"><span>ISSUES</span><b style="color:var(--ok)">0</b></div>
+  </div>
+  <nav class="nav-links" aria-label="導覽連結">
+    <a href="../gallery/chart_grid.html">📊 回 A23 圖表型錄 (#31–#36)</a>
+    <a href="codex_plugins_warroom.html">🌐 CODEX 戰情室</a>
+    <a href="#vault-only">◆ 主權指揮艙 Portal</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <!-- 模擬 portal.html 8-Tab 膠囊導覽列：點選任一視角即高亮對應的 2~6 張組合圖卡 -->
+  <section class="portal-bar" aria-label="Portal 八維導覽列對照器">
+    <div class="portal-tabs" role="tablist">
+      <button type="button" class="p-tab active" data-view="all">總覽 (6卡全開)</button>
+      <span class="p-sep"></span>
+      <button type="button" class="p-tab" data-view="goal">目標 (#31+#35)</button>
+      <button type="button" class="p-tab" data-view="route">路線 (#32+#34+#35)</button>
+      <button type="button" class="p-tab" data-view="matrix">介面 (#33+#36)</button>
+      <button type="button" class="p-tab t-unit" data-view="skills">單元 (#31+#32+#36)</button>
+      <span class="p-sep"></span>
+      <button type="button" class="p-tab" data-view="gov">治理 (#33+#35+#36)</button>
+      <button type="button" class="p-tab" data-view="time">時間 (#33+#35)</button>
+      <button type="button" class="p-tab t-edge" data-view="flow">邊界 (#32+#34+#36)</button>
+    </div>
+    <div class="mode-switch">
+      <button type="button" class="mode-btn on" id="btnPlayAll">⏸ 全部運行中</button>
+    </div>
+  </section>
+
+  <!-- 頂層主面板：#31 (01 GRAPH) -->
+  <section class="bento-hero" id="card-31" data-cards="31">
+    <div class="panel-hd">
+      <div><span class="idx" style="background:var(--warn)">01</span> <b>GRAPH · the YC CEO's second brain — every agent, one memory</b></div>
+      <span class="portal-map-tag">對應 Portal：總覽 / 目標 / 單元 (#31)</span>
+    </div>
+    <canvas id="cv31" class="cv-hero"></canvas>
+  </section>
+
+  <!-- 中層雙面板：#32 (02 LLM-WIKI) + #33 (03 AI-MEMORY) -->
+  <section class="bento-mid">
+    <article class="panel" id="card-32" data-cards="32">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--yellow)">02</span> <b>LLM-WIKI · the code/file behind all of it</b></div>
+        <span class="portal-map-tag">對應 Portal：路線 / 單元 / 邊界 (#32)</span>
+      </div>
+      <canvas id="cv32" class="cv-mid"></canvas>
+    </article>
+
+    <article class="panel" id="card-33" data-cards="33">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--acc)">03</span> <b>AI-MEMORY · Claude Code + Codex, in-context tool</b></div>
+        <span class="portal-map-tag">對應 Portal：介面 / 治理 / 時間 (#33)</span>
+      </div>
+      <canvas id="cv33" class="cv-mid"></canvas>
+    </article>
+  </section>
+
+  <!-- 底層三面板：#34 (04 VOICE->NOTE) + #35 (05 NIGHTLY PASS) + #36 (06 CDE MKLINK) -->
+  <section class="bento-bot">
+    <article class="panel" id="card-34" data-cards="34">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--acc)">04</span> <b>AGENT-SECOND-BRAIN · voice -> note</b></div>
+        <span class="portal-map-tag">對應 Portal：路線 / 邊界 (#34)</span>
+      </div>
+      <canvas id="cv34" class="cv-bot"></canvas>
+    </article>
+
+    <article class="panel" id="card-35" data-cards="35">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--rose)">05</span> <b>OMNI-SECOND-BRAIN · nightly pass</b></div>
+        <span class="portal-map-tag">對應 Portal：目標 / 治理 / 時間 (#35)</span>
+      </div>
+      <canvas id="cv35" class="cv-bot"></canvas>
+    </article>
+
+    <article class="panel" id="card-36" data-cards="36">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--violet)">06</span> <b>CDE · CLAUDE-SECOND-BRAIN · MKLINK</b></div>
+        <span class="portal-map-tag">對應 Portal：介面 / 單元 / 治理 (#36)</span>
+      </div>
+      <canvas id="cv36" class="cv-bot"></canvas>
+    </article>
+  </section>
+
+  <!-- Portal 八維度 × 2~6 組合圖卡評估對照表 -->
+  <section class="eval-table-card">
+    <h2>🧭 Portal.html 八大導覽維度（總覽｜目標｜路線｜介面｜單元｜治理｜時間｜邊界）組合圖卡配置評估</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Portal 導覽按鈕</th>
+          <th>核心問題定義</th>
+          <th>建議組合圖卡數</th>
+          <th>最佳圖卡組合（點上方藍鈕可即時預覽）</th>
+          <th>為何這樣組合最能一眼秒懂？</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>總覽</b> (Today)</td>
+          <td>全系統現在健康嗎？記憶與 Agent 連動全貌？</td>
+          <td><b>6 張全開 (1+2+3 Bento)</b></td>
+          <td>#31 + #32 + #33 + #34 + #35 + #36</td>
+          <td>完整對應 `YC CEO'S BRAIN` 6 合 1 單頁架構：頂層看全庫星系圖譜，中層看架構樹與雙 Agent 交接，底層看擷取、夜間燒結 (`/bye`) 與 Skills 掛載。</td>
+        </tr>
+        <tr>
+          <td><b>目標</b> (Goal)</td>
+          <td>Agentic System 有沒有達成目標？北極星指標如何？</td>
+          <td><b>2 張組合</b></td>
+          <td>#31 (全域知識圖譜 KPI) + #35 (夜間收斂達標圓點計數) + 搭配 #24 (Gauge)</td>
+          <td>左看知識資產累積規模與關鍵里程碑浮窗，右看每日偏誤修正收斂率。</td>
+        </tr>
+        <tr>
+          <td><b>路線</b> (Route)</td>
+          <td>Agentic Workflow 管線通不通？輸入如何變成知識？</td>
+          <td><b>3 張組合</b></td>
+          <td>#34 (語音/外部輸入) → #32 (LLM-Wiki 貝茲分流樹) → #35 (夜間規則燒結)</td>
+          <td>清楚呈現「S2 擷取 (#34) → S4/S5 編譯歸檔 (#32) → 反思睡眠閉環 (#35)」三階段資料流。</td>
+        </tr>
+        <tr>
+          <td><b>介面</b> (Matrix)</td>
+          <td>H/L/S/O/D 五元素與雙 Agent (Claude × AGY) 如何協作？</td>
+          <td><b>2 張組合</b></td>
+          <td>#33 (Claude + Codex/AGY 雙欄同步與 4 槽記憶黑板) + #36 (MKLINK 跨倉橋接)</td>
+          <td>把原本抽象的 5×5 表格轉為具體的「雙 Agent 讀寫 `decisions.md` / `progress.md` 黑板同步圖」。</td>
+        </tr>
+        <tr>
+          <td><b>單元</b> (Skills)</td>
+          <td>SSOT 核心資產、40+ Skills 與單一筆記在線嗎？</td>
+          <td><b>3 張組合</b></td>
+          <td>#31 (原子筆記星團) + #32 (7 大核心倉庫樹) + #36 (14 Skills 方格矩陣 × 12 Agents)</td>
+          <td>同時展示宏觀知識晶格 (#31)、中觀目錄分類 (#32) 與微觀 Skill/Agent 探針健康燈號 (#36)。</td>
+        </tr>
+        <tr>
+          <td><b>治理</b> (Gov)</td>
+          <td>誰能做・誰負責？門禁與憲法規則有沒有被遵守？</td>
+          <td><b>3 張組合</b></td>
+          <td>#33 (雙 Agent 權限與記憶隔離) + #35 (`rules.md` 門禁規則收斂) + #36 (PR 規則標籤樹)</td>
+          <td>直接視覺化「錯誤修正 → 門禁規則 (`log.lessons_learned.md`) → PR 攔截」的憲法治理閉環。</td>
+        </tr>
+        <tr>
+          <td><b>時間</b> (Time)</td>
+          <td>長程運作會不會 Context 漂移？何時觸發換場與睡眠？</td>
+          <td><b>2 張組合</b></td>
+          <td>#33 (Context 水位條 75% 熔斷監控) + #35 (02:00 Nightly Pass 排程時鐘雷達)</td>
+          <td>一張管「盤中 Context 膨脹水位」，一張管「夜間 Reflective Sleep 排程消熵」。</td>
+        </tr>
+        <tr>
+          <td><b>邊界</b> (Flow)</td>
+          <td>對外 Connected Apps / MCP / CLI 與本地端如何連接？</td>
+          <td><b>3 張組合</b></td>
+          <td>#34 (外部 Telegram/App 接入) + #32 (放射路由邊界) + #36 (CLI `npx` 與本地 Symlink)</td>
+          <td>一眼看懂外部 App 訊號如何穿過系統邊界落入本地 `~/.config/second-brain` 實體檔案。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script src="../a23_charts_tex.js"></script><script src="../a23_charts.js"></script>
+<script>
+(function () {
+  "use strict";
+  var C = window.A23Charts;
+  var ctls = [
+    C.ycGraph(document.getElementById("cv31"), {}),
+    C.ycWikiTree(document.getElementById("cv32"), {}),
+    C.ycAiMemory(document.getElementById("cv33"), {}),
+    C.ycVoiceNote(document.getElementById("cv34"), {}),
+    C.ycNightlyPass(document.getElementById("cv35"), {}),
+    C.ycCdeMklink(document.getElementById("cv36"), {})
+  ];
+  ctls.forEach(function (c) { c.play(); });
+
+  var playing = true;
+  document.getElementById("btnPlayAll").addEventListener("click", function () {
+    playing = !playing;
+    ctls.forEach(function (c) { if (playing) c.play(); else c.pause(); });
+    this.textContent = playing ? "⏸ 全部運行中" : "▶ 已暫停 (點擊播放)";
+    this.classList.toggle("on", playing);
+  });
+
+  var VIEW_MAP = {
+    all: [31, 32, 33, 34, 35, 36],
+    goal: [31, 35],
+    route: [32, 34, 35],
+    matrix: [33, 36],
+    skills: [31, 32, 36],
+    gov: [33, 35, 36],
+    time: [33, 35],
+    flow: [32, 34, 36]
+  };
+
+  document.querySelectorAll(".p-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".p-tab").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      var v = btn.dataset.view;
+      var activeCards = VIEW_MAP[v] || VIEW_MAP.all;
+      [31, 32, 33, 34, 35, 36].forEach(function (id) {
+        var el = document.getElementById("card-" + id);
+        if (!el) return;
+        var on = activeCards.indexOf(id) >= 0;
+        el.classList.toggle("dimmed", !on);
+        el.classList.toggle("highlighted", v !== "all" && on);
+      });
+    });
+  });
+
+  window.addEventListener("resize", function () {
+    ctls.forEach(function (c) { c.redraw(); });
+  });
+})();
+</script>
+</body>
+</html>

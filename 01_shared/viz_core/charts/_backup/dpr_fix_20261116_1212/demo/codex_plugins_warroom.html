@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CODEX // PLUGINS · 3D 測地線星系與 2×3 遙測戰情室</title>
+<style>
+:root {
+  --bg: #050912;
+  --card: #0b1220;
+  --card-2: #070d1a;
+  --line: #1e293b;
+  --ink: #e2e8f0;
+  --dim: #94a3b8;
+  --muted: #64748b;
+  --acc: #38bdf8;
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --rose: #f43f5e;
+  --violet: #a78bfa;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Microsoft JhengHei', ui-monospace, SFMono-Regular, Menlo, monospace, system-ui, sans-serif;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(5, 9, 18, 0.94);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 16px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand h1 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.brand h1 span { color: var(--acc); }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--ok);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--ok);
+  cursor: pointer;
+}
+.status-pill.paused {
+  border-color: var(--warn);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warn);
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nav-links a {
+  font-size: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--card);
+}
+.nav-links a:hover { border-color: var(--acc); color: var(--acc); }
+.wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 12px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hero-card {
+  background: var(--card-2);
+  border: 1px solid #1e3a8a;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hero-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.hero-title {
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+}
+.hero-title b { color: var(--acc); }
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.chip {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--dim);
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--acc); color: var(--ink); }
+.chip.on {
+  border-color: var(--acc);
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--acc);
+  font-weight: 700;
+}
+.speed-ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--dim);
+}
+.speed-ctl input { width: 96px; accent-color: var(--acc); }
+.globe-box {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.globe-box canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.globe-hint {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.bento {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 216px;
+}
+.panel-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--dim);
+}
+.panel-hd b { color: var(--ink); font-size: 12px; }
+.panel-hd .tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--acc);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+.panel canvas {
+  width: 100%;
+  height: 172px;
+  display: block;
+}
+.panel-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+}
+@media (max-width: 980px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: 1fr; }
+  .globe-box { height: 280px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1><span>CODEX</span> // PLUGINS · 3D 測地線星系戰情室</h1>
+    <button id="btnLive" class="status-pill" type="button">● 運行中 LIVE</button>
+  </div>
+  <nav class="nav-links" aria-label="A23 導覽">
+    <a href="../gallery/chart_grid.html">📊 A23 圖表型錄</a>
+    <a href="chart_demo.html">🧪 完整示範</a>
+    <a href="#vault-only">🎨 S4 知識表現</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="hero-card" aria-label="3D 測地線星系球">
+    <div class="hero-bar">
+      <div class="hero-title"><b>#30 CODEX GLOBE</b> · Fibonacci 球面三角網格 + #22 測地線弧 + #23 星團粒子 + #19 膠囊標籤</div>
+      <div class="filter-row" id="clusterChips"></div>
+      <label class="speed-ctl">轉速 <input id="rngSpeed" type="range" min="0" max="4" step="0.2" value="1.6"></label>
+    </div>
+    <div class="globe-box">
+      <canvas id="cvGlobe"></canvas>
+      <div class="globe-hint">拖曳球面可自由旋轉視角 · 點選上方星團標籤可篩選聯動弧線</div>
+    </div>
+  </section>
+
+  <section class="bento" aria-label="2x3 遙測儀表板">
+    <article class="panel">
+      <div class="panel-hd"><b>// INSTALL LOG</b><span class="tag">#26 Timeline</span></div>
+      <canvas id="cvLog"></canvas>
+      <div class="panel-foot"><span>即時套件安裝與同步佇列</span><span id="footLog">12 events</span></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-hd"><b>// 5 JOBS</b><span class="tag">#27 Segmented</span></div>
+      <canvas id="cvJobs"></canvas>
+      <div class="panel-foot"><span>20 格離散分段進度條</span><span>5 active workers</span></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-hd"><b>// CODEX CORE</b><span class="tag">#24 + #4</span></div>
+      <canvas id="cvCore"></canvas>
+      <div class="panel-foot"><span>外圈放射刻度 × 內圈多色間隔環弧</span><span>99.98% SLA</span></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-hd"><b>// PLUGIN MAP</b><span class="tag">#10 Waffle 15×5</span></div>
+      <canvas id="cvMap"></canvas>
+      <div class="panel-foot"><span>■ 實心=Plugin · □ 空心=Skill · ■ 暗灰=Idle</span><span id="footMap">75 slots</span></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-hd"><b>// CALLS</b><span class="tag">#5 48-Bin Spectrum</span></div>
+      <canvas id="cvCalls"></canvas>
+      <div class="panel-foot"><span>48 bins 高密度分類頻譜</span><span id="footCalls">1,420 req/s</span></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-hd"><b>// OPENAI REPOS</b><span class="tag">#1 + #27 Bullet</span></div>
+      <canvas id="cvRepos"></canvas>
+      <div class="panel-foot"><span>灰底軌道水平對照條 + 目標刻度</span><span>Top 5 repos</span></div>
+    </article>
+  </section>
+</main>
+
+<script src="../a23_charts.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var CLUSTERS = [
+    { id: "CORE", label: "CORE", lat: 24, lon: -35, color: "#38bdf8", count: 24, kind: "plugin" },
+    { id: "TOOLS", label: "TOOLS", lat: -14, lon: 22, color: "#10b981", count: 19, kind: "plugin" },
+    { id: "AGENTS", label: "AGENTS", lat: 38, lon: 78, color: "#a78bfa", count: 16, kind: "skill" },
+    { id: "WORKFLOW", label: "WORKFLOW", lat: -28, lon: -105, color: "#f59e0b", count: 14, kind: "skill" },
+    { id: "MEMORY", label: "MEMORY", lat: 12, lon: 145, color: "#14b8a6", count: 18, kind: "plugin" },
+    { id: "SECURITY", label: "SECURITY", lat: -36, lon: 108, color: "#f43f5e", count: 11, kind: "skill" }
+  ];
+  var ARCS = [
+    { from: "CORE", to: "TOOLS" }, { from: "CORE", to: "AGENTS" },
+    { from: "CORE", to: "MEMORY" }, { from: "TOOLS", to: "WORKFLOW" },
+    { from: "AGENTS", to: "SECURITY" }, { from: "MEMORY", to: "SECURITY" },
+    { from: "WORKFLOW", to: "CORE" }
+  ];
+
+  var LOG_ITEMS = [
+    { ts: "22:54:01", st: "OK", col: "#10b981", pkg: "@codex/mcp-bridge", ver: "v2.4.1" },
+    { ts: "22:54:04", st: "SYNC", col: "#38bdf8", pkg: "@a23/globe-geodesic", ver: "v4.1.0" },
+    { ts: "22:54:09", st: "OK", col: "#10b981", pkg: "@codex/sandbox-sqlite", ver: "v1.9.3" },
+    { ts: "22:54:12", st: "WARN", col: "#f59e0b", pkg: "@skill/arxiv-ingest", ver: "v3.0.2" },
+    { ts: "22:54:17", st: "OK", col: "#10b981", pkg: "@codex/token-pruner", ver: "v2.1.0" },
+    { ts: "22:54:22", st: "SYNC", col: "#a78bfa", pkg: "@agent/swarm-router", ver: "v1.4.8" },
+    { ts: "22:54:26", st: "OK", col: "#10b981", pkg: "@gate/html-spacing", ver: "v6.0.0" },
+    { ts: "22:54:31", st: "OK", col: "#14b8a6", pkg: "@memory/m2m-digest", ver: "v2.8.4" }
+  ];
+
+  var JOBS = [
+    { name: "INDEX_VAULT", pct: 0.92, col: "#38bdf8", eta: "02s" },
+    { name: "EMBED_SYNC", pct: 0.74, col: "#10b981", eta: "08s" },
+    { name: "GATE_SCAN", pct: 0.85, col: "#a78bfa", eta: "04s" },
+    { name: "MCP_BRIDGE", pct: 0.56, col: "#f59e0b", eta: "14s" },
+    { name: "M2M_DIGEST", pct: 0.68, col: "#14b8a6", eta: "09s" }
+  ];
+
+  var REPOS = [
+    { name: "codex-cli", val: 92, target: 85, col: "#38bdf8", txt: "92.4k" },
+    { name: "agents-sdk", val: 78, target: 75, col: "#10b981", txt: "78.1k" },
+    { name: "openai-python", val: 86, target: 80, col: "#a78bfa", txt: "86.0k" },
+    { name: "evals", val: 54, target: 65, col: "#f59e0b", txt: "54.2k" },
+    { name: "swarm", val: 64, target: 60, col: "#14b8a6", txt: "64.7k" }
+  ];
+
+  var activeCluster = "ALL";
+  var live = true;
+  var phase = 0;
+  var globeCtl = null;
+
+  function setupCanvas(cv) {
+    var dpr = window.devicePixelRatio || 1;
+    var r = cv.getBoundingClientRect();
+    var w = Math.max(1, Math.round(r.width));
+    var h = Math.max(1, Math.round(r.height));
+    if (cv.__w !== w || cv.__h !== h) {
+      cv.width = w * dpr; cv.height = h * dpr;
+      cv.__w = w; cv.__h = h;
+    }
+    var c = cv.getContext("2d");
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, w, h);
+    return { c: c, w: w, h: h };
+  }
+
+  function renderGlobe() {
+    var cv = document.getElementById("cvGlobe");
+    var arcs = activeCluster === "ALL" ? ARCS : ARCS.filter(function (a) {
+      return a.from === activeCluster || a.to === activeCluster;
+    });
+    var cls = activeCluster === "ALL" ? CLUSTERS : CLUSTERS.map(function (cl) {
+      return {
+        id: cl.id, label: cl.label, lat: cl.lat, lon: cl.lon,
+        color: cl.id === activeCluster ? cl.color : "#475569",
+        count: cl.count, kind: cl.kind
+      };
+    });
+    if (globeCtl) globeCtl.pause();
+    var spd = parseFloat(document.getElementById("rngSpeed").value) || 0;
+    globeCtl = A23Charts.codexGlobe(cv, { clusters: cls, arcs: arcs }, {
+      fps: Math.max(0.1, spd * 1.2),
+      spinSpeed: spd === 0 ? 0 : 0.045,
+      radiusScale: 0.39,
+      note: "A23Charts.codexGlobe · 零依賴 Canvas 3D"
+    });
+    if (live) globeCtl.play();
+  }
+
+  function buildChips() {
+    var box = document.getElementById("clusterChips");
+    var items = [{ id: "ALL", label: "全部星團" }].concat(CLUSTERS);
+    items.forEach(function (it) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip" + (it.id === activeCluster ? " on" : "");
+      b.textContent = it.label;
+      b.onclick = function () {
+        activeCluster = it.id;
+        Array.prototype.forEach.call(box.children, function (el) { el.classList.remove("on"); });
+        b.classList.add("on");
+        renderGlobe();
+      };
+      box.appendChild(b);
+    });
+  }
+
+  function drawLog(t) {
+    var s = setupCanvas(document.getElementById("cvLog")), c = s.c;
+    var rowH = 26, startIdx = Math.floor(t * 0.45) % LOG_ITEMS.length;
+    c.font = "11px ui-monospace, Menlo, monospace";
+    c.textBaseline = "middle";
+    for (var i = 0; i < 6; i++) {
+      var item = LOG_ITEMS[(startIdx + i) % LOG_ITEMS.length];
+      var y = 14 + i * rowH;
+      c.fillStyle = i === 0 ? "rgba(56,189,248,0.10)" : "rgba(15,23,42,0.55)";
+      c.fillRect(0, y - 10, s.w, 22);
+      c.fillStyle = "#64748b"; c.textAlign = "left";
+      c.fillText(item.ts, 6, y + 1);
+      c.fillStyle = item.col;
+      c.fillText("[" + item.st + "]", 68, y + 1);
+      c.fillStyle = "#e2e8f0";
+      c.fillText(item.pkg, 118, y + 1);
+      c.fillStyle = "#94a3b8"; c.textAlign = "right";
+      c.fillText(item.ver, s.w - 6, y + 1);
+    }
+  }
+
+  function drawJobs(t) {
+    var s = setupCanvas(document.getElementById("cvJobs")), c = s.c;
+    var slots = 20, rowH = 31;
+    c.font = "11px ui-monospace, Menlo, monospace";
+    c.textBaseline = "middle";
+    JOBS.forEach(function (jb, ji) {
+      var y = 16 + ji * rowH;
+      var dyn = Math.min(1, Math.max(0.15, jb.pct + Math.sin(t * 0.8 + ji * 1.3) * 0.08));
+      var lit = Math.round(dyn * slots);
+      c.fillStyle = "#cbd5e1"; c.textAlign = "left";
+      c.fillText(jb.name, 2, y);
+      var barX = 96, barW = s.w - 156, segW = Math.max(3, (barW - (slots - 1) * 2) / slots);
+      for (var si = 0; si < slots; si++) {
+        c.fillStyle = si < lit ? jb.col : "#1e293b";
+        c.fillRect(barX + si * (segW + 2), y - 6, segW, 12);
+      }
+      c.fillStyle = "#94a3b8"; c.textAlign = "right";
+      c.fillText(Math.round(dyn * 100) + "%", s.w - 2, y);
+    });
+  }
+
+  function drawCore(t) {
+    var s = setupCanvas(document.getElementById("cvCore")), c = s.c;
+    var cx = s.w * 0.34, cy = s.h * 0.5, R = Math.min(s.w * 0.28, s.h * 0.42);
+    for (var i = 0; i < 36; i++) {
+      var ang = (i / 36) * Math.PI * 2 - Math.PI / 2;
+      var lit = i < 30;
+      c.strokeStyle = lit ? "rgba(56,189,248,0.75)" : "#1e293b";
+      c.lineWidth = i % 3 === 0 ? 2 : 1;
+      c.beginPath();
+      c.moveTo(cx + Math.cos(ang) * (R - 6), cy + Math.sin(ang) * (R - 6));
+      c.lineTo(cx + Math.cos(ang) * R, cy + Math.sin(ang) * R);
+      c.stroke();
+    }
+    var segs = [
+      { v: 0.36, col: "#38bdf8" }, { v: 0.28, col: "#10b981" },
+      { v: 0.20, col: "#a78bfa" }, { v: 0.16, col: "#f59e0b" }
+    ];
+    var a0 = -Math.PI / 2 + t * 0.12;
+    segs.forEach(function (sg) {
+      var span = sg.v * Math.PI * 2 - 0.1;
+      c.strokeStyle = sg.col; c.lineWidth = 8;
+      c.beginPath(); c.arc(cx, cy, R - 14, a0, a0 + span); c.stroke();
+      a0 += sg.v * Math.PI * 2;
+    });
+    var util = (84.2 + Math.sin(t * 0.6) * 2.4).toFixed(1) + "%";
+    c.fillStyle = "#e2e8f0"; c.font = "bold 16px ui-monospace, monospace";
+    c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText(util, cx, cy - 4);
+    c.fillStyle = "#64748b"; c.font = "9px ui-monospace, monospace";
+    c.fillText("CORE LOAD", cx, cy + 12);
+
+    var kpis = [
+      { k: "ACTIVE", v: "42", col: "#10b981" },
+      { k: "LATENCY", v: "11ms", col: "#38bdf8" },
+      { k: "MEM", v: "1.8GB", col: "#a78bfa" },
+      { k: "TOKENS", v: "14.2k", col: "#f59e0b" }
+    ];
+    var rx = s.w * 0.66;
+    c.textAlign = "left";
+    kpis.forEach(function (kp, ki) {
+      var ky = 28 + ki * 36;
+      c.fillStyle = "#64748b"; c.font = "10px ui-monospace, monospace";
+      c.fillText(kp.k, rx, ky);
+      c.fillStyle = kp.col; c.font = "bold 14px ui-monospace, monospace";
+      c.fillText(kp.v, rx, ky + 14);
+    });
+  }
+
+  function drawMap(t) {
+    var s = setupCanvas(document.getElementById("cvMap")), c = s.c;
+    var cols = 15, rows = 5, pad = 6;
+    var cw = (s.w - pad * (cols - 1) - 8) / cols;
+    var ch = (s.h - pad * (rows - 1) - 8) / rows;
+    var sz = Math.min(cw, ch, 26);
+    var ox = (s.w - (cols * sz + (cols - 1) * pad)) * 0.5;
+    var oy = (s.h - (rows * sz + (rows - 1) * pad)) * 0.5;
+    var pal = ["#38bdf8", "#10b981", "#a78bfa", "#f59e0b", "#14b8a6"];
+    var pulseIdx = Math.floor(t * 2.2) % (cols * rows);
+    for (var r = 0; r < rows; r++) {
+      for (var k = 0; k < cols; k++) {
+        var idx = r * cols + k;
+        var x = ox + k * (sz + pad), y = oy + r * (sz + pad);
+        var kind = (idx * 7 + r * 3) % 11;
+        var col = pal[(idx + r) % pal.length];
+        if (kind < 6) {
+          c.fillStyle = idx === pulseIdx ? "#f8fafc" : col;
+          c.fillRect(x, y, sz, sz);
+        } else if (kind < 9) {
+          c.strokeStyle = col; c.lineWidth = 1.6;
+          c.strokeRect(x + 1, y + 1, sz - 2, sz - 2);
+        } else {
+          c.fillStyle = "#1e293b";
+          c.fillRect(x, y, sz, sz);
+        }
+      }
+    }
+  }
+
+  function drawCalls(t) {
+    var s = setupCanvas(document.getElementById("cvCalls")), c = s.c;
+    var bins = 48, gap = 2, bw = Math.max(2, (s.w - (bins - 1) * gap - 8) / bins);
+    var pal = ["#38bdf8", "#10b981", "#a78bfa", "#f59e0b"];
+    var total = 0;
+    for (var i = 0; i < bins; i++) {
+      var wave = 0.45 + 0.35 * Math.sin(i * 0.32 + t * 1.4) + 0.2 * Math.cos(i * 0.7 - t * 0.9);
+      var h = Math.max(8, wave * (s.h - 24));
+      var x = 4 + i * (bw + gap), y = s.h - 10 - h;
+      var col = pal[Math.floor(i / 12) % pal.length];
+      c.fillStyle = col; c.globalAlpha = 0.85;
+      c.fillRect(x, y, bw, h);
+      c.globalAlpha = 1; c.fillStyle = "#f8fafc";
+      c.fillRect(x, y - 3, bw, 2);
+      total += Math.round(wave * 42);
+    }
+    document.getElementById("footCalls").textContent = total.toLocaleString() + " req/s";
+  }
+
+  function drawRepos(t) {
+    var s = setupCanvas(document.getElementById("cvRepos")), c = s.c;
+    var rowH = 31;
+    c.font = "11px ui-monospace, Menlo, monospace";
+    c.textBaseline = "middle";
+    REPOS.forEach(function (rp, ri) {
+      var y = 16 + ri * rowH;
+      c.fillStyle = "#cbd5e1"; c.textAlign = "left";
+      c.fillText(rp.name, 2, y);
+      var bx = 104, bw = s.w - 156;
+      c.fillStyle = "#1e293b";
+      c.fillRect(bx, y - 5, bw, 10);
+      var v = Math.min(100, Math.max(10, rp.val + Math.sin(t * 0.7 + ri) * 3));
+      c.fillStyle = rp.col;
+      c.fillRect(bx, y - 5, bw * (v / 100), 10);
+      var tx = bx + bw * (rp.target / 100);
+      c.strokeStyle = "#f8fafc"; c.lineWidth = 1.6;
+      c.beginPath(); c.moveTo(tx, y - 8); c.lineTo(tx, y + 8); c.stroke();
+      c.fillStyle = "#94a3b8"; c.textAlign = "right";
+      c.fillText(rp.txt, s.w - 2, y);
+    });
+  }
+
+  function tickTelemetry() {
+    if (live) phase += 0.035;
+    drawLog(phase);
+    drawJobs(phase);
+    drawCore(phase);
+    drawMap(phase);
+    drawCalls(phase);
+    drawRepos(phase);
+    requestAnimationFrame(tickTelemetry);
+  }
+
+  document.getElementById("btnLive").onclick = function () {
+    live = !live;
+    this.className = "status-pill" + (live ? "" : " paused");
+    this.textContent = live ? "● 運行中 LIVE" : "▲ 已暫停 PAUSED";
+    if (globeCtl) { if (live) globeCtl.play(); else globeCtl.pause(); }
+  };
+
+  document.getElementById("rngSpeed").oninput = function () {
+    renderGlobe();
+  };
+
+  window.addEventListener("resize", function () {
+    if (globeCtl) globeCtl.redraw();
+  });
+
+  buildChips();
+  renderGlobe();
+  requestAnimationFrame(tickTelemetry);
+})();
+</script>
+</body>
+</html>

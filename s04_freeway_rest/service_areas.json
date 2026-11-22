@@ -1,0 +1,21 @@
+{
+  "coord_status": "approx_seed",
+  "note": "座標為估算種子(約±3km)，待 AGY 以官方 CSV(data.gov.tw/dataset/46801)校驗覆寫；覆寫後 coord_status 改 official_csv",
+  "areas": [
+    {"id":"N1-LK","name":"林口","hwy":"國1","lon":121.370,"lat":25.060},
+    {"id":"N1-ZL","name":"中壢","hwy":"國1","lon":121.230,"lat":24.970},
+    {"id":"N1-YM","name":"楊梅","hwy":"國1","lon":121.140,"lat":24.930},
+    {"id":"N1-HK","name":"湖口","hwy":"國1","lon":121.050,"lat":24.900},
+    {"id":"N1-TA","name":"泰安","hwy":"國1","lon":120.722,"lat":24.430},
+    {"id":"N1-QS","name":"清水","hwy":"國1","lon":120.565,"lat":24.280,"hot":0.12},
+    {"id":"N1-XL","name":"西螺","hwy":"國1","lon":120.453,"lat":23.793},
+    {"id":"N1-CY","name":"嘉義","hwy":"國1","lon":120.457,"lat":23.489},
+    {"id":"N1-XY","name":"新營","hwy":"國1","lon":120.310,"lat":23.310},
+    {"id":"N1-RD","name":"仁德","hwy":"國1","lon":120.241,"lat":22.946},
+    {"id":"N3-GX","name":"關西","hwy":"國3","lon":121.174,"lat":24.777,"hot":0.12},
+    {"id":"N3-XH","name":"西湖","hwy":"國3","lon":120.807,"lat":24.588},
+    {"id":"N3-MJ","name":"名間","hwy":"國3","lon":120.690,"lat":23.830},
+    {"id":"N3-GK","name":"古坑","hwy":"國3","lon":120.570,"lat":23.640},
+    {"id":"N3-GM","name":"關廟","hwy":"國3","lon":120.310,"lat":22.960}
+  ]
+}

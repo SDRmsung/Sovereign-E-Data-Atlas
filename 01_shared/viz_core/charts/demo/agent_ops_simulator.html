@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>客服 × 法務審核 · 多 Agent 戰情模擬室 (Grad Ops Simulator)</title>
+<style>
+:root {
+  --bg: #050912;
+  --card: #0b1220;
+  --card-2: #070d1a;
+  --line: #1e293b;
+  --ink: #e2e8f0;
+  --dim: #94a3b8;
+  --muted: #64748b;
+  --acc: #38bdf8;
+  --ok: #10b981;
+  --warn: #f97316;
+  --yellow: #eab308;
+  --rose: #f43f5e;
+  --violet: #a78bfa;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Microsoft JhengHei', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace, system-ui, sans-serif;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(5, 9, 18, 0.95);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 16px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ops-badge {
+  background: linear-gradient(135deg, #0284c7, #7c3aed);
+  color: #fff;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+}
+.ops-badge small {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.title-col h1 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.03em;
+}
+.title-col p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--dim);
+}
+.kpi-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.kpi-box {
+  text-align: center;
+  min-width: 58px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card-2);
+}
+.kpi-box span {
+  display: block;
+  font-size: 10px;
+  color: var(--dim);
+}
+.kpi-box b {
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.nav-links a {
+  font-size: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--card);
+}
+.nav-links a:hover { border-color: var(--acc); color: var(--acc); }
+
+.wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 12px 16px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 控制列 */
+.ctrl-bar {
+  background: var(--card-2);
+  border: 1px solid #1e3a8a;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ctrl-group, .view-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.c-btn, .p-tab {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.c-btn:hover, .p-tab:hover { border-color: var(--acc); color: var(--acc); }
+.c-btn.on { border-color: var(--ok); color: var(--ok); background: rgba(16, 185, 129, 0.12); }
+.c-btn.paused { border-color: var(--yellow); color: var(--yellow); background: rgba(234, 179, 8, 0.12); }
+.c-btn.danger { border-color: var(--rose); color: #fecdd3; background: rgba(244, 63, 94, 0.16); }
+.c-btn.danger:hover { background: rgba(244, 63, 94, 0.3); }
+.c-btn.night { border-color: var(--violet); color: #ddd6fe; background: rgba(167, 139, 250, 0.14); }
+.p-tab { color: var(--dim); background: transparent; border-color: transparent; padding: 4px 8px; }
+.p-tab.active { background: #1d4ed8; color: #fff; box-shadow: 0 0 12px rgba(29, 78, 216, 0.45); }
+
+/* HITL 人類指揮台 */
+.hitl-deck {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 12px;
+}
+.deck-box {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.deck-box.has-crit {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.35);
+}
+.deck-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+.deck-hd b { color: var(--ink); }
+.deck-hd small { color: var(--dim); font-size: 11px; }
+.inc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 150px;
+}
+.inc-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--acc);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.inc-card.crit { border-left-color: var(--rose); background: rgba(244, 63, 94, 0.06); }
+.inc-card.warn { border-left-color: var(--warn); background: rgba(249, 115, 22, 0.06); }
+.inc-card.ok { border-left-color: var(--ok); background: rgba(16, 185, 129, 0.05); }
+.inc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sev-tag {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+.sev-tag.crit { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid var(--rose); }
+.sev-tag.warn { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid var(--warn); }
+.sev-tag.ok { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--ok); }
+.inc-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.inc-desc { font-size: 12px; color: var(--dim); line-height: 1.45; }
+.inc-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.ttl-bar {
+  height: 4px;
+  background: #1e293b;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ttl-fill {
+  height: 100%;
+  background: var(--acc);
+  transition: width 0.25s linear;
+}
+.inc-card.crit .ttl-fill { background: var(--rose); }
+.inc-card.warn .ttl-fill { background: var(--warn); }
+.inc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.act-btn {
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: #0f172a;
+  color: var(--ink);
+  cursor: pointer;
+}
+.act-btn:hover { transform: translateY(-1px); }
+.act-btn.approve { border-color: var(--ok); color: #6ee7b7; }
+.act-btn.approve:hover { background: rgba(16, 185, 129, 0.2); }
+.act-btn.block { border-color: var(--rose); color: #fda4af; }
+.act-btn.block:hover { background: rgba(244, 63, 94, 0.22); }
+.act-btn.handoff { border-color: var(--yellow); color: #fde047; }
+.act-btn.handoff:hover { background: rgba(234, 179, 8, 0.2); }
+.act-btn.reroute { border-color: var(--acc); color: #7dd3fc; }
+.act-btn.reroute:hover { background: rgba(56, 189, 248, 0.2); }
+
+.empty-inc {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--dim);
+  font-size: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+.log-feed {
+  font-size: 11.5px;
+  line-height: 1.5;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.log-row {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--card);
+  border-left: 3px solid var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.log-row.good { border-left-color: var(--ok); }
+.log-row.bad { border-left-color: var(--rose); background: rgba(244, 63, 94, 0.08); }
+.log-row.rule { border-left-color: var(--violet); }
+.log-row.auto { border-left-color: var(--acc); }
+.log-row time { color: var(--muted); font-size: 10.5px; white-space: nowrap; }
+
+/* Bento 6合1 */
+.bento-hero {
+  background: var(--card-2);
+  border: 1px solid var(--warn);
+  border-radius: 10px;
+  padding: 12px;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.bento-mid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.bento-bot {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.panel {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.panel.dimmed, .bento-hero.dimmed { opacity: 0.24; }
+.panel.highlighted, .bento-hero.highlighted { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc); }
+.panel-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+.panel-hd .idx {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 11px;
+  color: #050912;
+}
+.panel-hd .portal-map-tag {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--acc);
+}
+.cv-hero { width: 100%; height: 320px; display: block; border-radius: 6px; background: var(--card); }
+.cv-mid { width: 100%; height: 235px; display: block; border-radius: 6px; background: var(--card); }
+.cv-bot { width: 100%; height: 215px; display: block; border-radius: 6px; background: var(--card); }
+
+.guide-card {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--dim);
+}
+.guide-card b { color: var(--ink); }
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.guide-item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 8px;
+}
+
+@media (max-width: 980px) {
+  .hitl-deck, .bento-mid, .bento-bot { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand-wrap">
+    <div class="ops-badge">CS × LEGAL OPS<small>GRADUATE AGENT LEAD</small></div>
+    <div class="title-col">
+      <h1>客服 × 法務審核 · 多 Agent 戰情模擬室</h1>
+      <p>模擬新鮮人主管 12 隻公司 Agents：接單分流 · 搶鎖熔斷 · 合規簽核 Gate · 夜間燒結 rules.md</p>
+    </div>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi-box"><span>排班時鐘</span><b id="kClock" style="color:var(--acc)">09:00</b></div>
+    <div class="kpi-box"><span>已結工單</span><b id="kDone" style="color:var(--ok)">0</b></div>
+    <div class="kpi-box"><span>合規事故</span><b id="kInc" style="color:var(--ok)">0</b></div>
+    <div class="kpi-box"><span>SOP 規則</span><b id="kRules" style="color:var(--violet)">3</b></div>
+    <div class="kpi-box"><span>API 預算</span><b id="kBudget" style="color:var(--yellow)">14%</b></div>
+    <div class="kpi-box"><span>考績評級</span><b id="kGrade" style="color:var(--acc)">A</b></div>
+  </div>
+  <nav class="nav-links" aria-label="導覽連結">
+    <a href="../gallery/chart_grid.html">📊 回 A23 圖表型錄</a>
+    <a href="yc_second_brain_warroom.html">🧠 YC Brain 6合1</a>
+    <a href="codex_plugins_warroom.html">🌐 CODEX 戰情室</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="ctrl-bar" aria-label="模擬控制與視角切換">
+    <div class="ctrl-group">
+      <button type="button" class="c-btn on" id="btnSimToggle">⏸ 模擬運行中</button>
+      <button type="button" class="c-btn" id="btnSpeed">⚡ 1x 速率</button>
+      <button type="button" class="c-btn danger" id="btnInject">💥 注入突發危機</button>
+      <button type="button" class="c-btn night" id="btnNightPass">🌙 執行下班燒結</button>
+      <button type="button" class="c-btn" id="btnReset">↺ 重置班表</button>
+    </div>
+    <div class="view-tabs" role="tablist" aria-label="聚焦視角">
+      <button type="button" class="p-tab active" data-view="all">總覽 (6卡全開)</button>
+      <button type="button" class="p-tab" data-view="intake">接單派工 (#34+#32)</button>
+      <button type="button" class="p-tab" data-view="sync">搶鎖與失憶 (#33)</button>
+      <button type="button" class="p-tab" data-view="gate">門禁燈號 (#36)</button>
+      <button type="button" class="p-tab" data-view="rules">規則收斂 (#35)</button>
+      <button type="button" class="p-tab" data-view="radar">全域風險 (#31)</button>
+    </div>
+  </section>
+
+  <!-- 畢業生每日真正動手的操作台 -->
+  <section class="hitl-deck" aria-label="人類調度員簽核台與稽核日誌">
+    <div class="deck-box" id="hitlBox">
+      <div class="deck-hd">
+        <b>🚨 待你簽核 / 介入的 Agent 異常事件 (<span id="qCount">0</span>)</b>
+        <small>高風險不可無腦核准 · 合規急件不可亂擋 · Context ≥75% 須強制 Handoff</small>
+      </div>
+      <div class="inc-list" id="incList"></div>
+    </div>
+    <div class="deck-box">
+      <div class="deck-hd">
+        <b>📜 戰情決策與自動化稽核日誌</b>
+        <small id="autoStat">自動攔截防禦：0 次</small>
+      </div>
+      <div class="log-feed" id="logFeed"></div>
+    </div>
+  </section>
+
+  <!-- 頂層主面板：#31 -->
+  <section class="bento-hero" id="card-31">
+    <div class="panel-hd">
+      <div><span class="idx" style="background:var(--warn)">01</span> <b>CS × LEGAL KNOWLEDGE & RISK GRAPH · 7 大業務知識星團與風險熱區</b></div>
+      <span class="portal-map-tag">全域態勢感知 (#31)</span>
+    </div>
+    <canvas id="cv31" class="cv-hero"></canvas>
+  </section>
+
+  <!-- 中層雙面板：#32 + #33 -->
+  <section class="bento-mid">
+    <article class="panel" id="card-32">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--yellow)">02</span> <b>DISPATCH TREE · 客服進線 → 法務檢核 → 7 條 Agent 路由管線</b></div>
+        <span class="portal-map-tag">派工與塞車斷流 (#32)</span>
+      </div>
+      <canvas id="cv32" class="cv-mid"></canvas>
+    </article>
+
+    <article class="panel" id="card-33">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--acc)">03</span> <b>SHARED MEMORY · CS-Draft ↔ Legal-Redline 協作水位與寫鎖監控</b></div>
+        <span class="portal-map-tag">Context 75% 熔斷與搶鎖 (#33)</span>
+      </div>
+      <canvas id="cv33" class="cv-mid"></canvas>
+    </article>
+  </section>
+
+  <!-- 底層三面板：#34 + #35 + #36 -->
+  <section class="bento-bot">
+    <article class="panel" id="card-34">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--acc)">04</span> <b>ESCALATION INBOX · 客訴/合約來信即時結構化</b></div>
+        <span class="portal-map-tag">S2 進線擷取 (#34)</span>
+      </div>
+      <canvas id="cv34" class="cv-bot"></canvas>
+    </article>
+
+    <article class="panel" id="card-35">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--rose)">05</span> <b>RULE SINTERING · 救火教訓收斂成 rules.md 硬門禁</b></div>
+        <span class="portal-map-tag">經驗沉澱 (#35)</span>
+      </div>
+      <canvas id="cv35" class="cv-bot"></canvas>
+    </article>
+
+    <article class="panel" id="card-36">
+      <div class="panel-hd">
+        <div><span class="idx" style="background:var(--violet)">06</span> <b>AGENT FLEET & SKILL GATE · 12 Agents 燈號 × 20 權限格子</b></div>
+        <span class="portal-map-tag">活體燈號與待簽 PR (#36)</span>
+      </div>
+      <canvas id="cv36" class="cv-bot"></canvas>
+    </article>
+  </section>
+
+  <section class="guide-card">
+    <b>🎓 為什麼這就是未來大學畢業生的第一份工作？</b>
+    <div class="guide-grid">
+      <div class="guide-item"><b>1. 不是自己寫回覆，是管邊界：</b>讓 <code>CS-Draft</code> 起草、<code>Legal-Redline</code> 審查，但高風險外發與超額賠償必須卡在人類 Gate。</div>
+      <div class="guide-item"><b>2. 抓 AI 失憶與死鎖：</b>盯緊 #33 雙 Agent Context 水位；超過 75% 就會開始把 7 天鑑賞期幻覺成 70 天，要果斷按 <b>✂ 強制 Handoff</b>。</div>
+      <div class="guide-item"><b>3. 救火一次，寫死成規則：</b>遇到違規不要只按拒發，按 <b>✕ 攔截並寫入規則</b>，#35 就會把規則寫進 <code>rules.md</code>，下次系統自動攔截。</div>
+      <div class="guide-item"><b>4. 辨別真假警報：</b>合法的 VIP 小額禮券或法務已預簽標準件若也亂擋，SLA 照樣掉分；主管的價值在於精準放行與精準攔截。</div>
+    </div>
+  </section>
+</main>
+
+<script src="../a23_charts_tex.js"></script><script src="../a23_charts.js"></script>
+<script>
+(function () {
+  "use strict";
+  var C = window.A23Charts;
+
+  /* ================= 客服 × 法務審核 劇本庫 ================= */
+  var SCENARIOS = [
+    {
+      id: "pii_leak",
+      sev: "crit",
+      tag: "個資外洩紅線",
+      ruleKey: "block_raw_pii_export",
+      ruleText: "+ block unmasked ID/phone in CRM-Sender",
+      title: "CRM-Sender 準備在客訴回函夾帶未遮罩身分證與銀行帳號",
+      desc: "客訴退費工單 #4082：CS-Draft 為了「核對方便」把完整身分證字號與帳號貼進對外 Email 草稿，正等待外發 Gate。",
+      agentIdx: 5,
+      skillIdx: 12,
+      clusterIdx: 4,
+      repoIdx: 5,
+      bestAction: "block",
+      inbox: {
+        channel: "VIP 客訴信",
+        voiceTag: "● 帳務退費急件",
+        duration: "01:12",
+        sourceLines: ["客戶：王○○ (VIP)", "要求：退還誤扣年費", "附件：含身分證影本"],
+        lines: [
+          { txt: "#4082 帳務退費草稿", col: "#f43f5e" },
+          { txt: "• 異常：偵測明碼身分證", col: "#fda4af" },
+          { txt: "• Skill: send_bulk_mail", col: "#facc15" },
+          { txt: "• 狀態：卡在 HITL Gate", col: "#f43f5e" }
+        ],
+        badges: ["[PII 警報]", "[待簽核]"]
+      },
+      ttl: 26
+    },
+    {
+      id: "unlimited_refund",
+      sev: "crit",
+      tag: "法務越權承諾",
+      ruleKey: "cap_refund_authority",
+      ruleText: "+ require legal sign-off if refund > $5,000",
+      title: "CS-Draft 擅自承諾「全額賠償客戶延伸營業損失 NT$180,000」",
+      desc: "企業客戶系統中斷 40 分鐘，客服 Agent 為安撫情緒在草稿寫出無限責任賠償條款，違反 SLA 賠償上限。",
+      agentIdx: 1,
+      skillIdx: 7,
+      clusterIdx: 3,
+      repoIdx: 1,
+      bestAction: "block",
+      inbox: {
+        channel: "企業 SLA 申訴",
+        voiceTag: "● 語音客訴轉譯",
+        duration: "02:05",
+        sourceLines: ["來電：XX 物流採購", "指控：API 斷線 40m", "索賠：營業損失 18 萬"],
+        lines: [
+          { txt: "#4091 SLA 賠償草稿", col: "#f43f5e" },
+          { txt: "• 擬賠：NT$180,000 (超限)", col: "#fda4af" },
+          { txt: "• 法務上限：僅限月費折抵", col: "#facc15" },
+          { txt: "• 狀態：Legal-Gate 攔截", col: "#f43f5e" }
+        ],
+        badges: ["[超額授權]", "[需寫規則]"]
+      },
+      ttl: 25
+    },
+    {
+      id: "clause_lock",
+      sev: "warn",
+      tag: "雙 Agent 搶檔鎖死",
+      ruleKey: "serialize_clause_locks",
+      ruleText: "+ enforce lease lock on policy_v3.md",
+      title: "CS-Draft 與 Legal-Redline 同時搶寫 refund_policy_v3.md",
+      desc: "兩隻 Agent 同時對同一份新版退費話術條文送出覆寫 Patch，若不序列化 Handoff，法務剛加的免責條款會被洗掉。",
+      agentIdx: 3,
+      skillIdx: 9,
+      clusterIdx: 1,
+      repoIdx: 3,
+      lockConflict: true,
+      bestAction: "handoff",
+      inbox: {
+        channel: "內部協作衝突",
+        voiceTag: "● Git Patch 碰撞",
+        duration: "LIVE",
+        sourceLines: ["檔案: refund_policy.md", "CS-Draft: 改寫第 4 段", "Legal: 剛插入免責條款"],
+        lines: [
+          { txt: "WRITE LOCK CONFLICT", col: "#f97316" },
+          { txt: "• CS 與法務同改第 4 條", col: "#e2e8f0" },
+          { txt: "• 風險：免責條款被覆蓋", col: "#f43f5e" },
+          { txt: "• 處置：強制 Handoff 排隊", col: "#eab308" }
+        ],
+        badges: ["[LOCK!]", "[待序列化]"]
+      },
+      ttl: 24
+    },
+    {
+      id: "ctx_overflow",
+      sev: "warn",
+      tag: "Context 84% 失憶漂移",
+      ruleKey: "auto_sinter_at_75",
+      ruleText: "+ force context handoff at >=75%",
+      title: "Legal-Redline Context 飆達 84%，開始把 2023 舊合約當現行條款",
+      desc: "連續審完 19 份合約未清快取，Legal-Redline 出現注意力漂移，引用已廢止的舊版仲裁條款並重複查詢資料庫。",
+      agentIdx: 2,
+      skillIdx: 4,
+      clusterIdx: 2,
+      repoIdx: 2,
+      ctxSpikeRight: 84,
+      bestAction: "handoff",
+      inbox: {
+        channel: "法務知識檢索",
+        voiceTag: "● RAG 上下文過載",
+        duration: "CTX 84%",
+        sourceLines: ["Agent: Legal-Redline", "連續輪次: 38 turns", "異常: 引用 2023 舊約"],
+        lines: [
+          { txt: "CONTEXT DRIFT ALERT", col: "#eab308" },
+          { txt: "• 水位 84% (>75% 紅線)", col: "#f43f5e" },
+          { txt: "• 症狀：新舊條款混雜", col: "#e2e8f0" },
+          { txt: "• 處置：立即 Sinter+Handoff", col: "#10b981" }
+        ],
+        badges: ["[失憶漂移]", "[壓縮換手]"]
+      },
+      ttl: 24
+    },
+    {
+      id: "loop_burn",
+      sev: "warn",
+      tag: "死循環燒預算",
+      ruleKey: "circuit_break_retry_3",
+      ruleText: "+ kill & downgrade model after 3 retries",
+      title: "Policy-RAG 重試第 11 次失敗，正以昂貴旗艦模型狂燒 API 額度",
+      desc: "外部司法判例庫格式微調導致 JSON 解析失敗，Policy-RAG 陷入無窮 Retry，再不降級或轉派，今日預算將見底。",
+      agentIdx: 6,
+      skillIdx: 15,
+      clusterIdx: 6,
+      repoIdx: 2,
+      bestAction: "reroute",
+      inbox: {
+        channel: "模型預算告警",
+        voiceTag: "● Retry Loop x11",
+        duration: "$4.8/m",
+        sourceLines: ["Agent: Policy-RAG", "錯誤: JSON parse fail", "重試次數: 11 / 上限 3"],
+        lines: [
+          { txt: "TOKEN BURN CIRCUIT", col: "#f97316" },
+          { txt: "• 旗艦模型死循環空轉", col: "#f43f5e" },
+          { txt: "• 預算消耗急升 +14%", col: "#eab308" },
+          { txt: "• 處置：降級/轉派備援", col: "#38bdf8" }
+        ],
+        badges: ["[燒錢循環]", "[轉派降級]"]
+      },
+      ttl: 22
+    },
+    {
+      id: "valid_nda",
+      sev: "ok",
+      tag: "合規標準急件",
+      ruleKey: null,
+      title: "標準版保密協議 (NDA v4) 雙簽檢核完成，客戶等 10 分鐘內回傳",
+      desc: "Legal-Redline 已比對 100% 無紅線修改，PII-Scrubber 綠燈無個資外洩，卡在最終人工簽核放行。",
+      agentIdx: 4,
+      skillIdx: 2,
+      clusterIdx: 1,
+      repoIdx: 3,
+      bestAction: "approve",
+      inbox: {
+        channel: "企業法務急件",
+        voiceTag: "● NDA v4 覆核通過",
+        duration: "00:18",
+        sourceLines: ["客戶：台達合作夥伴", "條款：100% 標準版", "PII 掃描：0 異常"],
+        lines: [
+          { txt: "#4103 標準 NDA 放行", col: "#10b981" },
+          { txt: "• 法務比對：0 條紅線修改", col: "#6ee7b7" },
+          { txt: "• 時效：SLA 剩 8 分鐘", col: "#38bdf8" },
+          { txt: "• 建議：核准放行", col: "#10b981" }
+        ],
+        badges: ["[綠燈合規]", "[建議放行]"]
+      },
+      ttl: 22
+    },
+    {
+      id: "valid_voucher",
+      sev: "ok",
+      tag: "授權內客訴安撫",
+      ruleKey: null,
+      title: "出貨延遲客訴：發送 NT$300 致歉折價券（規則授權內）",
+      desc: "金額在 NT$500 授權門檻內、無額外法律承諾文字、已附標準道歉函，QA-Gate 建議核准。",
+      agentIdx: 0,
+      skillIdx: 1,
+      clusterIdx: 0,
+      repoIdx: 5,
+      bestAction: "approve",
+      inbox: {
+        channel: "電商客服進線",
+        voiceTag: "● 物流延遲工單",
+        duration: "00:24",
+        sourceLines: ["客戶：林小姐 (2年會員)", "訴求：延遲 2 日補償", "金額：NT$300 券"],
+        lines: [
+          { txt: "#4109 安撫折價券", col: "#10b981" },
+          { txt: "• 金額 $300 <= 授權 $500", col: "#6ee7b7" },
+          { txt: "• 話術合規：無越權承諾", col: "#38bdf8" },
+          { txt: "• 建議：核准放行", col: "#10b981" }
+        ],
+        badges: ["[額度內]", "[建議放行]"]
+      },
+      ttl: 22
+    },
+    {
+      id: "unverified_law",
+      sev: "crit",
+      tag: "幻覺法條引用",
+      ruleKey: "cite_verified_statute",
+      ruleText: "+ reject uncited statute / case number",
+      title: "CS-Draft 援引「消保法第 99 條之 8（不存在條文）」強硬回絕客戶退款",
+      desc: "高風險幻覺！若把捏造法條寄給客戶，截圖上新聞將直接引爆公關與消保官檢舉事故。",
+      agentIdx: 1,
+      skillIdx: 11,
+      clusterIdx: 2,
+      repoIdx: 4,
+      ctxSpikeLeft: 78,
+      bestAction: "block",
+      inbox: {
+        channel: "消保爭議回函",
+        voiceTag: "● 法條幻覺偵測",
+        duration: "00:54",
+        sourceLines: ["草稿：拒退年費回函", "引用：消保法 §99-8", "查證：法規庫查無此條"],
+        lines: [
+          { txt: "HALLUCINATED STATUTE", col: "#f43f5e" },
+          { txt: "• 捏造「消保法 §99-8」", col: "#fda4af" },
+          { txt: "• 公關/法律風險：極高", col: "#f43f5e" },
+          { txt: "• 處置：攔截並寫入查核規則", col: "#eab308" }
+        ],
+        badges: ["[假法條]", "[高危攔截]"]
+      },
+      ttl: 25
+    }
+  ];
+
+  /* ================= 模擬器全域狀態 ================= */
+  var SIM;
+  function initSim() {
+    SIM = {
+      running: true,
+      speed: 1,
+      minuteOfDay: 9 * 60, // 09:00 -> 18:00
+      done: 14,
+      incidents: 0,
+      autoBlocked: 0,
+      budgetPct: 14,
+      ctxLeft: 38,
+      ctxRight: 42,
+      lockConflict: false,
+      activeQueue: [],
+      nextUid: 1,
+      spawnTimer: 2,
+      rules: [
+        "+ always mask bank account last 4",
+        "+ escalate VIP threat to legal-tier",
+        "+ keep raw complaint logs immutable"
+      ],
+      learnedKeys: {},
+      logs: [
+        { cls: "auto", msg: "09:00 班表啟動：12 隻客服/法務 Agent 上線待命，3 條基礎門禁已掛載。", tm: "09:00" }
+      ],
+      clusters: [
+        { id: "VIP客訴", col: "#f97316", count: 42, cx: 0.28, cy: 0.45, alert: false },
+        { id: "合約條款", col: "#38bdf8", count: 38, cx: 0.68, cy: 0.28, alert: false },
+        { id: "消保法規", col: "#14b8a6", count: 29, cx: 0.56, cy: 0.55, alert: false },
+        { id: "退款授權", col: "#facc15", count: 34, cx: 0.65, cy: 0.46, alert: false },
+        { id: "個資PII", col: "#a78bfa", count: 21, cx: 0.45, cy: 0.78, alert: false },
+        { id: "話術模板", col: "#f43f5e", count: 46, cx: 0.60, cy: 0.22, alert: false },
+        { id: "判例庫", col: "#10b981", count: 31, cx: 0.78, cy: 0.56, alert: false }
+      ],
+      agents: ["ok","work","work","ok","ok","idle","work","ok","idle","work","ok","ok"],
+      skills: [1,1,0,1, 1,0,1,0, 1,1,0,1, 0,1,1,0, 1,0,1,1]
+    };
+  }
+  initSim();
+
+  function fmtClock(mins) {
+    var m = Math.floor(mins) % (24 * 60);
+    var hh = String(Math.floor(m / 60)).padStart(2, "0");
+    var mm = String(m % 60).padStart(2, "0");
+    return hh + ":" + mm;
+  }
+
+  function addLog(cls, msg) {
+    SIM.logs.unshift({ cls: cls, msg: msg, tm: fmtClock(SIM.minuteOfDay) });
+    if (SIM.logs.length > 35) SIM.logs.pop();
+  }
+
+  function spawnScenario(forceIdx) {
+    if (SIM.activeQueue.length >= 3) return;
+    var pool = SCENARIOS.filter(function (sc) {
+      return !SIM.activeQueue.some(function (q) { return q.sc.id === sc.id; });
+    });
+    if (!pool.length) return;
+    var sc = (typeof forceIdx === "number")
+      ? SCENARIOS[forceIdx % SCENARIOS.length]
+      : pool[Math.floor(Math.random() * pool.length)];
+
+    // 若已學過該規則，自動防禦攔截！
+    if (sc.ruleKey && SIM.learnedKeys[sc.ruleKey]) {
+      SIM.autoBlocked++;
+      SIM.done++;
+      SIM.budgetPct = Math.min(100, SIM.budgetPct + 0.6);
+      addLog("auto", "🛡️ [rules.md 自動攔截] 依新規則擋下「" + sc.tag + "」，免人工介入！");
+      updateUI();
+      return;
+    }
+
+    var item = {
+      uid: SIM.nextUid++,
+      sc: sc,
+      ttl: sc.ttl,
+      maxTtl: sc.ttl
+    };
+    SIM.activeQueue.push(item);
+    if (sc.ctxSpikeLeft) SIM.ctxLeft = Math.max(SIM.ctxLeft, sc.ctxSpikeLeft);
+    if (sc.ctxSpikeRight) SIM.ctxRight = Math.max(SIM.ctxRight, sc.ctxSpikeRight);
+    if (sc.lockConflict) SIM.lockConflict = true;
+    addLog(sc.sev === "crit" ? "bad" : "auto", "📥 新事件 [" + sc.tag + "]：" + sc.title);
+    updateUI();
+  }
+
+  function resolveItem(uid, action) {
+    var idx = SIM.activeQueue.findIndex(function (x) { return x.uid === uid; });
+    if (idx < 0) return;
+    var item = SIM.activeQueue[idx];
+    var sc = item.sc;
+    SIM.activeQueue.splice(idx, 1);
+
+    if (action === "approve") {
+      if (sc.bestAction === "approve") {
+        SIM.done += 2;
+        SIM.budgetPct = Math.min(100, SIM.budgetPct + 1.2);
+        addLog("good", "✅ 精準放行「" + sc.tag + "」：合規且在 SLA 內完成交付 (+2 工單)。");
+      } else {
+        SIM.incidents++;
+        SIM.budgetPct = Math.min(100, SIM.budgetPct + 4);
+        addLog("bad", "💥 誤放行事故！「" + sc.title + "」應攔截或處理卻被放行，法務/資安事故 +1！");
+      }
+    } else if (action === "block") {
+      if (sc.sev === "ok") {
+        SIM.incidents++;
+        addLog("bad", "⚠️ 過度防禦誤殺：標準合規件「" + sc.tag + "」被退件延誤 SLA！");
+      } else {
+        SIM.done++;
+        if (sc.ruleKey && !SIM.learnedKeys[sc.ruleKey]) {
+          SIM.learnedKeys[sc.ruleKey] = true;
+          SIM.rules.push(sc.ruleText);
+          addLog("rule", "🛡️ 攔截成功並燒結新規則：" + sc.ruleText + "（後續同類將自動攔截）");
+        } else {
+          addLog("good", "🛡️ 成功攔截「" + sc.tag + "」，避免違規外流。");
+        }
+      }
+    } else if (action === "handoff") {
+      SIM.ctxLeft = 18;
+      SIM.ctxRight = 22;
+      SIM.lockConflict = false;
+      SIM.done++;
+      if (sc.bestAction === "handoff") {
+        if (sc.ruleKey && !SIM.learnedKeys[sc.ruleKey]) {
+          SIM.learnedKeys[sc.ruleKey] = true;
+          SIM.rules.push(sc.ruleText);
+        }
+        addLog("good", "✂️ 強制 Sinter & Handoff 成功！雙 Agent Context 已壓縮重置、寫鎖解除。");
+      } else {
+        addLog("auto", "✂️ 已重啟對話槽並退回重審「" + sc.tag + "」。");
+      }
+    } else if (action === "reroute") {
+      SIM.budgetPct = Math.max(5, SIM.budgetPct - 3);
+      SIM.done++;
+      if (sc.bestAction === "reroute") {
+        if (sc.ruleKey && !SIM.learnedKeys[sc.ruleKey]) {
+          SIM.learnedKeys[sc.ruleKey] = true;
+          SIM.rules.push(sc.ruleText);
+        }
+        addLog("good", "⚡ 已切斷死循環並降級至輕量模型處理，止血 API 預算！");
+      } else {
+        addLog("auto", "⚡ 已將「" + sc.tag + "」轉派備援法務專責槽位。");
+      }
+    }
+
+    // 清理無衝突狀態
+    if (!SIM.activeQueue.some(function (q) { return q.sc.lockConflict; })) {
+      SIM.lockConflict = false;
+    }
+    syncCanvasStates();
+    updateUI();
+  }
+
+  function syncCanvasStates() {
+    SIM.clusters.forEach(function (cl) { cl.alert = false; });
+    SIM.agents = ["ok","work","work","ok","ok","idle","work","ok","idle","work","ok","ok"];
+    SIM.skills = [1,1,0,1, 1,0,1,0, 1,1,0,1, 0,1,1,0, 1,0,1,1];
+    SIM.activeQueue.forEach(function (q) {
+      var sc = q.sc;
+      if (SIM.clusters[sc.clusterIdx]) SIM.clusters[sc.clusterIdx].alert = (sc.sev !== "ok");
+      SIM.agents[sc.agentIdx] = (sc.sev === "crit") ? "gate" : (sc.sev === "warn" ? "warn" : "work");
+      SIM.skills[sc.skillIdx] = (sc.sev === "ok") ? 3 : 2;
+    });
+  }
+
+  /* ================= 6 個 Canvas 狀態餵入器 ================= */
+  function payload31() {
+    var top = SIM.activeQueue[0];
+    var callouts = SIM.activeQueue.length
+      ? SIM.activeQueue.map(function (q) {
+          return {
+            title: "[" + q.sc.tag + "] " + q.sc.title.slice(0, 18) + "…",
+            sub: "TTL " + Math.ceil(q.ttl) + "s · " + (q.sc.sev === "crit" ? "急需人工攔截" : "待調度處置"),
+            sev: q.sc.sev,
+            nx: SIM.clusters[q.sc.clusterIdx].cx,
+            ny: SIM.clusters[q.sc.clusterIdx].cy
+          };
+        })
+      : [
+          { title: "全線合規運行中 · " + SIM.done + " 工單已交付", sub: "已掛載 " + SIM.rules.length + " 條 rules.md 防火牆", sev: "ok", nx: 0.54, ny: 0.44 }
+        ];
+    return {
+      title: "01 RISK GRAPH · 客服 × 法務七大風險星團",
+      subtitle: SIM.done + " TICKETS · " + SIM.activeQueue.length + " GATES OPEN",
+      hubLabel: "OPS",
+      cats: SIM.clusters,
+      callouts: callouts
+    };
+  }
+
+  function payload32() {
+    var blockedMap = {};
+    SIM.activeQueue.forEach(function (q) {
+      if (q.sc.sev !== "ok") blockedMap[q.sc.repoIdx] = true;
+    });
+    var repos = [
+      { name: "Intake-Triage (進線)", col: "#38bdf8", blocked: !!blockedMap[0] },
+      { name: "CS-Draft (客服草稿)", col: "#f97316", blocked: !!blockedMap[1] },
+      { name: "Policy-RAG (條款檢索)", col: "#14b8a6", blocked: !!blockedMap[2] },
+      { name: "Legal-Redline (法務)", col: "#a78bfa", blocked: !!blockedMap[3] },
+      { name: "PII-Scrubber (去識別)", col: "#10b981", blocked: !!blockedMap[4] },
+      { name: "CRM-Sender (對外發送)", col: "#f43f5e", blocked: !!blockedMap[5] },
+      { name: "Audit-Vault (稽核歸檔)", col: "#eab308", blocked: !!blockedMap[6] }
+    ];
+    return {
+      title: "02 DISPATCH TREE · 進線 → 法務閘門路由樹",
+      rightTag: SIM.activeQueue.length ? ("⚠ " + SIM.activeQueue.length + " 管線阻塞") : "✓ 全線暢通",
+      leftTitle: "active guardrails (" + SIM.rules.length + ")",
+      hubLabel: "YOU",
+      rules: SIM.rules.slice(-7),
+      repos: repos
+    };
+  }
+
+  function payload33() {
+    var top = SIM.activeQueue[0];
+    return {
+      title: "03 SHARED MEMORY · 客服 × 法務雙 Agent 搶鎖與失憶監控",
+      rightTag: SIM.lockConflict ? "⚠ WRITE LOCK CONFLICT" : "lease sync ok",
+      lockConflict: SIM.lockConflict,
+      leftAgent: {
+        name: "CS-Draft (客服)",
+        status: SIM.ctxLeft >= 75 ? "DRIFT!" : "drafting",
+        task: top ? "> " + top.sc.tag : "> reply VIP tickets",
+        lines: ["read refund_policy_v3.md", "write ticket_state.json"],
+        ctxPct: SIM.ctxLeft,
+        col: "#f97316"
+      },
+      rightAgent: {
+        name: "Legal-Redline (法務)",
+        status: SIM.ctxRight >= 75 ? "OVERFLOW!" : "auditing",
+        task: SIM.lockConflict ? "> LOCK refund_policy_v3" : "> verify NDA & SLA",
+        lines: ["enforce rules.md (" + SIM.rules.length + ")", "check PII & cap"],
+        ctxPct: SIM.ctxRight,
+        col: "#38bdf8"
+      },
+      vaults: [
+        { name: "ticket_state", detail: SIM.done + " done", sub: "SLA ok", alert: false },
+        { name: "clause_locks", detail: SIM.lockConflict ? "COLLISION" : "0 locks", sub: "policy_v3.md", alert: SIM.lockConflict },
+        { name: "hitl_queue", detail: SIM.activeQueue.length + " pending", sub: "human gate", alert: SIM.activeQueue.length > 0 },
+        { name: "rules.md", detail: SIM.rules.length + " rules", sub: SIM.autoBlocked + " blocked", alert: false }
+      ]
+    };
+  }
+
+  function payload34() {
+    var top = SIM.activeQueue[0];
+    if (!top) {
+      return {
+        title: "04 ESCALATION INBOX · 客服進線轉結構化工單",
+        channel: "Queue Clear",
+        voiceTag: "● 待命中",
+        duration: "00:00",
+        cardTitle: "/ticket-parser",
+        sourceLines: ["目前無待審異常", "背景自動處理常規詢價", "可點上方💥注入突發危機"],
+        lines: [
+          { txt: "all-clear · SLA 100%", col: "#10b981" },
+          { txt: "• 自動攔截累計: " + SIM.autoBlocked, col: "#38bdf8" },
+          { txt: "• 規則庫: " + SIM.rules.length + " 條運作中", col: "#a78bfa" },
+          { txt: "• 等待下一波進線…", col: "#94a3b8" }
+        ],
+        badges: [{ txt: "[Ready]", col: "#10b981" }, { txt: "[Auto]", col: "#38bdf8" }],
+        alert: false
+      };
+    }
+    var ib = top.sc.inbox;
+    return {
+      title: "04 ESCALATION INBOX · " + top.sc.tag,
+      channel: ib.channel,
+      channelCol: top.sc.sev === "crit" ? "#f43f5e" : "#38bdf8",
+      voiceTag: ib.voiceTag,
+      duration: ib.duration,
+      cardTitle: "/ticket-parser",
+      sourceLines: ib.sourceLines,
+      lines: ib.lines,
+      badges: ib.badges.map(function (b) {
+        return { txt: b, col: top.sc.sev === "crit" ? "#f43f5e" : (top.sc.sev === "warn" ? "#f97316" : "#10b981") };
+      }),
+      alert: top.sc.sev === "crit"
+    };
+  }
+
+  function payload35() {
+    return {
+      title: "05 RULE SINTERING · 救火經驗轉 rules.md",
+      rightTag: "incidents -> rules",
+      clockLabel: fmtClock(SIM.minuteOfDay),
+      showNums: true,
+      metrics: [
+        { k: "auto blocked", n: SIM.autoBlocked, col: "#10b981" },
+        { k: "active rules", n: SIM.rules.length, col: "#f97316" },
+        { k: "human gates", n: SIM.activeQueue.length, col: "#38bdf8" },
+        { k: "mis-incidents", n: SIM.incidents, col: "#f43f5e" }
+      ],
+      rulesHeader: "rules.md · live agent guardrails (" + SIM.rules.length + ")",
+      rules: SIM.rules
+    };
+  }
+
+  function payload36() {
+    var prs = SIM.activeQueue.length
+      ? SIM.activeQueue.slice(0, 3).map(function (q, idx) {
+          var pfx = (idx === Math.min(2, SIM.activeQueue.length - 1)) ? "└─ " : "├─ ";
+          return {
+            txt: pfx + q.sc.tag.slice(0, 14),
+            tag: q.sc.sev === "crit" ? "BLOCK?" : (q.sc.sev === "ok" ? "PASS?" : "FIX?"),
+            col: q.sc.sev === "crit" ? "#f43f5e" : (q.sc.sev === "ok" ? "#10b981" : "#f97316")
+          };
+        })
+      : [
+          { txt: "├─ CS-Draft -> QA-Gate", tag: "ok", col: "#10b981" },
+          { txt: "├─ Legal-Redline -> Vault", tag: "sync", col: "#38bdf8" },
+          { txt: "└─ rules.md -> 12 Agents", tag: "guard", col: "#a78bfa" }
+        ];
+    return {
+      title: "06 AGENT FLEET · 12 Agents 燈號 × 20 權限矩陣",
+      cliCmd: "$ ops-ctl status --dept cs-legal --rules " + SIM.rules.length,
+      cliStatus: SIM.activeQueue.length
+        ? ("⚠ " + SIM.activeQueue.length + " pending HITL gates · budget " + Math.round(SIM.budgetPct) + "%")
+        : "✓ all 12 agents nominal · 0 deadlocks",
+      cliStatusCol: SIM.activeQueue.length ? "#f59e0b" : "#10b981",
+      leftHeader: "20 skills (紅=觸發高危)",
+      rightHeader: "12 agents 活體燈號",
+      skills: SIM.skills,
+      agents: SIM.agents,
+      treeHeader: "hitl-gate-queue -> human supervisor",
+      prs: prs
+    };
+  }
+
+  var ctls = [
+    C.ycGraph(document.getElementById("cv31"), payload31),
+    C.ycWikiTree(document.getElementById("cv32"), payload32),
+    C.ycAiMemory(document.getElementById("cv33"), payload33),
+    C.ycVoiceNote(document.getElementById("cv34"), payload34),
+    C.ycNightlyPass(document.getElementById("cv35"), payload35),
+    C.ycCdeMklink(document.getElementById("cv36"), payload36)
+  ];
+  ctls.forEach(function (c) { c.play(); });
+
+  /* ================= DOM 渲染與操作綁定 ================= */
+  function calcGrade() {
+    if (SIM.incidents >= 3 || SIM.budgetPct >= 95) return { g: "D (停權檢討)", col: "#f43f5e" };
+    if (SIM.incidents >= 1) return { g: "B", col: "#f59e0b" };
+    if (SIM.rules.length >= 6 && SIM.done >= 20) return { g: "S (資深調度)", col: "#10b981" };
+    return { g: "A", col: "#38bdf8" };
+  }
+
+  function updateUI() {
+    document.getElementById("kClock").textContent = fmtClock(SIM.minuteOfDay);
+    document.getElementById("kDone").textContent = String(SIM.done);
+    var kInc = document.getElementById("kInc");
+    kInc.textContent = String(SIM.incidents);
+    kInc.style.color = SIM.incidents > 0 ? "var(--rose)" : "var(--ok)";
+    document.getElementById("kRules").textContent = String(SIM.rules.length);
+    var kBud = document.getElementById("kBudget");
+    kBud.textContent = Math.round(SIM.budgetPct) + "%";
+    kBud.style.color = SIM.budgetPct >= 80 ? "var(--rose)" : (SIM.budgetPct >= 60 ? "var(--warn)" : "var(--yellow)");
+    var gr = calcGrade();
+    var kGr = document.getElementById("kGrade");
+    kGr.textContent = gr.g;
+    kGr.style.color = gr.col;
+
+    document.getElementById("qCount").textContent = String(SIM.activeQueue.length);
+    document.getElementById("autoStat").textContent = "自動攔截防禦：" + SIM.autoBlocked + " 次";
+
+    var hasCrit = SIM.activeQueue.some(function (q) { return q.sc.sev === "crit"; });
+    document.getElementById("hitlBox").classList.toggle("has-crit", hasCrit);
+
+    var incList = document.getElementById("incList");
+    if (!SIM.activeQueue.length) {
+      incList.innerHTML = "<div class='empty-inc'>目前所有 Agent 都在 <code>rules.md</code> 護欄內安全運行。<br>等待下一波客戶進線，或點上方 <b>💥 注入突發危機</b> 馬上模擬緊急狀況。</div>";
+    } else {
+      incList.innerHTML = SIM.activeQueue.map(function (item) {
+        var sc = item.sc;
+        var pct = Math.max(0, Math.min(100, (item.ttl / item.maxTtl) * 100));
+        return "<div class='inc-card " + sc.sev + "'>" +
+          "<div class='inc-top'>" +
+            "<span class='sev-tag " + sc.sev + "'>" + sc.tag + "</span>" +
+            "<span style='font-size:11px;color:var(--dim)'>剩餘決策時間 <b>" + Math.ceil(item.ttl) + "s</b></span>" +
+          "</div>" +
+          "<div class='inc-title'>" + sc.title + "</div>" +
+          "<div class='inc-desc'>" + sc.desc + "</div>" +
+          "<div class='ttl-bar'><div class='ttl-fill' style='width:" + pct + "%'></div></div>" +
+          "<div class='inc-actions'>" +
+            "<button class='act-btn approve' data-uid='" + item.uid + "' data-act='approve'>✓ 核准放行</button>" +
+            "<button class='act-btn block' data-uid='" + item.uid + "' data-act='block'>✕ 攔截並寫入規則</button>" +
+            "<button class='act-btn handoff' data-uid='" + item.uid + "' data-act='handoff'>✂ 強制 Handoff</button>" +
+            "<button class='act-btn reroute' data-uid='" + item.uid + "' data-act='reroute'>⚡ 降級 / 轉派</button>" +
+          "</div>" +
+        "</div>";
+      }).join("");
+    }
+
+    var logFeed = document.getElementById("logFeed");
+    logFeed.innerHTML = SIM.logs.map(function (l) {
+      return "<div class='log-row " + l.cls + "'><span>" + l.msg + "</span><time>" + l.tm + "</time></div>";
+    }).join("");
+  }
+
+  document.getElementById("incList").addEventListener("click", function (ev) {
+    var btn = ev.target.closest(".act-btn");
+    if (!btn) return;
+    resolveItem(Number(btn.dataset.uid), btn.dataset.act);
+  });
+
+  /* ================= 模擬器主時鐘 ================= */
+  setInterval(function () {
+    if (!SIM.running) return;
+    var dt = 0.5 * SIM.speed;
+    SIM.minuteOfDay += 1.5 * SIM.speed;
+    if (SIM.minuteOfDay >= 18 * 60) {
+      SIM.minuteOfDay = 9 * 60;
+      addLog("rule", "🌙 18:00 日終結算：共交付 " + SIM.done + " 件、合規事故 " + SIM.incidents + " 次、累積 " + SIM.rules.length + " 條規則。已自動切入隔日早班。");
+    }
+
+    // 自然緩慢增長 Context 與正常吞吐
+    SIM.ctxLeft = Math.min(96, SIM.ctxLeft + 0.55 * SIM.speed);
+    SIM.ctxRight = Math.min(96, SIM.ctxRight + 0.45 * SIM.speed);
+    SIM.budgetPct = Math.min(100, SIM.budgetPct + 0.08 * SIM.speed);
+
+    // 定期出題
+    SIM.spawnTimer -= dt;
+    if (SIM.spawnTimer <= 0) {
+      spawnScenario();
+      SIM.spawnTimer = 6.5;
+    }
+
+    // 倒數 TTL，超時視同未處理失職
+    var expired = [];
+    SIM.activeQueue.forEach(function (q) {
+      q.ttl -= dt;
+      if (q.ttl <= 0) expired.push(q);
+    });
+    expired.forEach(function (q) {
+      var idx = SIM.activeQueue.indexOf(q);
+      if (idx >= 0) SIM.activeQueue.splice(idx, 1);
+      if (q.sc.sev === "ok") {
+        addLog("bad", "⏱️ 超時 SLA 違約：「" + q.sc.tag + "」超過時限未簽核，客戶投訴！");
+      } else {
+        SIM.incidents++;
+        addLog("bad", "💥 超時未攔截：「" + q.sc.tag + "」自動逾時觸發事故 (+1)！");
+      }
+      syncCanvasStates();
+    });
+
+    updateUI();
+  }, 500);
+
+  /* ================= 控制列按鈕 ================= */
+  var btnToggle = document.getElementById("btnSimToggle");
+  btnToggle.addEventListener("click", function () {
+    SIM.running = !SIM.running;
+    ctls.forEach(function (c) { if (SIM.running) c.play(); else c.pause(); });
+    btnToggle.textContent = SIM.running ? "⏸ 模擬運行中" : "▶ 已暫停 (點擊繼續)";
+    btnToggle.classList.toggle("on", SIM.running);
+    btnToggle.classList.toggle("paused", !SIM.running);
+  });
+
+  var btnSpeed = document.getElementById("btnSpeed");
+  btnSpeed.addEventListener("click", function () {
+    SIM.speed = SIM.speed === 1 ? 2 : 1;
+    btnSpeed.textContent = "⚡ " + SIM.speed + "x 速率";
+    btnSpeed.classList.toggle("on", SIM.speed === 2);
+  });
+
+  document.getElementById("btnInject").addEventListener("click", function () {
+    spawnScenario();
+    syncCanvasStates();
+    updateUI();
+  });
+
+  document.getElementById("btnNightPass").addEventListener("click", function () {
+    SIM.ctxLeft = 15;
+    SIM.ctxRight = 15;
+    SIM.lockConflict = false;
+    SIM.budgetPct = Math.max(8, SIM.budgetPct * 0.4);
+    addLog("rule", "🌙 執行手動 Sinter & Nightly Pass：Context 已重置為 15%，" + SIM.rules.length + " 條 rules.md 已同步至全體 12 Agents。");
+    syncCanvasStates();
+    updateUI();
+  });
+
+  document.getElementById("btnReset").addEventListener("click", function () {
+    initSim();
+    spawnScenario(0);
+    syncCanvasStates();
+    updateUI();
+  });
+
+  /* ================= 視角切換高亮 ================= */
+  var VIEW_MAP = {
+    all: [31, 32, 33, 34, 35, 36],
+    intake: [32, 34],
+    sync: [33],
+    gate: [36],
+    rules: [35],
+    radar: [31]
+  };
+  document.querySelectorAll(".p-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".p-tab").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      var v = btn.dataset.view;
+      var active = VIEW_MAP[v] || VIEW_MAP.all;
+      [31, 32, 33, 34, 35, 36].forEach(function (id) {
+        var el = document.getElementById("card-" + id);
+        if (!el) return;
+        var on = active.indexOf(id) >= 0;
+        el.classList.toggle("dimmed", !on);
+        el.classList.toggle("highlighted", v !== "all" && on);
+      });
+    });
+  });
+
+  window.addEventListener("resize", function () {
+    ctls.forEach(function (c) { c.redraw(); });
+  });
+
+  // 開局先拋出第一道真實危機，讓畫面一進來就有東西可操作
+  spawnScenario(0);
+  syncCanvasStates();
+  updateUI();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>A23 Charts v2 Demo（資料：s02 YouBike 24h）</title>
+<style>
+body{margin:0;background:#050912;color:#e2e8f0;font-family:'Microsoft JhengHei',system-ui,sans-serif}
+h1{font-size:16px;margin:12px 16px 0}p.s{margin:4px 16px 8px;color:#64748b;font-size:12px}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px 16px}
+.c{background:#0b1220;border:1px solid #1e293b;border-radius:8px;padding:8px}
+.c h2{font-size:13px;margin:0 0 4px;color:#94a3b8}.c canvas{width:100%;height:300px;display:block}
+.b{display:flex;gap:8px;align-items:center;margin-top:4px}.b button{background:#1e293b;color:#e2e8f0;border:0;border-radius:4px;padding:4px 8px;cursor:pointer}.b input{flex:1}
+</style></head><body>
+<h1>A23 Charts v2 · 動態圖示範（n05 #1 #2 #3 #8 #10 #11 #12 #13 #14 #15 #16 #19 #20）</h1>
+<p class="s">資料來源：s02_youbike_tide 24h 聚合（行政區層級）。Flow Map 為推估淨流量，非實測 OD。</p>
+<div class="g" id="g"></div>
+<script src="data_s02.js"></script><script src="../a23_charts_tex.js"></script><script src="../a23_charts.js"></script><script src="../../../geo/tw_towns_2021_rings.js"></script>
+<script>
+var D=window.A23_DEMO_S02,C=A23Charts,g=document.getElementById("g"),ctls=[];
+function panel(title,fn,slider){
+  var d=document.createElement("div");d.className="c";
+  d.innerHTML="<h2>"+title+"</h2><canvas></canvas><div class='b'><button>⏸</button>"+(slider?"<input type=range min=0 value=0 step=0.01>":"")+"</div>";
+  g.appendChild(d);var cv=d.querySelector("canvas"),btn=d.querySelector("button"),rg=d.querySelector("input");
+  var ctl=fn(cv,function(t){if(rg&&!rg.__drag)rg.value=t;});
+  if(rg){rg.max=ctl.n-1;rg.oninput=function(){rg.__drag=1;ctl.pause();btn.textContent="▶";ctl.seek(+rg.value);rg.__drag=0;};}
+  btn.onclick=function(){if(ctl.playing){ctl.pause();btn.textContent="▶";}else{ctl.play();btn.textContent="⏸";}};
+  ctl.play();ctls.push(ctl);window.addEventListener("resize",function(){ctl.redraw();});
+}
+panel("#1 Bar Chart Race｜各區可借車輛數",function(cv,tk){return C.barRace(cv,D.bar,{topN:10,fps:1.2,onTick:tk,title:"可借車輛（輛）"});},1);
+panel("#8 Animated Bubble｜滿載率 × 缺車站占比（大小＝可借車）",function(cv,tk){return C.bubble(cv,D.bubble,{fps:1.2,onTick:tk,xLabel:"滿載率 %",yLabel:"缺車站 %（<20%）"});},1);
+panel("#10 Animated Heatmap｜行政區 × 時段 滿載率",function(cv,tk){return C.heatmap(cv,D.heat,{fps:1.5,onTick:tk,title:"滿載率（可借/容量）",min:0,max:1});},1);
+panel("#12 Sankey｜類型 → 行政區 → 供需狀態（"+D.sankey_hour+" 站數）",function(cv){return C.sankey(cv,D.sankey);});
+panel("#20 Flow Map｜"+D.flow.note,function(cv){return C.flowMap(cv,D.flow,{note:D.flow.note});});
+panel("#2 Animated Line｜前 5 大行政區 滿載率",function(cv,tk){return C.line(cv,D.line,{fps:1.5,onTick:tk,title:"滿載率（可借/容量）"});},1);
+panel("#15 Treemap｜各區可借車輛占比（隨時段重排）",function(cv,tk){return C.treemap(cv,D.bar,{fps:1.2,onTick:tk,title:"可借車輛"});},1);
+panel("#19 Choropleth｜滿載率（Voronoi 示意格，非行政區界）",function(cv,tk){return C.choropleth(cv,D.choro,{fps:1.2,onTick:tk,title:"滿載率",min:0,max:1,note:"示意格：由各區站點重心 Voronoi 切分，僅供語法示範"});},1);
+panel("#14 Network｜行政區滿載率日變化相關（|r|≥0.7，紅＝負相關）",function(cv){return C.network(cv,D.net,{note:"節點大小＝全日可借車輛；邊粗＝|r|"});});
+/* 第三批（v2）：由 s02 聚合資料在頁面內轉換 */
+(function(){
+  var names=Object.keys(D.bar[0].values),hrs=D.bar.map(function(f){return f.label.slice(0,2);});
+  var st={x:hrs,series:names.slice(0,7).map(function(n){return {name:n,values:D.bar.map(function(f){return f.values[n]||0;})};})};
+  panel("#3 Streamgraph｜各區可借車輛 24h 流動",function(cv,tk){return C.streamgraph(cv,st,{fps:1.5,onTick:tk,title:"可借車輛（輛，置中堆疊）",dec:0});},1);
+  var R=D.heat.rows.slice(0,6),ri=R.map(function(r){return D.heat.rows.indexOf(r);});
+  var avg=ri.map(function(i){var a=D.heat.z[i];return a.reduce(function(p,q){return p+q;},0)/a.length;});
+  var rd={axes:R,max:1,frames:D.heat.cols.map(function(cl,h){return {label:cl+" 時",series:[{name:"該時段滿載率",values:ri.map(function(i){return D.heat.z[i][h];})},{name:"全日平均",values:avg}]};})};
+  panel("#11 Radar｜6 區滿載率 vs 全日平均",function(cv,tk){return C.radar(cv,rd,{fps:1.2,onTick:tk,title:"滿載率"});},1);
+  var cn=[];D.flow.arcs.forEach(function(a){if(cn.indexOf(a.from)<0)cn.push(a.from);if(cn.indexOf(a.to)<0)cn.push(a.to);});
+  var M=cn.map(function(){return cn.map(function(){return 0;});});D.flow.arcs.forEach(function(a){M[cn.indexOf(a.from)][cn.indexOf(a.to)]+=a.v;});
+  panel("#13 Chord｜行政區間淨流量（推估，非實測 OD）",function(cv){return C.chord(cv,{names:cn,frames:[{label:"推估淨流量",matrix:M},{label:"推估淨流量",matrix:M}]},{fps:0.5,note:"弦寬＝推估淨流量；白點＝流向"});});
+  var TPE=["中正區","大同區","中山區","松山區","大安區","萬華區","信義區","士林區","北投區","內湖區","南港區","文山區"];
+  function grp(f){return names.filter(f).map(function(n){return {name:n.replace("區",""),values:D.bar.map(function(b){return b.values[n]||0;})};});}
+  var sb={x:D.bar.map(function(f){return f.label;}),tree:{name:"可借車",children:[{name:"臺北市",children:grp(function(n){return TPE.indexOf(n)>=0;})},{name:"新北市",children:grp(function(n){return TPE.indexOf(n)<0;})}]}};
+  panel("#16 Sunburst｜縣市 → 行政區 可借車輛（前 10 區）",function(cv,tk){return C.sunburst(cv,sb,{fps:1.2,onTick:tk,title:"可借車輛",dec:0});},1);
+})();
+/* 真實行政區界 Choropleth（v2）：北北兩市，無 s02 資料的區塗灰 */
+(function(){
+  if(!window.A23_TW_TOWNS)return;
+  var F=A23_TW_TOWNS.filter(function(t){return t.county==="台北市"||t.county==="新北市";}).map(function(t){return {key:t.name,name:t.name,rings:t.rings};});
+  var fr=D.choro.frames;
+  panel("#19 Choropleth｜滿載率（真實行政區界，內政部 2021）",function(cv,tk){return C.choropleth(cv,{features:F,frames:fr},{fps:1.2,onTick:tk,title:"滿載率",min:0,max:1,lineWidth:0.6,fitData:true,note:"灰＝s02 無資料區；界線：taiwan-atlas towns-10t（MIT）"});},1);
+})();
+</script></body></html>

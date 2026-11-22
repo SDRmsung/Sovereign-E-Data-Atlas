@@ -1,0 +1,18 @@
+{
+  "version": 8,
+  "name": "A23-MOI-20m-Dark-Terrain",
+  "metadata": {
+    "max_lightness_lstar": 18,
+    "dem_source": "MOI 20m DEM + 2024 DSM-DTM"
+  },
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#030712"
+      }
+    }
+  ]
+}

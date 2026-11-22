@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S06 · 體感溫度穿搭地圖 | A23 Spatiotemporal Studio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧥</text></svg>">
+
+  <!-- MapLibre GL 4.7.1 & Basemap Switcher -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="../01_shared/basemaps/basemap_switcher.js"></script>
+
+  <style>
+    :root {
+      --bg-deep: #030712;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(148, 163, 184, 0.18);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+
+      --accent-sky: #38bdf8;
+      --accent-blue: #3b82f6;
+      --accent-teal: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-orange: #f97316;
+      --accent-rose: #f43f5e;
+
+      --ink: #f8fafc;
+      --ink-sec: #cbd5e1;
+      --ink-mute: #94a3b8;
+
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-deep);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 頂部導航列 */
+    .top-header {
+      position: relative;
+      z-index: 50;
+      background: rgba(3, 7, 18, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      font-size: 1.25rem;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .brand-title {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-live {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      font-family: ui-monospace, Consolas, monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-live::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    .badge-p1 {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      font-family: ui-monospace, Consolas, monospace;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-sky);
+    }
+
+    /* 五力微卡 */
+    .five-force-card {
+      background: rgba(13, 30, 56, 0.94);
+      border: 1px solid rgba(56, 189, 248, 0.42);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      backdrop-filter: blur(8px);
+      max-width: 320px;
+      display: none;
+    }
+    @media (min-width: 1200px) {
+      .five-force-card { display: block; }
+    }
+    .five-force-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .five-force-list li { display: flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--ink-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .force-badge { min-width: 16px; height: 16px; border-radius: 3px; background: rgba(56, 189, 248, 0.18); color: var(--accent-sky); font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+
+    /* 主視圖容器 */
+    .main-viewport {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #basemap {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: #030712;
+    }
+
+    #weatherCanvas {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    /* 懸浮 HUD 儀表板 */
+    .hud-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+
+    .hud-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* 左上：KPI 卡片群 */
+    .hud-card {
+      pointer-events: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .kpi-row {
+      display: flex;
+      gap: 12px;
+    }
+    .kpi-item {
+      display: flex;
+      flex-direction: column;
+      min-width: 100px;
+    }
+    .kpi-lbl {
+      font-size: 11px;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .kpi-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--accent-sky);
+      font-family: ui-monospace, Consolas, monospace;
+      margin-top: 4px;
+    }
+
+    /* 右上：南北反差敘事 HUD */
+    .contrast-card {
+      max-width: 380px;
+      pointer-events: auto;
+    }
+    .contrast-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f59e0b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .contrast-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .contrast-box {
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+    }
+    .contrast-box.north { border-left: 3px solid #38bdf8; }
+    .contrast-box.south { border-left: 3px solid #f97316; }
+    .c-region { font-weight: 700; font-size: 11.5px; margin-bottom: 4px; }
+    .c-temp { font-size: 1.1rem; font-weight: 800; font-family: ui-monospace, Consolas, monospace; }
+    .c-tier { font-size: 11px; color: var(--ink-sec); margin-top: 4px; }
+
+    /* 左下：穿搭等級圖例 */
+    .legend-card {
+      position: absolute;
+      left: 16px;
+      bottom: 100px;
+      pointer-events: auto;
+      max-width: 250px;
+      font-size: 11.5px;
+    }
+    .legend-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink-sec);
+      margin-bottom: 8px;
+    }
+    .legend-tier {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .tier-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* 測站詳情浮動 Popup */
+    .station-popup {
+      position: absolute;
+      display: none;
+      z-index: 30;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--accent-sky);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      font-size: 12px;
+      min-width: 200px;
+      transform: translate(-50%, -120%);
+      transition: opacity 0.15s ease;
+    }
+    .popup-title { font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+    .popup-tier { display: inline-block; padding: 4px 4px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-bottom: 4px; }
+    .popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; color: var(--ink-sec); font-size: 11.5px; }
+
+    /* 底部時間控制甲板 */
+    .time-deck {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      pointer-events: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 8px 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-sky);
+      color: #030712;
+      border: none;
+      font-size: 14px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .play-btn:hover { transform: scale(1.08); background: #7dd3fc; }
+
+    .time-slider-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .time-slider-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--ink-mute);
+      font-family: ui-monospace, Consolas, monospace;
+    }
+    .active-hour-badge {
+      color: var(--accent-sky);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .time-range {
+      width: 100%;
+      height: 6px;
+      accent-color: var(--accent-sky);
+      cursor: pointer;
+    }
+    .time-ticks-strip {
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      gap: 4px;
+      margin-top: 4px;
+      height: 6px;
+      width: 100%;
+      border-radius: 2px;
+    }
+    .time-tick {
+      height: 100%;
+      border-radius: 1px;
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .time-tick:hover {
+      opacity: 0.8;
+      transform: scaleY(1.4);
+    }
+    .time-tick.observed, .time-tick.live { background: #10b981; }
+    .time-tick.cwa_history { background: #3b82f6; }
+    .time-tick.missing { background: rgba(148, 163, 184, 0.25); }
+    .time-tick.active { outline: 1px solid #38bdf8; box-shadow: 0 0 4px #38bdf8; }
+
+    .speed-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--ink-sec);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-family: ui-monospace, Consolas, monospace;
+    }
+    .speed-btn:hover { color: #fff; border-color: var(--accent-sky); }
+
+    .deck-info {
+      font-size: 11px;
+      color: var(--ink-mute);
+      text-align: right;
+      white-space: nowrap;
+      display: none;
+    }
+    @media (min-width: 900px) { .deck-info { display: block; } }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導航 -->
+  <header class="top-header">
+    <div class="brand-wrap">
+      <span class="brand-icon">🧥</span>
+      <div class="brand-title">
+        <span>S06 · 體感溫度穿搭地圖</span>
+        <span class="badge-live" id="liveBadge">LIVE 853 站</span>
+        <span class="badge-p1">P1 首做</span>
+      </div>
+    </div>
+
+    <!-- 五力摘要 -->
+    <aside class="five-force-card" aria-label="五力評估核心摘要">
+      <ul class="five-force-list">
+        <li title="CWA 自動氣象站逐時 API＋局屬站，雙源共融覆蓋"><span class="force-badge">資</span><span>CWA 局屬 + 自動氣象站 853 測站全開</span></li>
+        <li title="體感等溫推進波＋風場粒子向量流速映射"><span class="force-badge">視</span><span>風場粒子沿風向向量漂移，速度∝風速</span></li>
+        <li id="forceNarrativeLi" title="北部最低體感站 vs 屏東最高體感站之動態反差"><span class="force-badge">故</span><span id="forceNarrativeText">南北體感反差分析中...</span></li>
+      </ul>
+    </aside>
+
+    <div class="nav-actions">
+      <button class="btn" id="baseSwitchBtn">🗺️ 切換底圖</button>
+      <a class="btn" href="chart_view.html" title="n05 非地圖圖表視角（modeled 為底、實測標註）">📊 圖表視角</a>
+      <a class="btn" href="../index.html">← 返回 A23</a>
+    </div>
+  </header>
+
+  <!-- 示意模式警告橫幅 -->
+  <div id="modeBanner" style="position:fixed;top:62px;left:50%;transform:translateX(-50%);background:rgba(220,38,38,0.9);color:#fff;padding:6px 18px;border-radius:20px;font-size:12px;font-weight:700;z-index:9999;display:none;backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,0.4)">⚠️ 注意：當前為日行循環推估示意，非真實觀測</div>
+
+  <!-- 地圖可視化核心 -->
+  <main class="main-viewport">
+    <div id="basemap"></div>
+    <canvas id="weatherCanvas"></canvas>
+
+    <!-- 測站彈窗 -->
+    <div class="station-popup" id="stationPopup">
+      <div class="popup-title">
+        <span id="popName">測站名稱</span>
+        <span id="popTemp">24.0°C</span>
+      </div>
+      <div class="popup-tier" id="popTier">L3_防風風衣薄外套</div>
+      <div class="popup-grid">
+        <div>體感溫度: <strong id="popApparent" style="color:#38bdf8">22.5°C</strong></div>
+        <div>相對濕度: <strong id="popRh">85%</strong></div>
+        <div>平均風速: <strong id="popWind">4.5 m/s</strong></div>
+        <div>觀測風向: <strong id="popWindDir">50°</strong></div>
+      </div>
+    </div>
+
+    <!-- HUD 浮動疊層 -->
+    <div class="hud-layer">
+      <!-- 頂部資訊區 -->
+      <div class="hud-top-row">
+        <!-- KPI 摘要 -->
+        <div class="hud-card">
+          <div class="kpi-row">
+            <div class="kpi-item">
+              <span class="kpi-lbl">即時氣象測站</span>
+              <span class="kpi-val" id="kpiStationCount">853 站</span>
+            </div>
+            <div class="kpi-item">
+              <span class="kpi-lbl">全台最低體感</span>
+              <span class="kpi-val" id="kpiMinAt" style="color:#38bdf8">1.2 °C</span>
+            </div>
+            <div class="kpi-item">
+              <span class="kpi-lbl">全台最高體感</span>
+              <span class="kpi-val" id="kpiMaxAt" style="color:#f97316">32.1 °C</span>
+            </div>
+            <div class="kpi-item">
+              <span class="kpi-lbl">南北穿搭跨度</span>
+              <span class="kpi-val" id="kpiSpan">5 級滿跨</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 南北反差敘事 HUD -->
+        <div class="hud-card contrast-card">
+          <div class="contrast-title">
+            <span id="contrastTitleText">⚡ 南北氣候反差動態實測</span>
+            <span style="font-size:11px;color:var(--ink-mute);font-weight:400" id="captureTime">2026-11-03</span>
+          </div>
+          <div class="contrast-grid">
+            <div class="contrast-box north">
+              <div class="c-region" id="northRegionLabel" style="color:#38bdf8">北部最低體感</div>
+              <div class="c-temp" id="northTemp">-- °C</div>
+              <div class="c-tier" id="northTier">--</div>
+            </div>
+            <div class="contrast-box south">
+              <div class="c-region" id="southRegionLabel" style="color:#f97316">屏東最高體感</div>
+              <div class="c-temp" id="southTemp">-- °C</div>
+              <div class="c-tier" id="southTier">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 左下穿搭圖例 -->
+      <div class="hud-card legend-card">
+        <div class="legend-title">體感溫度 ➔ 穿搭決策決策梯級</div>
+        <div class="legend-tier"><span class="tier-dot" style="background:#3b82f6;box-shadow:0 0 6px #3b82f6"></span> <span><strong>&lt; 11°C</strong>：L5 防風羽絨衣 🧥</span></div>
+        <div class="legend-tier"><span class="tier-dot" style="background:#06b6d4;box-shadow:0 0 6px #06b6d4"></span> <span><strong>11~16°C</strong>：L4 保暖毛衣厚外套 🧶</span></div>
+        <div class="legend-tier"><span class="tier-dot" style="background:#10b981;box-shadow:0 0 6px #10b981"></span> <span><strong>16~21°C</strong>：L3 防風風衣薄外套 🧥</span></div>
+        <div class="legend-tier"><span class="tier-dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0b"></span> <span><strong>21~26°C</strong>：L2 透氣薄長袖 👔</span></div>
+        <div class="legend-tier"><span class="tier-dot" style="background:#f97316;box-shadow:0 0 6px #f97316"></span> <span><strong>≥ 26°C</strong>：L1 短袖防曬 👕</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--ink-mute);border-top:1px solid var(--border-subtle);padding-top:6px;">
+          💨 粒子飄流方向 = 風向向量 (速度∝風速)
+        </div>
+      </div>
+
+      <!-- 底部時序回放控制甲板 -->
+      <div class="time-deck">
+        <button class="play-btn" id="playBtn" title="播放/暫停時序回放">▶</button>
+        <div class="time-slider-wrap">
+          <div class="time-slider-meta">
+            <span>24H 時空時序回放</span>
+            <span class="active-hour-badge" id="activeHourText">07:00 (即時觀測)</span>
+            <span id="obsCountBadge" style="color:#10b981;font-weight:700">觀測: 1/24</span>
+          </div>
+          <input type="range" class="time-range" id="timeSlider" min="0" max="23" step="1" value="7">
+          <div class="time-ticks-strip" id="timeTicksStrip"></div>
+        </div>
+        <button class="speed-btn" id="speedBtn">1x 速度</button>
+        <label style="font-size:11px;color:var(--ink-sec);cursor:pointer;display:flex;align-items:center;gap:4px;user-select:none" title="預設關閉。切換為太陽日行公式物理推估示意">
+          <input type="checkbox" id="modeSwitch"> 📐推估示意
+        </label>
+        <div class="deck-info">
+          <div>資料源: CWA O-A0003-001 & O-A0001-001</div>
+          <div id="deckStatus">Zero-CORS · 真實觀測模式</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 載入 Zero-CORS 雙 Feed -->
+  <script src="feed/latest_frame.js"></script>
+  <script src="feed/timeline.js"></script>
+
+  <script>
+    (function () {
+      // 1. 初始化資料
+      const liveFeed = window.A23_OUTFIT_FEED || window.A23_FEED || {};
+      const timelineData = window.A23_OUTFIT_TIMELINE || {};
+      const capturedAt = liveFeed.captured_at || new Date().toISOString();
+      let currentHour = new Date(capturedAt).getHours();
+      if (isNaN(currentHour)) currentHour = 7;
+
+      let isPlaying = false;
+      let playSpeed = 1; // 1x, 2x, 4x
+      let playTimer = null;
+      let hoveredStation = null;
+
+      // 2. DOM 元素綁定
+      const timeSlider = document.getElementById("timeSlider");
+      const activeHourText = document.getElementById("activeHourText");
+      const playBtn = document.getElementById("playBtn");
+      const speedBtn = document.getElementById("speedBtn");
+      const canvas = document.getElementById("weatherCanvas");
+      const ctx = canvas.getContext("2d");
+      const popup = document.getElementById("stationPopup");
+      const ticksContainer = document.getElementById("timeTicksStrip");
+
+      let isModeledMode = false; // 必須在 updateActiveHourDisplay 首次呼叫前宣告
+
+      function initTicks() {
+        if (!ticksContainer) return;
+        ticksContainer.innerHTML = "";
+        for (let i = 0; i < 24; i++) {
+          const k = String(i).padStart(2, "0") + ":00";
+          const tick = document.createElement("div");
+          tick.className = "time-tick";
+          tick.id = `tick_${i}`;
+          tick.title = `${k}`;
+          const frame = timelineData[k];
+          if (isModeledMode) {
+            tick.className += " observed";
+          } else if (frame && !frame.missing) {
+            if (frame.source === "cwa_history") tick.className += " cwa_history";
+            else tick.className += " observed";
+          } else {
+            tick.className += " missing";
+          }
+          tick.addEventListener("click", () => {
+            timeSlider.value = i;
+            updateActiveHourDisplay(i);
+          });
+          ticksContainer.appendChild(tick);
+        }
+      }
+
+      function updateTicksActive(activeH) {
+        if (!ticksContainer) return;
+        for (let i = 0; i < 24; i++) {
+          const t = document.getElementById(`tick_${i}`);
+          if (t) {
+            if (i === activeH) t.classList.add("active");
+            else t.classList.remove("active");
+          }
+        }
+      }
+
+      // HUD 綁定
+      document.getElementById("captureTime").textContent = capturedAt.replace("T", " ").slice(0, 19);
+      initTicks();
+      timeSlider.value = currentHour;
+      updateActiveHourDisplay(currentHour);
+
+      // 3. 地圖底圖初始化 (MapLibre + A23Basemap)
+      const bounds = { minLon: 119.3, maxLon: 122.4, minLat: 21.8, maxLat: 25.5 };
+      let basemap = null;
+      let useBasemapProject = false;
+
+      try {
+        if (window.A23Basemap && window.maplibregl) {
+          basemap = A23Basemap.create({
+            container: "basemap",
+            bounds: bounds,
+            padding: 40
+          });
+          useBasemapProject = true;
+          document.getElementById("baseSwitchBtn").addEventListener("click", () => {
+            basemap.cycle();
+          });
+          basemap.map.on("move", () => render());
+          basemap.map.on("resize", () => resizeCanvas());
+        }
+      } catch (err) {
+        console.warn("MapLibre 初始化失敗，切換為 Canvas 離線原生投影模式", err);
+      }
+
+      if (!basemap) {
+        document.getElementById("baseSwitchBtn").style.display = "none";
+      }
+
+      // 4. 座標投影 (相容 MapLibre 與 Canvas 原生投影)
+      function project(lon, lat) {
+        if (useBasemapProject && basemap) {
+          return basemap.project(lon, lat);
+        }
+        // Fallback Web Mercator
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        const padX = w * 0.15;
+        const padY = h * 0.08;
+        const availW = w - padX * 2;
+        const availH = h - padY * 2;
+
+        const x = padX + ((lon - bounds.minLon) / (bounds.maxLon - bounds.minLon)) * availW;
+        const y = h - padY - ((lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * availH;
+        return { x, y };
+      }
+
+      // 5. 畫布縮放與風粒子系統
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+
+      function resizeCanvas() {
+        width = canvas.parentElement.clientWidth;
+        height = canvas.parentElement.clientHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        ctx.scale(dpr, dpr);
+        initParticles();
+      }
+      window.addEventListener("resize", resizeCanvas);
+
+      // 風場粒子初始化
+      const PARTICLE_COUNT = 320;
+      const particles = [];
+
+      function initParticles() {
+        particles.length = 0;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push(createParticle());
+        }
+      }
+
+      function createParticle() {
+        // 在台灣本島範圍隨機生成經緯度
+        const lon = bounds.minLon + Math.random() * (bounds.maxLon - bounds.minLon);
+        const lat = bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
+        const p = project(lon, lat);
+        return {
+          lon,
+          lat,
+          x: p.x,
+          y: p.y,
+          oldX: p.x,
+          oldY: p.y,
+          life: Math.floor(Math.random() * 80) + 30,
+          maxLife: 100,
+          speed: 1.0,
+          vx: 0,
+          vy: 0,
+        };
+      }
+
+      // 6. 顏色與階層對應
+      function getTierColor(apparent) {
+        if (apparent < 11.0) return "#3b82f6"; // 亮藍 L5
+        if (apparent < 16.0) return "#06b6d4"; // 湖藍 L4
+        if (apparent < 21.0) return "#10b981"; // 碧綠 L3
+        if (apparent < 26.0) return "#f59e0b"; // 琥珀黃 L2
+        return "#f97316";                      // 暖珊瑚橘 L1
+      }
+
+      function getTierBadgeClass(tier) {
+        if (tier.startsWith("L5")) return { bg: "rgba(59,130,246,0.25)", color: "#60a5fa" };
+        if (tier.startsWith("L4")) return { bg: "rgba(6,182,212,0.25)", color: "#22d3ee" };
+        if (tier.startsWith("L3")) return { bg: "rgba(16,185,129,0.25)", color: "#34d399" };
+        if (tier.startsWith("L2")) return { bg: "rgba(245,158,11,0.25)", color: "#fbbf24" };
+        return { bg: "rgba(249,115,22,0.25)", color: "#fb923c" };
+      }
+
+      // isModeledMode 已上移至 HUD 綁定前（TDZ 修正 2026-11-03）
+      const modeSwitch = document.getElementById("modeSwitch");
+      const modeBanner = document.getElementById("modeBanner");
+      const obsCountBadge = document.getElementById("obsCountBadge");
+      const deckStatus = document.getElementById("deckStatus");
+
+      function updateObsBadge() {
+        const meta = timelineData.meta || {};
+        const obs = meta.hours_observed || 1;
+        const total = meta.hours_total || 24;
+        obsCountBadge.textContent = isModeledMode ? "推估模式: 24/24" : `觀測: ${obs}/${total}`;
+        obsCountBadge.style.color = isModeledMode ? "#fb923c" : "#10b981";
+      }
+      updateObsBadge();
+
+      modeSwitch.addEventListener("change", (e) => {
+        isModeledMode = e.target.checked;
+        modeBanner.style.display = isModeledMode ? "block" : "none";
+        deckStatus.textContent = isModeledMode ? "物理日行正弦推估示意" : "Zero-CORS · 真實觀測模式";
+        updateObsBadge();
+        initTicks();
+        updateActiveHourDisplay(currentHour);
+      });
+
+      function calcApparentTemp(temp, rh, windMs) {
+        const e = (rh / 100.0) * 6.105 * Math.exp((17.27 * temp) / (237.7 + temp));
+        const at = 1.07 * temp + 0.2 * e - 0.65 * windMs - 2.7;
+        return Math.round(at * 10) / 10;
+      }
+
+      function classifyTier(apparent) {
+        if (apparent < 11.0) return "L5 酷寒 (保暖羽絨衣)";
+        if (apparent < 16.0) return "L4 偏冷 (毛衣厚外套)";
+        if (apparent < 21.0) return "L3 舒適偏涼 (薄外套風衣)";
+        if (apparent < 26.0) return "L2 舒適微溫 (透氣薄長袖)";
+        return "L1 炎熱 (透氣短袖)";
+      }
+
+      function computeModeledFrame(hour) {
+        const baseStations = liveFeed.stations || [];
+        const cyclePhase = (hour - 5.5) / 12.0 * Math.PI;
+        const cycleFactor = Math.sin(cyclePhase);
+        return baseStations.map(st => {
+          const high = st.daily_high !== undefined && st.daily_high !== null ? st.daily_high : (st.temp + 2.5);
+          const low = st.daily_low !== undefined && st.daily_low !== null ? st.daily_low : (st.temp - 2.5);
+          const midT = (high + low) / 2.0;
+          const amplitude = Math.max(1.5, Math.abs(high - low) / 2.0);
+          const simT = Math.round((midT + amplitude * cycleFactor) * 10) / 10;
+          const simRh = Math.max(35.0, Math.min(98.0, Math.round((st.rh - cycleFactor * 12.0) * 10) / 10));
+          const windFactor = cycleFactor > 0 ? (1.0 + 0.25 * cycleFactor) : (1.0 + 0.15 * cycleFactor);
+          const simWind = Math.max(0.5, Math.round(st.wind_ms * windFactor * 10) / 10);
+          const apparent = calcApparentTemp(simT, simRh, simWind);
+          return {
+            id: st.id,
+            name: st.name,
+            lat: st.lat,
+            lon: st.lon,
+            temp: simT,
+            rh: simRh,
+            wind_ms: simWind,
+            wind_dir: st.wind_dir,
+            apparent: apparent,
+            tier: classifyTier(apparent)
+          };
+        });
+      }
+
+      // 7. 取出當前時間點的測站清單
+      function getActiveStations() {
+        const hourKey = String(currentHour).padStart(2, "0") + ":00";
+        const dict = timelineData.stations_dict || {};
+        const metaInfo = timelineData.meta || {};
+        const tierNames = metaInfo.tier_names || ["L1_短袖防曬", "L2_透氣薄長袖", "L3_防風風衣薄外套", "L4_保暖毛衣厚外套", "L5_防風羽絨衣"];
+        const scale = metaInfo.scale || 10;
+        const stKeys = Object.keys(dict);
+
+        const hydrate = (list) => {
+          if (!list || list.length === 0) return [];
+          return list.map(s => {
+            if (s.lat !== undefined && s.name !== undefined) return s;
+            const meta = dict[s.id] || {};
+            return {
+              ...s,
+              name: meta.name || s.name || s.id,
+              lat: meta.lat !== undefined ? meta.lat : 0,
+              lon: meta.lon !== undefined ? meta.lon : 0
+            };
+          });
+        };
+
+        const decodeCols = (cols) => {
+          if (!cols || !cols.t) return [];
+          const out = [];
+          for (let i = 0; i < stKeys.length; i++) {
+            if (cols.t[i] === null && cols.ap[i] === null) continue;
+            const sid = stKeys[i];
+            const meta = dict[sid] || {};
+            const tIdx = cols.tier ? cols.tier[i] : null;
+            out.push({
+              id: sid,
+              name: meta.name || sid,
+              lat: meta.lat !== undefined ? meta.lat : 0,
+              lon: meta.lon !== undefined ? meta.lon : 0,
+              temp: cols.t[i] !== null ? cols.t[i] / scale : null,
+              rh: cols.rh && cols.rh[i] !== null ? cols.rh[i] : null,
+              wind_ms: cols.w && cols.w[i] !== null ? cols.w[i] / scale : null,
+              wind_dir: cols.wd && cols.wd[i] !== null ? cols.wd[i] : null,
+              apparent: cols.ap && cols.ap[i] !== null ? cols.ap[i] / scale : null,
+              tier: tIdx !== null && tierNames[tIdx] ? tierNames[tIdx] : null
+            });
+          }
+          return out;
+        };
+
+        if (isModeledMode) {
+          const modTimeline = timelineData.modeled_timeline || {};
+          if (modTimeline[hourKey] && modTimeline[hourKey].stations && modTimeline[hourKey].stations.length > 0) {
+            return hydrate(modTimeline[hourKey].stations);
+          }
+          return computeModeledFrame(currentHour);
+        }
+        if (timelineData[hourKey]) {
+          const frame = timelineData[hourKey];
+          if (!frame.missing) {
+            if (frame.cols) {
+              return decodeCols(frame.cols);
+            }
+            if (frame.stations && frame.stations.length > 0) {
+              return hydrate(frame.stations);
+            }
+          }
+          if (frame.missing) {
+            return []; // 缺格不補造，返回空測站
+          }
+        }
+        return liveFeed.stations || [];
+      }
+
+      // 8. 空間風場內插 (Inverse Distance Weighting)
+      function getWindVectorAt(lon, lat, stations) {
+        if (!stations || stations.length === 0) return { vx: 0, vy: 0 };
+        let sumWx = 0, sumWy = 0, sumWeight = 0;
+        let count = 0;
+        for (let i = 0; i < stations.length; i += 3) {
+          const s = stations[i];
+          const d2 = (s.lon - lon) * (s.lon - lon) + (s.lat - lat) * (s.lat - lat);
+          if (d2 < 1.8) {
+            const w = 1 / (d2 + 0.04);
+            const rad = ((s.wind_dir + 180) % 360) * Math.PI / 180;
+            const vx = Math.sin(rad) * s.wind_ms;
+            const vy = -Math.cos(rad) * s.wind_ms;
+            sumWx += vx * w;
+            sumWy += vy * w;
+            sumWeight += w;
+            count++;
+          }
+        }
+        if (count > 0 && sumWeight > 0) {
+          return { vx: sumWx / sumWeight, vy: sumWy / sumWeight };
+        }
+        // 預設平均微風 (經向與緯向平均)
+        return { vx: -1.0, vy: 1.5 };
+      }
+
+      // 9. 更新 HUD 統計與南北反差 (動態實測，不寫死季風)
+      function updateHUD(stations) {
+        if (!stations || stations.length === 0) {
+          document.getElementById("kpiStationCount").textContent = "0 站 (缺格)";
+          document.getElementById("kpiMinAt").textContent = "--";
+          document.getElementById("kpiMaxAt").textContent = "--";
+          document.getElementById("kpiSpan").textContent = "--";
+          document.getElementById("northRegionLabel").textContent = "北部 (時段缺格)";
+          document.getElementById("northTemp").textContent = "--";
+          document.getElementById("northTier").textContent = "無觀測資料";
+          document.getElementById("southRegionLabel").textContent = "屏東 (時段缺格)";
+          document.getElementById("southTemp").textContent = "--";
+          document.getElementById("southTier").textContent = "無觀測資料";
+          return;
+        }
+
+        let minSt = stations[0], maxSt = stations[0];
+        let northStations = [], pingtungStations = [];
+
+        for (const s of stations) {
+          if (s.apparent < minSt.apparent) minSt = s;
+          if (s.apparent > maxSt.apparent) maxSt = s;
+
+          // 北部: Lat >= 24.8
+          if (s.lat >= 24.8) northStations.push(s);
+          // 屏東 / 恆春半島 / 南部: Lat <= 22.8 或名稱含屏東/恆春
+          if (s.lat <= 22.8 || (s.name && (s.name.includes("屏東") || s.name.includes("恆春")))) {
+            pingtungStations.push(s);
+          }
+        }
+
+        document.getElementById("kpiStationCount").textContent = stations.length + " 站";
+        document.getElementById("kpiMinAt").textContent = `${minSt.apparent} °C (${minSt.name})`;
+        document.getElementById("kpiMaxAt").textContent = `${maxSt.apparent} °C (${maxSt.name})`;
+
+        const tiersSet = new Set(stations.map(s => s.tier.slice(0, 2)));
+        document.getElementById("kpiSpan").textContent = `${tiersSet.size} 級滿跨`;
+
+        // 北部最低體感站 vs 屏東最高體感站 動態反差
+        const northMinSt = northStations.length > 0
+          ? northStations.reduce((a, b) => a.apparent < b.apparent ? a : b)
+          : minSt;
+        const pingtungMaxSt = pingtungStations.length > 0
+          ? pingtungStations.reduce((a, b) => a.apparent > b.apparent ? a : b)
+          : maxSt;
+
+        document.getElementById("northRegionLabel").textContent = `北部最低 · ${northMinSt.name}`;
+        document.getElementById("northTemp").textContent = `${northMinSt.apparent} °C`;
+        document.getElementById("northTier").textContent = `🧥 ${northMinSt.tier}`;
+
+        document.getElementById("southRegionLabel").textContent = `屏東最高 · ${pingtungMaxSt.name}`;
+        document.getElementById("southTemp").textContent = `${pingtungMaxSt.apparent} °C`;
+        document.getElementById("southTier").textContent = `👕 ${pingtungMaxSt.tier}`;
+
+        const forceText = `${northMinSt.name} (${northMinSt.apparent}°C) vs ${pingtungMaxSt.name} (${pingtungMaxSt.apparent}°C)`;
+        document.getElementById("forceNarrativeText").textContent = forceText;
+        document.getElementById("forceNarrativeLi").title = `北部最低 ${northMinSt.name} (${northMinSt.apparent}°C) vs 屏東最高 ${pingtungMaxSt.name} (${pingtungMaxSt.apparent}°C)`;
+      }
+
+      // 10. 動畫繪製主迴圈
+      function render() {
+        ctx.clearRect(0, 0, width, height);
+        const stations = getActiveStations();
+
+        // A. 繪製測站體感溫度光斑
+        for (let i = 0; i < stations.length; i++) {
+          const st = stations[i];
+          const pos = project(st.lon, st.lat);
+          if (pos.x < -20 || pos.x > width + 20 || pos.y < -20 || pos.y > height + 20) continue;
+
+          const color = getTierColor(st.apparent);
+
+          // 外層微光暈
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 6.5, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.28;
+          ctx.fill();
+
+          // 核心光點
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.95;
+          ctx.fill();
+        }
+
+        // B. 繪製風場粒子流
+        ctx.globalAlpha = 0.65;
+        ctx.lineWidth = 1.2;
+
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          const wind = getWindVectorAt(p.lon, p.lat, stations);
+
+          p.oldX = p.x;
+          p.oldY = p.y;
+
+          // 向量漂移
+          const spdFactor = 0.18 * playSpeed;
+          p.x += wind.vx * spdFactor;
+          p.y += wind.vy * spdFactor;
+          p.life--;
+
+          // 畫線
+          ctx.beginPath();
+          ctx.moveTo(p.oldX, p.oldY);
+          ctx.lineTo(p.x, p.y);
+          ctx.strokeStyle = "rgba(224, 242, 254, 0.55)";
+          ctx.stroke();
+
+          // 生命週期重置或飄出邊界
+          if (p.life <= 0 || p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+            particles[i] = createParticle();
+          }
+        }
+
+        // C. 高亮選中測站
+        if (hoveredStation) {
+          const hPos = project(hoveredStation.lon, hoveredStation.lat);
+          ctx.beginPath();
+          ctx.arc(hPos.x, hPos.y, 11, 0, Math.PI * 2);
+          ctx.strokeStyle = "#38bdf8";
+          ctx.lineWidth = 2;
+          ctx.globalAlpha = 0.9;
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1.0;
+      }
+
+      // 11. requestAnimationFrame 動畫驅動
+      function animLoop() {
+        render();
+        requestAnimationFrame(animLoop);
+      }
+
+      // 12. 互動監聽：Hover 偵測
+      canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        const stations = getActiveStations();
+        let closest = null;
+        let minDist = 14; // 偵測半徑
+
+        for (const st of stations) {
+          const pos = project(st.lon, st.lat);
+          const dist = Math.hypot(pos.x - mx, pos.y - my);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = st;
+          }
+        }
+
+        hoveredStation = closest;
+        if (closest) {
+          const pos = project(closest.lon, closest.lat);
+          popup.style.display = "block";
+          popup.style.left = pos.x + "px";
+          popup.style.top = pos.y + "px";
+
+          document.getElementById("popName").textContent = closest.name;
+          document.getElementById("popTemp").textContent = closest.temp + "°C";
+          document.getElementById("popApparent").textContent = closest.apparent + "°C";
+          document.getElementById("popRh").textContent = closest.rh + "%";
+          document.getElementById("popWind").textContent = closest.wind_ms + " m/s";
+          document.getElementById("popWindDir").textContent = closest.wind_dir + "°";
+
+          const tierEl = document.getElementById("popTier");
+          tierEl.textContent = closest.tier;
+          const badgeStyle = getTierBadgeClass(closest.tier);
+          tierEl.style.background = badgeStyle.bg;
+          tierEl.style.color = badgeStyle.color;
+        } else {
+          popup.style.display = "none";
+        }
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        hoveredStation = null;
+        popup.style.display = "none";
+      });
+
+      // 13. 時間軸播放控制 (缺格跳過且標示灰色)
+      function updateActiveHourDisplay(h) {
+        currentHour = h;
+        const hourStr = String(h).padStart(2, "0") + ":00";
+        if (isModeledMode) {
+          activeHourText.textContent = `${hourStr} (推估示意)`;
+          activeHourText.style.color = "#fb923c";
+        } else {
+          const frame = timelineData[hourStr];
+          if (frame && !frame.missing) {
+            const isLive = h === new Date(capturedAt).getHours();
+            activeHourText.textContent = `${hourStr} ${isLive ? "(即時觀測)" : "(時序回放)"}`;
+            activeHourText.style.color = "#38bdf8";
+          } else {
+            activeHourText.textContent = `${hourStr} (缺格 · 無觀測快照)`;
+            activeHourText.style.color = "#94a3b8";
+          }
+        }
+        updateTicksActive(h);
+        updateHUD(getActiveStations());
+      }
+
+      timeSlider.addEventListener("input", (e) => {
+        updateActiveHourDisplay(parseInt(e.target.value, 10));
+      });
+
+      function getNextPlayableHour(cur) {
+        if (isModeledMode) return (cur + 1) % 24;
+        const validHours = [];
+        for (let i = 0; i < 24; i++) {
+          const k = String(i).padStart(2, "0") + ":00";
+          if (timelineData[k] && !timelineData[k].missing) validHours.push(i);
+        }
+        if (validHours.length <= 1) return cur;
+        const idx = validHours.indexOf(cur);
+        if (idx === -1) return validHours[0];
+        return validHours[(idx + 1) % validHours.length];
+      }
+
+      function togglePlay() {
+        isPlaying = !isPlaying;
+        playBtn.textContent = isPlaying ? "⏸" : "▶";
+        if (isPlaying) {
+          playTimer = setInterval(() => {
+            currentHour = getNextPlayableHour(currentHour);
+            timeSlider.value = currentHour;
+            updateActiveHourDisplay(currentHour);
+          }, 1400 / playSpeed);
+        } else {
+          clearInterval(playTimer);
+        }
+      }
+      playBtn.addEventListener("click", togglePlay);
+
+      speedBtn.addEventListener("click", () => {
+        if (playSpeed === 1) playSpeed = 2;
+        else if (playSpeed === 2) playSpeed = 4;
+        else playSpeed = 1;
+        speedBtn.textContent = playSpeed + "x 速度";
+        if (isPlaying) {
+          clearInterval(playTimer);
+          playTimer = setInterval(() => {
+            currentHour = getNextPlayableHour(currentHour);
+            timeSlider.value = currentHour;
+            updateActiveHourDisplay(currentHour);
+          }, 1400 / playSpeed);
+        }
+      });
+
+      // 啟動
+      initTicks();
+      resizeCanvas();
+      updateHUD(getActiveStations());
+      animLoop();
+    })();
+  </script>
+</body>
+</html>

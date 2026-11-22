@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S02 · YouBike潮汐調度戰：通勤潮如何搬空一座城市的車 | A23 Spatiotemporal Studio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚲</text></svg>">
+  <style>
+    :root {
+      --bg-deep: #030712;
+      --bg-surface: #0b1120;
+      --bg-card: rgba(15, 23, 42, 0.86);
+      --bg-card-hover: rgba(30, 41, 59, 0.94);
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --border-focus: #38bdf8;
+
+      --accent-sky: #38bdf8;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #c084fc;
+
+      --ink: #f8fafc;
+      --ink-sec: #cbd5e1;
+      --ink-mute: #94a3b8;
+
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-deep);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 頂部導航列 */
+    .top-header {
+      position: relative;
+      z-index: 50;
+      background: rgba(3, 7, 18, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      font-size: 1.25rem;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .brand-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-p1 {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      font-family: ui-monospace, Consolas, monospace;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-sky);
+    }
+
+    .btn.active {
+      background: var(--accent-sky);
+      color: #030712;
+      border-color: var(--accent-sky);
+      font-weight: 700;
+    }
+
+    /* 主要地圖與 HUD 視窗 */
+    .viewport {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 50%, #081126 0%, #030712 100%);
+    }
+
+    #tideCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      cursor: grab;
+    }
+
+    #tideCanvas:active {
+      cursor: grabbing;
+    }
+
+    /* HUD 圖層 */
+    .hud-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hud-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .hud-bot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+
+    .hud-panel {
+      pointer-events: auto;
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    /* 左上：情境核心敘事卡 */
+    .narrative-panel {
+      max-width: 440px;
+    }
+
+    .narrative-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .narrative-sub {
+      font-size: 12.5px;
+      color: var(--ink-sec);
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+
+    .contrast-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tag-red {
+      background: rgba(244, 63, 94, 0.18);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .tag-white {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .tag-green {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    /* 右上：時鐘與潮汐狀態指標 */
+    .phase-panel {
+      text-align: right;
+    }
+
+    .time-display {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-sky);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .phase-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.18);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    /* 左下：即時告警站點看板 */
+    .alerts-panel {
+      max-width: 380px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .alerts-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .alert-name {
+      font-weight: 600;
+      color: var(--ink-sec);
+    }
+
+    .alert-val {
+      font-family: ui-monospace, Consolas, monospace;
+      font-weight: 700;
+      padding: 4px 4px;
+      border-radius: 4px;
+    }
+
+    .val-depleted {
+      background: rgba(244, 63, 94, 0.2);
+      color: #f43f5e;
+    }
+
+    .val-saturated {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    /* 右下：KPI 矩陣 */
+    .kpi-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      min-width: 320px;
+    }
+
+    .kpi-cell {
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+
+    .kpi-cell-label {
+      font-size: 11px;
+      color: var(--ink-mute);
+      margin-bottom: 4px;
+    }
+
+    .kpi-cell-val {
+      font-size: 1.2rem;
+      font-weight: 800;
+      font-family: ui-monospace, Consolas, monospace;
+      color: var(--accent-sky);
+    }
+
+    /* 底部控制器列 */
+    .timeline-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(720px, calc(100% - 40px));
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 30;
+    }
+
+    .timeline-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .timeline-presets {
+      display: flex;
+      gap: 4px;
+    }
+
+    .preset-btn {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--ink-sec);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--accent-sky);
+      color: #030712;
+      border-color: var(--accent-sky);
+    }
+
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .timeline-slider {
+      flex: 1;
+      accent-color: var(--accent-sky);
+      cursor: pointer;
+    }
+
+    /* 站點懸浮 Tooltip */
+    .station-tooltip {
+      position: absolute;
+      z-index: 60;
+      pointer-events: none;
+      background: rgba(3, 7, 18, 0.95);
+      border: 1px solid var(--accent-sky);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+      display: none;
+      transform: translate(-50%, -120%);
+      white-space: nowrap;
+    }
+
+    .tooltip-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--accent-sky);
+      margin-bottom: 4px;
+    }
+  
+    /* [五力評估微型卡片 - 遷移自 Atlas_Portal 卡片] */
+    .five-force-card {
+      background: rgba(13, 30, 56, 0.94);
+      border: 1px solid rgba(56, 189, 248, 0.42);
+      border-radius: var(--radius-md, 8px);
+      padding: 4px 12px;
+      backdrop-filter: blur(8px);
+      min-width: 260px;
+      max-width: 380px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      flex-shrink: 0;
+    }
+    .five-force-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .five-force-list li {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--ink-sec, #cbd5e1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .force-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 17px;
+      height: 17px;
+      border-radius: 3px;
+      background: rgba(56, 189, 248, 0.18);
+      color: var(--accent-sky, #38bdf8);
+      font-size: 10.5px;
+      font-weight: 800;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      flex-shrink: 0;
+    }
+    .force-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media (max-width: 1180px) {
+      .five-force-card {
+        width: 100%;
+        max-width: 100%;
+        order: 10;
+      }
+    }
+
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="../01_shared/basemaps/basemap_switcher.js"></script>
+  <style>
+    #basemap { position: absolute; inset: 0; z-index: 5; background: #030712; }
+    #tideCanvas { pointer-events: none !important; }
+    .hud-layer { pointer-events: none; }
+    .hud-layer .hud-panel, .hud-layer button, .hud-layer input { pointer-events: auto; }
+    .maplibregl-ctrl-attrib { background: rgba(3,7,18,.6) !important; color: #64748b !important; }
+    .maplibregl-ctrl-attrib a { color: #94a3b8 !important; }
+  </style>
+</head>
+<body>
+
+  <header class="top-header">
+    <div class="brand-wrap">
+      <div class="brand-icon">🚲</div>
+      <div>
+        <div class="brand-title">
+          <span>S02 · YouBike潮汐調度戰 (雙北時空動態)</span>
+          <span class="badge-p1">P1 首做 · 加權 5.00 (24/25)</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button type="button" class="btn" id="basemapBtn"><span>🗺</span><span id="basemapText">底圖: dem_dark</span></button>
+      <button type="button" class="btn" id="toggleFlowBtn"><span>⚡</span><span>潮汐向量光軌: 開</span></button>
+      <button type="button" class="btn" id="playBtn"><span>▶</span><span id="playText">播放 24H 潮汐</span></button>
+      <a class="btn" href="../01_shared/index.html"><span>🧰</span><span>共同技術底座</span></a>
+      <a class="btn" href="../01_shared/viz_core/charts/gallery/scroll_grid.html"><span>📜</span><span>捲動敘事型錄 →</span></a>
+      <a class="btn" href="../index.html"><span>←</span><span>返回 A23 入口矩陣</span></a>
+    </div>
+      <!-- [五力評估微型卡片 - 遷移自 Atlas_Portal 卡片] -->
+    <aside class="five-force-card" id="fiveForceCard" aria-label="五力評估核心摘要">
+      <ul class="five-force-list">
+        <li title="TDX 公共自行車即時車位 API，站點座標＋5 分鐘批次，全都會覆蓋。"><span class="force-badge">資</span><span class="force-text">TDX 公共自行車即時車位 API</span></li><li title="站點呼吸燈＋缺車熱力，早晨住宅區由綠轉紅歸零、捷運站爆白，潮汐感強。"><span class="force-badge">視</span><span class="force-text">站點呼吸燈＋缺車熱力</span></li><li title="「通勤潮一早搬空一座城市的車」，半夜調度車逆向補車，起伏完整。"><span class="force-badge">故</span><span class="force-text">「通勤潮一早搬空一座城市的車」</span></li><li title="通勤族天天遇到借不到、還不了，秒懂且想轉發。"><span class="force-badge">共</span><span class="force-text">通勤族天天遇到借不到、還不了</span></li><li title="對應「交通」主題，可直接供營運商調度與站點增設參考；屬營運優化而非重大政策。"><span class="force-badge">應</span><span class="force-text">對應「交通」主題</span></li>
+      </ul>
+    </aside>
+  </header>
+
+  <div class="viewport" id="viewport">
+    <div id="basemap"></div>
+    <canvas id="tideCanvas"></canvas>
+
+    <div class="hud-layer">
+      <!-- 上半部 -->
+      <div class="hud-top-row">
+        <div class="hud-panel narrative-panel">
+          <div class="narrative-title">
+            <span>YouBike 潮汐調度戰</span>
+            <span style="font-size: 12px; font-weight: normal; color: var(--accent-sky);">| 5 分鐘顆粒度</span>
+          </div>
+          <p class="narrative-sub">
+            通勤潮如何搬空一座城市的車：晨峰永和與板橋住宅區瞬間被搬空歸零；捷運商辦滿位塞爆；深夜由保母車逆向補綠。
+          </p>
+          <div class="contrast-tags">
+            <span class="tag-red">● 刺眼紅光: 住宅無車赤字 (<15%)</span>
+            <span class="tag-white">● 亮白光斑: 商辦滿位塞爆 (>85%)</span>
+            <span class="tag-green">● 青綠薄荷: 供需平衡</span>
+          </div>
+        </div>
+
+        <div class="hud-panel phase-panel">
+          <div class="time-display" id="hudClock">08:00</div>
+          <div class="phase-badge" id="hudPhase">● 晨峰通勤搬空戰</div>
+        </div>
+      </div>
+
+      <!-- 底部控制器 (置中) -->
+      <div class="timeline-bar">
+        <div class="timeline-controls">
+          <div class="timeline-presets">
+            <button type="button" class="preset-btn active" data-hour="8">08:00 晨峰搬空</button>
+            <button type="button" class="preset-btn" data-hour="12">12:00 午間平衡</button>
+            <button type="button" class="preset-btn" data-hour="18">18:30 晚峰逆流</button>
+            <button type="button" class="preset-btn" data-hour="2">02:00 深夜調度</button>
+          </div>
+          <span style="font-size: 12px; color: var(--ink-mute); font-family: ui-monospace, monospace;" id="timeSpeedText">流速: 1.0x</span>
+        </div>
+        <div class="slider-wrap">
+          <span style="font-size: 11px; font-family: ui-monospace, monospace; color: var(--ink-mute);">00:00</span>
+          <input type="range" class="timeline-slider" id="hourSlider" min="0" max="23" step="1" value="8">
+          <span style="font-size: 11px; font-family: ui-monospace, monospace; color: var(--ink-mute);">23:00</span>
+        </div>
+      </div>
+
+      <!-- 下半部 -->
+      <div class="hud-bot-row">
+        <div class="hud-panel alerts-panel">
+          <div class="alerts-title">
+            <span>雙北即時極端站點 (告警前線)</span>
+            <span id="alertCountBadge" style="color: #f43f5e;">8 站告警</span>
+          </div>
+          <div id="alertsList">
+            <!-- 動態注入 -->
+          </div>
+        </div>
+
+        <div class="hud-panel kpi-matrix">
+          <div class="kpi-cell">
+            <div class="kpi-cell-label">監測站點總數</div>
+            <div class="kpi-cell-val" id="kpiTotal">2,840 站</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-cell-label">無車紅燈警報</div>
+            <div class="kpi-cell-val" style="color: #f43f5e;" id="kpiDepleted">384 站</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-cell-label">捷運滿位塞爆</div>
+            <div class="kpi-cell-val" style="color: #ffffff;" id="kpiSaturated">192 站</div>
+          </div>
+          <div class="kpi-cell">
+            <div class="kpi-cell-label">夜間調度回補率</div>
+            <div class="kpi-cell-val" style="color: #34d399;" id="kpiRecover">94.6%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 站點 Hover Tooltip -->
+    <div class="station-tooltip" id="stationTooltip">
+      <div class="tooltip-title" id="ttName">捷運頂溪站</div>
+      <div id="ttDetail" style="line-height: 1.5; color: var(--ink-sec);">可借: 0 台 | 滿車率: 0%</div>
+      <div id="ttStatus" style="font-weight: 700; margin-top: 2px;">● 無車可借 (赤字告警)</div>
+    </div>
+  </div>
+
+  <!-- 引入最新快照與時序資料 -->
+  <script src="feed/latest_frame.js"></script>
+  <script src="feed/tide_timeline.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      const canvas = document.getElementById("tideCanvas");
+      const ctx = canvas.getContext("2d");
+      const viewport = document.getElementById("viewport");
+      const tooltip = document.getElementById("stationTooltip");
+      const ttName = document.getElementById("ttName");
+      const ttDetail = document.getElementById("ttDetail");
+      const ttStatus = document.getElementById("ttStatus");
+
+      const hudClock = document.getElementById("hudClock");
+      const hudPhase = document.getElementById("hudPhase");
+      const hourSlider = document.getElementById("hourSlider");
+      const playBtn = document.getElementById("playBtn");
+      const playText = document.getElementById("playText");
+      const toggleFlowBtn = document.getElementById("toggleFlowBtn");
+      const alertsList = document.getElementById("alertsList");
+      const alertCountBadge = document.getElementById("alertCountBadge");
+      const presetBtns = document.querySelectorAll(".preset-btn");
+
+      const kpiTotal = document.getElementById("kpiTotal");
+      const kpiDepleted = document.getElementById("kpiDepleted");
+      const kpiSaturated = document.getElementById("kpiSaturated");
+      const kpiRecover = document.getElementById("kpiRecover");
+
+      let currentHour = 8;
+      let isPlaying = false;
+      let showFlowArcs = true;
+      let animationTimer = null;
+      let pulseAngle = 0;
+
+      // 視角與地圖座標變換 (台北都會區坐標 121.43 ~ 121.63, 24.96 ~ 25.18)
+      const GEO_BOUNDS = {
+        minLon: 121.42,
+        maxLon: 121.64,
+        minLat: 24.96,
+        maxLat: 25.18
+      };
+
+      let width = 0;
+      let height = 0;
+      let stationsData = [];
+      let flowsData = [];
+      let hoveredStation = null;
+
+      function resize() {
+        width = viewport.clientWidth;
+        height = viewport.clientHeight;
+        canvas.width = width * window.devicePixelRatio;
+        canvas.height = height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      // n02 §3：共用底圖模組（01_shared/basemaps/basemap_switcher.js）
+      const bm = A23Basemap.create({ container: "basemap", bounds: GEO_BOUNDS, labelEl: document.getElementById("basemapText") });
+      const map = bm.map;
+      function lonLatToScreen(lon, lat) { return bm.project(lon, lat); }
+
+      function loadHourData(hour) {
+        currentHour = hour;
+        const hourKey = String(hour).padStart(2, "0") + ":00";
+        hudClock.textContent = hourKey;
+        hourSlider.value = hour;
+
+        presetBtns.forEach(btn => {
+          btn.classList.toggle("active", Number(btn.dataset.hour) === hour);
+        });
+
+        const timeline = window.A23_TIDE_TIMELINE || {};
+        const frame = timeline[hourKey] || (window.A23_FEED || {});
+
+        stationsData = frame.stations || [];
+        flowsData = frame.flows || [];
+
+        // 更新 HUD 狀態與 KPI
+        if (frame.kpi) {
+          hudPhase.textContent = "● " + (frame.kpi["潮汐相位狀態"] || frame.kpi["當前潮汐相位"] || "常態調度");
+          if (frame.kpi["無車紅站數量"] || frame.kpi["晨峰無車紅站"]) {
+            kpiDepleted.textContent = frame.kpi["無車紅站數量"] || frame.kpi["晨峰無車紅站"];
+          }
+          if (frame.kpi["滿位塞爆數量"] || frame.kpi["捷運滿位塞爆"]) {
+            kpiSaturated.textContent = frame.kpi["滿位塞爆數量"] || frame.kpi["捷運滿位塞爆"];
+          }
+          if (frame.kpi["夜間調度回補率"]) {
+            kpiRecover.textContent = frame.kpi["夜間調度回補率"];
+          }
+        }
+
+        renderAlerts(stationsData);
+      }
+
+      function renderAlerts(stations) {
+        alertsList.innerHTML = "";
+        const depleted = stations.filter(s => s.status_code === "RED_DEPLETED");
+        const saturated = stations.filter(s => s.status_code === "WHITE_SATURATED");
+        const allAlerts = [...depleted, ...saturated].slice(0, 6);
+
+        alertCountBadge.textContent = `${depleted.length + saturated.length} 站告警`;
+
+        if (allAlerts.length === 0) {
+          alertsList.innerHTML = `<div style="color: #34d399; font-size: 12px; padding: 4px 0;">✓ 目前全城站點供需平穩，零極端赤字</div>`;
+          return;
+        }
+
+        allAlerts.forEach(s => {
+          const item = document.createElement("div");
+          item.className = "alert-item";
+          const isDep = s.status_code === "RED_DEPLETED";
+          item.innerHTML = `
+            <span class="alert-name">${s.name} (${s.district})</span>
+            <span class="alert-val ${isDep ? 'val-depleted' : 'val-saturated'}">
+              ${isDep ? `赤字 0 車` : `滿載 ${s.available_bikes}/${s.capacity}`}
+            </span>
+          `;
+          alertsList.appendChild(item);
+        });
+      }
+
+      // 繪製背景裝飾底圖：淡水河水系與地圖網格
+      function drawBasemap() {
+        ctx.save();
+        // 網格點
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.04)";
+        ctx.lineWidth = 1;
+        const gridStep = 40;
+        for (let x = 0; x < width; x += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+        for (let y = 0; y < height; y += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+
+        // 淡水河 / 基隆河抽象光流
+        const riverPoints = [
+          [121.439, 25.170],
+          [121.470, 25.120],
+          [121.500, 25.070],
+          [121.505, 25.035],
+          [121.530, 24.990]
+        ].map(p => lonLatToScreen(p[0], p[1]));
+
+        ctx.strokeStyle = "rgba(6, 182, 212, 0.12)";
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(riverPoints[0].x, riverPoints[0].y);
+        for (let i = 1; i < riverPoints.length; i++) {
+          ctx.lineTo(riverPoints[i].x, riverPoints[i].y);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // 繪製潮汐流向弧線
+      function drawFlowArcs() {
+        if (!showFlowArcs || flowsData.length === 0) return;
+
+        flowsData.forEach((flow, idx) => {
+          const s = lonLatToScreen(flow.source[0], flow.source[1]);
+          const t = lonLatToScreen(flow.target[0], flow.target[1]);
+
+          // 計算控制點形成向上隆起的曲線
+          const midX = (s.x + t.x) / 2;
+          const midY = (s.y + t.y) / 2 - 40;
+
+          // 繪製弧線
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y);
+          ctx.quadraticCurveTo(midX, midY, t.x, t.y);
+
+          const grad = ctx.createLinearGradient(s.x, s.y, t.x, t.y);
+          const c1 = flow.source_color || [244, 63, 94, 220];
+          const c2 = flow.target_color || [56, 189, 248, 220];
+          grad.addColorStop(0, `rgba(${c1[0]}, ${c1[1]}, ${c1[2]}, 0.2)`);
+          grad.addColorStop(1, `rgba(${c2[0]}, ${c2[1]}, ${c2[2]}, 0.8)`);
+
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+
+          // 粒子流動動畫
+          const progress = ((pulseAngle * 0.8 + idx * 0.25) % 1);
+          const px = (1 - progress) * (1 - progress) * s.x + 2 * (1 - progress) * progress * midX + progress * progress * t.x;
+          const py = (1 - progress) * (1 - progress) * s.y + 2 * (1 - progress) * progress * midY + progress * progress * t.y;
+
+          ctx.beginPath();
+          ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${c2[0]}, ${c2[1]}, ${c2[2]}, 1)`;
+          ctx.shadowColor = `rgba(${c2[0]}, ${c2[1]}, ${c2[2]}, 0.8)`;
+          ctx.shadowBlur = 8;
+          ctx.fill();
+
+          ctx.restore();
+        });
+      }
+
+      // 繪製站點呼吸燈
+      function drawStations() {
+        pulseAngle += 0.05;
+        const pulse = (Math.sin(pulseAngle) + 1) / 2; // 0 ~ 1
+
+        stationsData.forEach(st => {
+          const pt = lonLatToScreen(st.lon, st.lat);
+          const isDepleted = st.status_code === "RED_DEPLETED";
+          const isSaturated = st.status_code === "WHITE_SATURATED";
+
+          ctx.save();
+
+          // 光暈外圈 (呼吸燈)
+          let glowRadius = 8 + pulse * 6;
+          let glowColor = "rgba(16, 185, 129, 0.25)";
+          let coreColor = "#10b981";
+
+          if (isDepleted) {
+            glowRadius = 12 + pulse * 10;
+            glowColor = `rgba(244, 63, 94, ${0.3 + pulse * 0.35})`;
+            coreColor = "#f43f5e";
+          } else if (isSaturated) {
+            glowRadius = 11 + pulse * 7;
+            glowColor = `rgba(255, 255, 255, ${0.4 + pulse * 0.3})`;
+            coreColor = "#ffffff";
+          }
+
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, glowRadius, 0, Math.PI * 2);
+          ctx.fillStyle = glowColor;
+          ctx.fill();
+
+          // 核心圓點
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, isDepleted ? 5.5 : 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = coreColor;
+          ctx.shadowColor = coreColor;
+          ctx.shadowBlur = 10;
+          ctx.fill();
+
+          // 站名文字標籤 (關鍵樞紐常時顯示)
+          if (isDepleted || isSaturated || st.type === "hub" || st.type === "cbd") {
+            ctx.font = "11px -apple-system, sans-serif";
+            ctx.fillStyle = isDepleted ? "#fb7185" : isSaturated ? "#ffffff" : "rgba(203, 213, 225, 0.8)";
+            ctx.fillText(st.name.replace("捷運", "").split("(")[0], pt.x + 8, pt.y + 4);
+          }
+
+          ctx.restore();
+        });
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, width, height);
+        drawFlowArcs();
+        drawStations();
+        requestAnimationFrame(loop);
+      }
+
+      // 事件監聽：Hover Tooltip
+      map.on("mousemove", (e) => {
+        const mx = e.point.x;
+        const my = e.point.y;
+
+        hoveredStation = null;
+        for (const st of stationsData) {
+          const pt = lonLatToScreen(st.lon, st.lat);
+          const dist = Math.hypot(pt.x - mx, pt.y - my);
+          if (dist < 12) {
+            hoveredStation = st;
+            break;
+          }
+        }
+
+        if (hoveredStation) {
+          tooltip.style.display = "block";
+          tooltip.style.left = `${mx}px`;
+          tooltip.style.top = `${my}px`;
+          ttName.textContent = hoveredStation.name;
+          ttDetail.textContent = `行政區: ${hoveredStation.district} ｜ 可借: ${hoveredStation.available_bikes} 輛 / 可還: ${hoveredStation.available_returns} 位 (滿車率: ${Math.round(hoveredStation.ratio * 100)}%)`;
+          ttStatus.textContent = `● ${hoveredStation.status_label}`;
+          ttStatus.style.color = hoveredStation.status_code === "RED_DEPLETED" ? "#f43f5e" : hoveredStation.status_code === "WHITE_SATURATED" ? "#ffffff" : "#10b981";
+        } else {
+          tooltip.style.display = "none";
+        }
+      });
+
+      viewport.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+
+      // 時間滑桿控制
+      hourSlider.addEventListener("input", (e) => {
+        loadHourData(Number(e.target.value));
+      });
+
+      // 快捷按鈕
+      presetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          loadHourData(Number(btn.dataset.hour));
+        });
+      });
+
+      // 潮汐光軌切換
+      document.getElementById("basemapBtn").addEventListener("click", () => bm.cycle());
+
+      toggleFlowBtn.addEventListener("click", () => {
+        showFlowArcs = !showFlowArcs;
+        toggleFlowBtn.innerHTML = `<span>⚡</span><span>潮汐向量光軌: ${showFlowArcs ? '開' : '關'}</span>`;
+        toggleFlowBtn.classList.toggle("active", showFlowArcs);
+      });
+
+      // 自動播放 24H 潮汐
+      playBtn.addEventListener("click", () => {
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+          playText.textContent = "暫停播放";
+          playBtn.classList.add("active");
+          animationTimer = setInterval(() => {
+            currentHour = (currentHour + 1) % 24;
+            loadHourData(currentHour);
+          }, 1200);
+        } else {
+          playText.textContent = "播放 24H 潮汐";
+          playBtn.classList.remove("active");
+          clearInterval(animationTimer);
+        }
+      });
+
+      // 初始載入 08:00 晨峰資料
+      loadHourData(8);
+      loop();
+    })();
+  </script>
+</body>
+</html>

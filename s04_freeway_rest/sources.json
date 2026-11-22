@@ -1,0 +1,5 @@
+{
+  "_doc": "live 來源設定；由 AGY 探測後填入。parking.url 為空時 pipeline 走 sample。light_key 與 free/total 二擇一。",
+  "parking": {"url": "", "list_path": "", "name_key": "", "free_key": "", "total_key": "", "light_key": ""},
+  "probe_status": "NOT_PROBED"
+}

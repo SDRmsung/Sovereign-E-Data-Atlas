@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "name": "tw_corridor_anchors",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "TPE",
+        "name": "台北核心錨點"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.517,
+          25.0478
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "HSZ",
+        "name": "新竹竹科錨點"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.008,
+          24.782
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "TXG",
+        "name": "台中市政快官"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.625,
+          24.155
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "TNN",
+        "name": "台南安南永康"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.252,
+          23.042
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "KHH",
+        "name": "高雄都會核心"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.301,
+          22.639
+        ]
+      }
+    }
+  ]
+}

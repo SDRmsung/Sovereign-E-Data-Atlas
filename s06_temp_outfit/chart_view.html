@@ -1,0 +1,35 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>S06 穿搭溫度｜圖表視角（n05 實戰案例）</title>
+<style>
+body{margin:0;background:#050912;color:#e2e8f0;font-family:'Microsoft JhengHei',system-ui,sans-serif}
+h1{font-size:16px;margin:12px 16px 0}p.s{margin:4px 16px 8px;color:#94a3b8;font-size:12px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:12px;padding:12px 16px}
+.c{background:#0b1220;border:1px solid #1e293b;border-radius:8px;padding:8px}
+.c h2{font-size:13px;margin:0 0 4px;color:#94a3b8}.c canvas{width:100%;height:300px;display:block}
+.b{display:flex;gap:8px;align-items:center;margin-top:4px}.b button{background:#1e293b;color:#e2e8f0;border:0;border-radius:4px;padding:4px 8px;cursor:pointer}.b input{flex:1}
+a{color:#38bdf8}
+</style></head><body>
+<p style="margin:10px 16px 0;font-size:12px"><a href="index.html">← 回 S06 地圖</a>　<a href="../index.html">A23 入口</a></p>
+<h1>S06 穿搭溫度 · 圖表視角（實界 Choropleth／Heatmap／Line／Bubble／Treemap）</h1>
+<p class="s" id="src"></p>
+<div class="g" id="g"></div>
+<script src="feed/chart_agg.js"></script><script src="../01_shared/viz_core/charts/a23_charts_tex.js"></script><script src="../01_shared/viz_core/charts/a23_charts.js"></script><script src="../01_shared/geo/tw_towns_2021_rings.js"></script>
+<script>
+var D=window.A23_S06_AGG,C=A23Charts,g=document.getElementById("g");
+var obs=Object.keys(D.hour_src).filter(function(h){return D.hour_src[h]==="observed"});
+document.getElementById("src").innerHTML="資料來源："+D.source+"｜實測 "+obs.length+" 小時（"+(obs.join("、")||"無")+"）＋ 模型推估 "+(24-obs.length)+" 小時；畫面標籤標示「實測／推估」。與地圖版互補：<a href='index.html'>回 s06 地圖版</a>";
+function panel(title,fn,slider){
+  var d=document.createElement("div");d.className="c";
+  d.innerHTML="<h2>"+title+"</h2><canvas></canvas><div class='b'><button>⏸</button>"+(slider?"<input type=range min=0 value=0 step=0.01>":"")+"</div>";
+  g.appendChild(d);var cv=d.querySelector("canvas"),btn=d.querySelector("button"),rg=d.querySelector("input");
+  var ctl=fn(cv,function(t){if(rg&&!rg.__drag)rg.value=t;});
+  if(rg){rg.max=ctl.n-1;rg.oninput=function(){rg.__drag=1;ctl.pause();btn.textContent="▶";ctl.seek(+rg.value);rg.__drag=0;};}
+  btn.onclick=function(){if(ctl.playing){ctl.pause();btn.textContent="▶";}else{ctl.play();btn.textContent="⏸";}};
+  ctl.play();window.addEventListener("resize",function(){ctl.redraw();});
+}
+if(D.choro&&window.A23_TW_TOWNS){var CF=A23_TW_TOWNS.filter(function(t){return t.county!=="金門縣"&&t.county!=="連江縣";}).map(function(t){return {key:t.county,name:t.county,rings:t.rings};});
+panel("#19 Choropleth｜各縣市平均體感溫度（真實行政區界，內政部 2021）",function(cv,tk){return C.choropleth(cv,{features:CF,frames:D.choro.frames},{fps:1.5,onTick:tk,title:"縣市平均體感 °C",dec:1,labels:false,lineWidth:0.3,stroke:"#0b1220",note:"測站 "+D.choro_meta.stations_mapped+"/"+D.choro_meta.stations_total+" 依經緯度歸縣市；金門、連江未繪（有算）；界線 taiwan-atlas（MIT）"});},1);}
+panel("全台體感溫度日變化（最低／平均／最高）",function(cv,tk){return C.line(cv,D.line,{fps:2,onTick:tk,dec:1,title:"體感溫度 °C"});},1);
+panel("穿搭等級 × 時段 站數占比（何時該加外套）",function(cv,tk){return C.heatmap(cv,D.heat,{fps:2,onTick:tk,title:"占全台站數比例",min:0,max:1,labelW:130});},1);
+panel("穿搭等級群：體感 × 濕度（大小＝站數）",function(cv,tk){return C.bubble(cv,D.bubble,{fps:1.5,onTick:tk,xLabel:"平均體感 °C",yLabel:"平均相對濕度 %",labelTop:5});},1);
+panel("穿搭等級站數占比（隨時段重排）",function(cv,tk){return C.treemap(cv,D.bar,{fps:1.5,onTick:tk,title:"站數"});},1);
+</script></body></html>

@@ -1,0 +1,587 @@
+// Auto-generated 24h Rolling Stream Timeline
+window.A23_TIMELINE = {
+  "updated_at": "2026-11-22 09:00:38",
+  "topics": [
+    {
+      "id": 0,
+      "name": "AI與生成科技",
+      "color": "#38bdf8",
+      "kw": [
+        "ai",
+        "model",
+        "llm",
+        "diffusion",
+        "gpt",
+        "agent",
+        "intelligence",
+        "learning",
+        "neural",
+        "flow",
+        "prompt",
+        "人工智慧",
+        "智慧",
+        "大模型",
+        "生成式"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "開源與軟體架構",
+      "color": "#a855f7",
+      "kw": [
+        "github",
+        "code",
+        "repo",
+        "framework",
+        "python",
+        "rust",
+        "build",
+        "api",
+        "platform",
+        "software",
+        "工具",
+        "框架",
+        "開源",
+        "架構"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "半導體與硬體運算",
+      "color": "#ec4899",
+      "kw": [
+        "chip",
+        "semiconductor",
+        "tsmc",
+        "nvidia",
+        "hardware",
+        "gpu",
+        "台積電",
+        "半導體",
+        "晶圓",
+        "晶片",
+        "輝達",
+        "代工",
+        "算力"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "總經與資本市場",
+      "color": "#f59e0b",
+      "kw": [
+        "market",
+        "stock",
+        "fed",
+        "inflation",
+        "economy",
+        "trade",
+        "fund",
+        "通膨",
+        "股市",
+        "大盤",
+        "指數",
+        "降息",
+        "央行",
+        "外資",
+        "證券",
+        "金融",
+        "國發會",
+        "證交所",
+        "彭博",
+        "貿易",
+        "進博會"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "地緣政經與國防",
+      "color": "#ef4444",
+      "kw": [
+        "defense",
+        "security",
+        "war",
+        "taiwan",
+        "china",
+        "us",
+        "biden",
+        "trump",
+        "military",
+        "國防",
+        "軍事",
+        "外交",
+        "美中",
+        "兩岸",
+        "共軍",
+        "安全",
+        "地緣",
+        "期中選舉",
+        "民主黨",
+        "共和黨",
+        "川普",
+        "國台辦",
+        "菲中",
+        "間諜",
+        "外長",
+        "制裁",
+        "國會",
+        "參院",
+        "選舉",
+        "民調",
+        "總統",
+        "習近平",
+        "北韓",
+        "中國",
+        "金與正",
+        "反制",
+        "炸彈"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "永續能源與基礎建設",
+      "color": "#10b981",
+      "kw": [
+        "green",
+        "energy",
+        "solar",
+        "wind",
+        "power",
+        "climate",
+        "grid",
+        "綠能",
+        "電力",
+        "供電",
+        "核能",
+        "風電",
+        "光電",
+        "水情",
+        "碳排",
+        "水庫",
+        "交通",
+        "鐵路"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "社會法政與民生消費",
+      "color": "#6366f1",
+      "kw": [
+        "court",
+        "policy",
+        "labor",
+        "social",
+        "hospital",
+        "health",
+        "勞工",
+        "檢調",
+        "法院",
+        "醫療",
+        "衛福",
+        "教育",
+        "物價",
+        "生活",
+        "交通部",
+        "勞動部",
+        "起火",
+        "失聯",
+        "認養",
+        "不適",
+        "水質",
+        "宿舍",
+        "住持",
+        "捐款",
+        "空氣品質",
+        "棄包裹",
+        "醫院",
+        "校方",
+        "社區",
+        "食安",
+        "詐騙"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "全球焦點與特寫",
+      "color": "#06b6d4",
+      "kw": [
+        "global",
+        "world",
+        "asia",
+        "europe",
+        "japan",
+        "korea",
+        "國際",
+        "日本",
+        "南韓",
+        "歐洲",
+        "美歐",
+        "聯合國",
+        "外媒"
+      ]
+    }
+  ],
+  "frame_count": 24,
+  "frames": [
+    {
+      "timestamp": "2026-11-21 10:00",
+      "missing": false,
+      "total": 276,
+      "cluster_counts": [
+        49,
+        7,
+        10,
+        26,
+        52,
+        1,
+        2,
+        129
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 11:00",
+      "missing": false,
+      "total": 277,
+      "cluster_counts": [
+        49,
+        7,
+        11,
+        26,
+        52,
+        3,
+        2,
+        127
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 12:00",
+      "missing": false,
+      "total": 274,
+      "cluster_counts": [
+        48,
+        7,
+        12,
+        28,
+        48,
+        6,
+        3,
+        122
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 13:00",
+      "missing": false,
+      "total": 278,
+      "cluster_counts": [
+        48,
+        7,
+        12,
+        27,
+        53,
+        6,
+        2,
+        123
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 14:00",
+      "missing": false,
+      "total": 261,
+      "cluster_counts": [
+        32,
+        6,
+        11,
+        29,
+        54,
+        5,
+        3,
+        121
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 15:00",
+      "missing": false,
+      "total": 279,
+      "cluster_counts": [
+        46,
+        6,
+        10,
+        27,
+        50,
+        4,
+        5,
+        131
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 16:00",
+      "missing": false,
+      "total": 281,
+      "cluster_counts": [
+        47,
+        6,
+        9,
+        28,
+        46,
+        4,
+        4,
+        137
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 17:00",
+      "missing": false,
+      "total": 283,
+      "cluster_counts": [
+        50,
+        5,
+        7,
+        30,
+        40,
+        4,
+        5,
+        142
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 18:00",
+      "missing": false,
+      "total": 282,
+      "cluster_counts": [
+        50,
+        5,
+        7,
+        30,
+        39,
+        4,
+        5,
+        142
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 19:00",
+      "missing": false,
+      "total": 281,
+      "cluster_counts": [
+        50,
+        6,
+        7,
+        30,
+        39,
+        3,
+        3,
+        143
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 20:00",
+      "missing": false,
+      "total": 281,
+      "cluster_counts": [
+        50,
+        6,
+        6,
+        28,
+        41,
+        5,
+        6,
+        139
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 21:00",
+      "missing": false,
+      "total": 280,
+      "cluster_counts": [
+        50,
+        5,
+        6,
+        29,
+        43,
+        5,
+        4,
+        138
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 22:00",
+      "missing": false,
+      "total": 278,
+      "cluster_counts": [
+        48,
+        5,
+        6,
+        30,
+        45,
+        4,
+        4,
+        136
+      ]
+    },
+    {
+      "timestamp": "2026-11-21 23:00",
+      "missing": false,
+      "total": 275,
+      "cluster_counts": [
+        47,
+        6,
+        5,
+        24,
+        42,
+        4,
+        7,
+        140
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 00:00",
+      "missing": false,
+      "total": 276,
+      "cluster_counts": [
+        47,
+        5,
+        5,
+        20,
+        42,
+        2,
+        5,
+        150
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 01:00",
+      "missing": false,
+      "total": 267,
+      "cluster_counts": [
+        44,
+        2,
+        4,
+        18,
+        45,
+        3,
+        5,
+        146
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 02:00",
+      "missing": false,
+      "total": 273,
+      "cluster_counts": [
+        48,
+        5,
+        4,
+        18,
+        45,
+        3,
+        3,
+        147
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 03:00",
+      "missing": false,
+      "total": 255,
+      "cluster_counts": [
+        33,
+        5,
+        4,
+        14,
+        48,
+        3,
+        3,
+        145
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 04:00",
+      "missing": false,
+      "total": 254,
+      "cluster_counts": [
+        31,
+        5,
+        4,
+        15,
+        51,
+        2,
+        3,
+        143
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 05:00",
+      "missing": false,
+      "total": 252,
+      "cluster_counts": [
+        31,
+        5,
+        4,
+        14,
+        50,
+        2,
+        3,
+        143
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 06:00",
+      "missing": false,
+      "total": 233,
+      "cluster_counts": [
+        29,
+        5,
+        4,
+        15,
+        46,
+        2,
+        3,
+        129
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 07:00",
+      "missing": false,
+      "total": 231,
+      "cluster_counts": [
+        29,
+        7,
+        3,
+        15,
+        43,
+        2,
+        3,
+        129
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 08:00",
+      "missing": false,
+      "total": 230,
+      "cluster_counts": [
+        29,
+        5,
+        3,
+        14,
+        28,
+        2,
+        3,
+        146
+      ]
+    },
+    {
+      "timestamp": "2026-11-22 09:00",
+      "missing": false,
+      "total": 247,
+      "cluster_counts": [
+        32,
+        6,
+        2,
+        13,
+        45,
+        2,
+        4,
+        143
+      ]
+    }
+  ]
+};

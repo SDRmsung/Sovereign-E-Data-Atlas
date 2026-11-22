@@ -1,0 +1,8 @@
+01_shared/export_pipe/
+__pycache__/
+*.py[cod]
+*.pyc
+*.bak*
+*.bundle
+*.ndjson.gz
+*.log

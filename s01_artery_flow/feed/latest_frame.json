@@ -1,0 +1,142 @@
+{
+  "schema": "a23.transit_pulse.corridor_feed.v1",
+  "captured_at": "2026-11-01T23:38:27+08:00",
+  "date_key": "20261101",
+  "source_mode": "FALLBACK_BASELINE_SNAPSHOT",
+  "vd_online_count": 8,
+  "avg_speed_kmh": 71.1,
+  "freeway_active_est": 7074,
+  "expressway_active_est": 3473,
+  "cumulative_vehicles_est": 111611,
+  "stations": [
+    {
+      "id": "VD-N1-025",
+      "name": "國1 台北圓山",
+      "road": "國道1號",
+      "lon": 121.525,
+      "lat": 25.073,
+      "norm": [
+        0.58,
+        0.12
+      ],
+      "speed_kmh": 88.0,
+      "volume_tpm": 64,
+      "congested": false
+    },
+    {
+      "id": "VD-N1-052",
+      "name": "國1 桃園機場系統",
+      "road": "國道1號",
+      "lon": 121.258,
+      "lat": 25.024,
+      "norm": [
+        0.53,
+        0.2
+      ],
+      "speed_kmh": 82.5,
+      "volume_tpm": 79,
+      "congested": false
+    },
+    {
+      "id": "VD-N1-095",
+      "name": "國1 新竹科學園區",
+      "road": "國道1號",
+      "lon": 121.008,
+      "lat": 24.782,
+      "norm": [
+        0.46,
+        0.32
+      ],
+      "speed_kmh": 74.0,
+      "volume_tpm": 92,
+      "congested": false
+    },
+    {
+      "id": "VD-N1-174",
+      "name": "國1 台中大雅中清",
+      "road": "國道1號",
+      "lon": 120.65,
+      "lat": 24.205,
+      "norm": [
+        0.42,
+        0.46
+      ],
+      "speed_kmh": 36.5,
+      "volume_tpm": 138,
+      "congested": true
+    },
+    {
+      "id": "VD-74-014",
+      "name": "台74 台中市政快官",
+      "road": "台74線",
+      "lon": 120.625,
+      "lat": 24.155,
+      "norm": [
+        0.45,
+        0.45
+      ],
+      "speed_kmh": 33.0,
+      "volume_tpm": 146,
+      "congested": true
+    },
+    {
+      "id": "VD-N1-264",
+      "name": "國1 嘉義系統",
+      "road": "國道1號",
+      "lon": 120.395,
+      "lat": 23.472,
+      "norm": [
+        0.39,
+        0.6
+      ],
+      "speed_kmh": 91.0,
+      "volume_tpm": 52,
+      "congested": false
+    },
+    {
+      "id": "VD-N1-319",
+      "name": "國1 台南永康",
+      "road": "國道1號",
+      "lon": 120.252,
+      "lat": 23.042,
+      "norm": [
+        0.4,
+        0.74
+      ],
+      "speed_kmh": 84.0,
+      "volume_tpm": 68,
+      "congested": false
+    },
+    {
+      "id": "VD-N1-367",
+      "name": "國1 高雄中正",
+      "road": "國道1號",
+      "lon": 120.332,
+      "lat": 22.628,
+      "norm": [
+        0.44,
+        0.86
+      ],
+      "speed_kmh": 79.5,
+      "volume_tpm": 74,
+      "congested": false
+    }
+  ],
+  "tdx_oauth2": {
+    "highway_vd_sampled": 0,
+    "tra_live_trains": 0,
+    "auth_note": "TDX_CLIENT_ID not set; Track A / Fallback active"
+  },
+  "events": [
+    {
+      "code": "TRA-SUHUA",
+      "status": "預警性封閉",
+      "corridor": "蘇花鐵路"
+    },
+    {
+      "code": "TRA-BEIHUI",
+      "status": "全日停駛",
+      "corridor": "北迴線"
+    }
+  ]
+}

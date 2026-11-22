@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1920, initial-scale=1.0" />
+  <title>A23 庫存戰情儀表板 · Inventory Warroom</title>
+  <link rel="stylesheet" href="../cis_tokens.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans, "Microsoft JhengHei", system-ui, sans-serif);
+      font-size: 12px;
+    }
+    .warroom {
+      width: 1920px;
+      height: 1080px;
+      display: grid;
+      grid-template-rows: 46px 116px 1fr 248px 34px;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+    .topbar-sub { font-size: 12px; color: var(--text-muted); }
+    .topbar-controls { display: flex; align-items: center; gap: 8px; }
+    .layer-btn {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, border-color 0.2s;
+    }
+    .layer-btn.active {
+      border-color: var(--accent-cyan);
+      background: var(--bg-accent);
+    }
+    .sim-badge {
+      background: var(--bg-elevated);
+      color: var(--accent-amber);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: opacity 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .card.dimmed { opacity: 0.25; }
+    .card.hero-focus {
+      border-color: var(--accent-rose);
+      box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.45);
+    }
+    .card canvas { width: 100%; height: 100%; display: block; }
+    .mid-grid {
+      display: grid;
+      grid-template-columns: 390px 1fr 480px;
+      gap: 8px;
+      min-height: 0;
+    }
+    .col-stack {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      min-height: 0;
+    }
+    .right-stack {
+      display: grid;
+      grid-template-rows: 1fr 170px;
+      gap: 8px;
+      min-height: 0;
+    }
+    .corner-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      min-height: 0;
+    }
+    .bot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      min-height: 0;
+    }
+    .story-bar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr) 110px;
+      gap: 4px;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+    .beat {
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .beat.active {
+      background: var(--bg-accent);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-cyan);
+      font-weight: 700;
+    }
+    .clock-pill {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .focus-overlay {
+      position: absolute;
+      pointer-events: none;
+      inset: 0;
+      display: none;
+    }
+    .focus-overlay.show { display: block; }
+    .focus-tag {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(244, 63, 94, 0.92);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="warroom">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">A23 庫存戰情儀表板</span>
+        <span class="topbar-sub">主角料：<strong id="heroSkuLabel">SKU-001 車規MLCC電容 (C類)</strong></span>
+      </div>
+      <div class="topbar-controls">
+        <button class="layer-btn" data-layer="exec" id="btnExec">1 高階</button>
+        <button class="layer-btn" data-layer="mc" id="btnMc">2 物控</button>
+        <button class="layer-btn" data-layer="wh" id="btnWh">3 倉儲</button>
+        <span class="sim-badge">模擬資料</span>
+      </div>
+    </header>
+
+    <section class="card" data-layers="exec" id="cardCcc">
+      <canvas id="cvCcc"></canvas>
+    </section>
+
+    <section class="mid-grid">
+      <div class="col-stack">
+        <div class="card" data-layers="exec" id="cardWaterfall">
+          <canvas id="cvWaterfall"></canvas>
+          <div class="focus-overlay" id="ovWaterfall"><span class="focus-tag">主角料入庫段</span></div>
+        </div>
+        <div class="card" data-layers="exec" id="cardTreemap">
+          <canvas id="cvTreemap"></canvas>
+        </div>
+      </div>
+
+      <div class="card" data-layers="wh" id="cardHeat">
+        <canvas id="cvHeat"></canvas>
+        <div class="focus-overlay" id="ovHeat"><span class="focus-tag" id="ovHeatTxt">主角料儲位 A-R06-C05</span></div>
+      </div>
+
+      <div class="right-stack">
+        <div class="card" data-layers="mc" id="cardBullet">
+          <canvas id="cvBullet"></canvas>
+          <div class="focus-overlay" id="ovBullet"><span class="focus-tag" id="ovBulletTxt">SKU-001 預警</span></div>
+        </div>
+        <div class="corner-pair">
+          <div class="card" data-layers="exec wh" id="cardIra">
+            <canvas id="cvIra"></canvas>
+          </div>
+          <div class="card" data-layers="mc" id="cardLead">
+            <canvas id="cvLead"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bot-grid">
+      <div class="card" data-layers="exec" id="cardPareto">
+        <canvas id="cvPareto"></canvas>
+      </div>
+      <div class="card" data-layers="mc" id="cardMatrix">
+        <canvas id="cvMatrix"></canvas>
+      </div>
+      <div class="card" data-layers="mc" id="cardSankey">
+        <canvas id="cvSankey"></canvas>
+        <div class="focus-overlay" id="ovSankey"><span class="focus-tag">齊套卡單路徑 (SKU-001)</span></div>
+      </div>
+      <div class="card" data-layers="exec mc" id="cardTradeoff">
+        <canvas id="cvTradeoff"></canvas>
+      </div>
+    </section>
+
+    <footer class="story-bar">
+      <div class="beat" data-beat="0">0–3s 入庫</div>
+      <div class="beat" data-beat="1">3–8s 消耗</div>
+      <div class="beat" data-beat="2">8–11s 跌破 ROP</div>
+      <div class="beat" data-beat="3">11–14s 預警牆紅框</div>
+      <div class="beat" data-beat="4">14–17s 桑基卡單</div>
+      <div class="beat" data-beat="5">17–20s 調撥建議</div>
+      <div class="clock-pill" id="clockLabel">T = 0.0s / 20s</div>
+    </footer>
+  </div>
+
+  <script src="../a23_charts_tex.js"></script><script src="../a23_charts.js"></script>
+  <script src="../a23_charts_inv.js"></script>
+  <script src="data_inv.js"></script>
+  <script>
+    (function () {
+      var HERO_SKU = "SKU-001";
+      var data = window.A23_DEMO_INV || {};
+      var C = window.A23Charts || {};
+      var R = (window.A23_REGISTRY && window.A23_REGISTRY.INV_REUSE) || {};
+
+      function pickFn(reuseKey, fallbackName) {
+        if (R[reuseKey] && typeof C[R[reuseKey]] === "function") return C[R[reuseKey]];
+        if (typeof C[fallbackName] === "function") return C[fallbackName];
+        return null;
+      }
+
+      var specs = [
+        { id: "cvCcc", fn: C.invCccBar, d: data, opt: { focusSku: HERO_SKU } },
+        { id: "cvWaterfall", fn: pickFn("waterfall", "invWaterfall") || C.waterfall, d: data.reuse && data.reuse.waterfall ? data.reuse.waterfall : data, opt: {} },
+        { id: "cvTreemap", fn: pickFn("treemap", "invAgingTreemap") || C.treemap, d: data.reuse && data.reuse.treemap ? data.reuse.treemap : data, opt: {} },
+        { id: "cvHeat", fn: C.invWarehouseHeat, d: data, opt: { focusSku: HERO_SKU } },
+        { id: "cvBullet", fn: C.invBulletWall, d: data, opt: { focusSku: HERO_SKU } },
+        { id: "cvIra", fn: pickFn("gauge", "invIraGauge") || C.gauge, d: data.reuse && data.reuse.gauge ? data.reuse.gauge : data, opt: {} },
+        { id: "cvLead", fn: pickFn("boxplot", "invLeadBox") || C.boxplot, d: data.reuse && data.reuse.boxplot ? data.reuse.boxplot : data, opt: {} },
+        { id: "cvPareto", fn: C.invPareto, d: data, opt: { focusSku: HERO_SKU } },
+        { id: "cvMatrix", fn: C.invAbcXyz, d: data, opt: { focusSku: HERO_SKU } },
+        { id: "cvSankey", fn: pickFn("sankey", "invKitSankey") || C.sankey, d: data.reuse && data.reuse.sankey ? data.reuse.sankey : data, opt: {} },
+        { id: "cvTradeoff", fn: C.invTradeoff, d: data, opt: { focusSku: HERO_SKU } }
+      ];
+
+      var ctrls = specs.map(function (sp) {
+        var cv = document.getElementById(sp.id);
+        if (!cv || typeof sp.fn !== "function") return null;
+        try {
+          var ctrl = sp.fn(cv, sp.d, sp.opt);
+          if (ctrl && typeof ctrl.stop === "function") ctrl.stop();
+          return ctrl;
+        } catch (e) {
+          return null;
+        }
+      });
+
+      // Layer filter (B3)
+      var activeLayer = null;
+      var btns = document.querySelectorAll(".layer-btn");
+      var cards = document.querySelectorAll(".card");
+
+      function applyLayer(layer, updateHash) {
+        activeLayer = (activeLayer === layer) ? null : layer;
+        btns.forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-layer") === activeLayer);
+        });
+        cards.forEach(function (cd) {
+          if (!activeLayer) {
+            cd.classList.remove("dimmed");
+          } else {
+            var ls = (cd.getAttribute("data-layers") || "").split(/\s+/);
+            cd.classList.toggle("dimmed", ls.indexOf(activeLayer) === -1);
+          }
+        });
+        if (updateHash) {
+          location.hash = activeLayer ? ("layer=" + activeLayer) : "";
+        }
+      }
+
+      btns.forEach(function (b) {
+        b.addEventListener("click", function () {
+          applyLayer(b.getAttribute("data-layer"), true);
+        });
+      });
+
+      window.addEventListener("keydown", function (e) {
+        if (e.key === "1") applyLayer("exec", true);
+        else if (e.key === "2") applyLayer("mc", true);
+        else if (e.key === "3") applyLayer("wh", true);
+      });
+
+      var mHash = location.hash.match(/layer=(exec|mc|wh)/);
+      if (mHash) applyLayer(mHash[1], false);
+
+      // Shared 20s clock (B4)
+      var beats = document.querySelectorAll(".beat");
+      var clockLabel = document.getElementById("clockLabel");
+      var cardBullet = document.getElementById("cardBullet");
+      var cardSankey = document.getElementById("cardSankey");
+      var cardHeat = document.getElementById("cardHeat");
+      var cardWaterfall = document.getElementById("cardWaterfall");
+      var ovWaterfall = document.getElementById("ovWaterfall");
+      var ovHeat = document.getElementById("ovHeat");
+      var ovHeatTxt = document.getElementById("ovHeatTxt");
+      var ovBullet = document.getElementById("ovBullet");
+      var ovBulletTxt = document.getElementById("ovBulletTxt");
+      var ovSankey = document.getElementById("ovSankey");
+
+      function renderAt(T) {
+        var normT = ((T % 20) + 20) % 20;
+        var u = normT / 20;
+        ctrls.forEach(function (ctrl) {
+          if (!ctrl || typeof ctrl.seek !== "function") return;
+          var nFrames = ctrl.frames || 120;
+          ctrl.seek(Math.round(u * (nFrames - 1)));
+        });
+
+        var beatIdx = normT < 3 ? 0 : (normT < 8 ? 1 : (normT < 11 ? 2 : (normT < 14 ? 3 : (normT < 17 ? 4 : 5))));
+        beats.forEach(function (el, i) { el.classList.toggle("active", i === beatIdx); });
+        clockLabel.textContent = "T = " + normT.toFixed(1) + "s / 20s";
+
+        ovWaterfall.classList.toggle("show", beatIdx === 0);
+        ovHeat.classList.toggle("show", beatIdx === 0 || beatIdx === 5);
+        ovHeatTxt.textContent = beatIdx === 5 ? "調撥建議：B/C倉 → A-R06-C05" : "主角料入庫亮起 A-R06-C05";
+        cardBullet.classList.toggle("hero-focus", beatIdx === 3);
+        ovBullet.classList.toggle("show", beatIdx === 1 || beatIdx === 2 || beatIdx === 3 || beatIdx === 5);
+        ovBulletTxt.textContent = beatIdx === 5 ? "SKU-001 調撥優先 (+95)" : (beatIdx >= 2 ? "SKU-001 跌破 ROP" : "SKU-001 可用量下降");
+        cardSankey.classList.toggle("hero-focus", beatIdx === 4);
+        ovSankey.classList.toggle("show", beatIdx === 4);
+      }
+
+      var qs = new URLSearchParams(location.search);
+      if (qs.has("t")) {
+        var fixedT = parseFloat(qs.get("t")) || 0;
+        renderAt(fixedT);
+      } else {
+        var startMs = performance.now();
+        function tick(now) {
+          var elapsed = (now - startMs) / 1000;
+          renderAt(elapsed);
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+    })();
+  </script>
+</body>
+</html>

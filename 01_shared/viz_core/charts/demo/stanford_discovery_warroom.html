@@ -1,0 +1,1413 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STANFORD AI LAB // DISCOVERY ARCHITECTURE · 14K-Node 逆向還原戰情室</title>
+<style>
+:root {
+  --bg: #030508;
+  --panel: #070b12;
+  --panel-2: #0b111c;
+  --line: #182438;
+  --line-hi: #1e3a5f;
+  --ink: #e2e8f0;
+  --dim: #94a3b8;
+  --muted: #52637a;
+  --cyan: #00f0ff;
+  --sky: #38bdf8;
+  --amber: #ffb700;
+  --gold: #fde047;
+  --emerald: #10b981;
+  --violet: #a855f7;
+  --rose: #f43f5e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Microsoft JhengHei', monospace;
+  overflow-x: hidden;
+}
+/* Top Navigation Bar (A23 Standard) */
+.a23-nav {
+  background: rgba(5, 9, 18, 0.95);
+  border-bottom: 1px solid var(--line);
+  padding: 4px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+.a23-nav .left, .a23-nav .right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.a23-nav a, .a23-nav button {
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.a23-nav a:hover, .a23-nav button:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.a23-nav .badge-live {
+  border-color: var(--emerald);
+  color: var(--emerald);
+  background: rgba(16, 185, 129, 0.12);
+  font-weight: 700;
+}
+
+/* Main Warroom Poster Frame (Matches Threads 4:5 Portrait/Desktop HUD Ratio) */
+.warroom-shell {
+  max-width: 1240px;
+  margin: 8px auto 28px;
+  background: #020407;
+  border: 1px solid #1a2639;
+  border-radius: 8px;
+  box-shadow: 0 0 60px rgba(0, 240, 255, 0.06);
+  padding: 12px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 1. HUD Header */
+.hud-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+  gap: 8px;
+}
+.hud-title-block .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.hud-title-block .main-model {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hud-title-block .main-model .plus { color: var(--dim); font-weight: 400; }
+.hud-title-block .main-model .sol { color: var(--cyan); }
+.hud-title-block .main-model .meta-tag {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  border-left: 1px solid var(--line);
+  padding-left: 8px;
+}
+.hud-right-meta {
+  text-align: right;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.hud-right-meta .cypher-pill {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 3px;
+  color: var(--cyan);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+/* 2. Execution Pipeline DAG (2 Rows) */
+.pipeline-box {
+  background: rgba(7, 11, 18, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 8px 8px 4px;
+}
+.pipeline-Canvas-wrap {
+  width: 100%;
+  height: 76px;
+  position: relative;
+}
+.pipeline-Canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.subsystems-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #111a29;
+  padding-top: 4px;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.subsystems-bar span b { color: var(--dim); }
+.subsystems-bar .active-dot {
+  color: var(--emerald);
+}
+
+/* 3. Center Core Workspace: Left 3D Toroidal Graph + Right 5-Stack Telemetry */
+.core-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(290px, 1fr);
+  gap: 8px;
+  min-height: 450px;
+}
+@media (max-width: 900px) {
+  .core-grid { grid-template-columns: 1fr; }
+}
+.torus-stage {
+  position: relative;
+  background: radial-gradient(circle at 46% 52%, rgba(14, 30, 56, 0.38) 0%, rgba(2, 4, 7, 0.98) 72%);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  min-height: 450px;
+}
+.torus-stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+.torus-stage canvas:active { cursor: grabbing; }
+.torus-hud-tl {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  pointer-events: none;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.torus-hud-tl b { color: var(--ink); font-size: 11px; }
+.torus-hud-tr {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  pointer-events: none;
+  text-align: right;
+  font-size: 10px;
+  color: var(--muted);
+}
+.torus-callout {
+  position: absolute;
+  left: 14px;
+  bottom: 58px;
+  background: rgba(5, 8, 14, 0.92);
+  border: 1px solid var(--amber);
+  border-left: 3px solid var(--amber);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 10px;
+  line-height: 1.45;
+  max-width: 265px;
+  box-shadow: 0 0 20px rgba(255, 183, 0, 0.15);
+  pointer-events: none;
+}
+.torus-callout .ct-hd {
+  color: var(--amber);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.torus-callout .ct-sub {
+  color: var(--dim);
+  margin-top: 4px;
+}
+.torus-legend-bl {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* Right Telemetry Stack */
+.right-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.t-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.t-card .t-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.t-card .t-hd b {
+  color: var(--amber);
+  font-weight: 700;
+}
+.t-card canvas {
+  width: 100%;
+  display: block;
+}
+.t-kpi-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #121c2c;
+  font-size: 10px;
+}
+.t-kpi-row .big-rate {
+  color: var(--amber);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+/* 4. Full-Width Horizon Bus Strip */
+.horizon-strip {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 8px 4px;
+}
+.horizon-strip .h-hd {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.horizon-strip canvas {
+  width: 100%;
+  height: 36px;
+  display: block;
+}
+
+/* 5. Bottom 3-Column Dock */
+.bottom-dock {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1.15fr;
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  .bottom-dock { grid-template-columns: 1fr; }
+}
+.dock-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 8px;
+  display: flex;
+  flex-direction: column;
+}
+.dock-card .d-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  border-bottom: 1px solid #111b2b;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+.dock-card .d-hd span:last-child {
+  color: var(--muted);
+  font-size: 9px;
+}
+.dock-card canvas {
+  width: 100%;
+  height: 195px;
+  display: block;
+}
+.dock-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Comparison Audit Drawer */
+.audit-drawer {
+  max-width: 1240px;
+  margin: 0 auto 40px;
+  background: #070d1a;
+  border: 1px solid #1e3a8a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'Microsoft JhengHei', system-ui, sans-serif;
+}
+.audit-drawer h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--sky);
+}
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.audit-table th, .audit-table td {
+  border: 1px solid #1e293b;
+  padding: 8px 8px;
+  text-align: left;
+  line-height: 1.5;
+}
+.audit-table th {
+  background: #0b1426;
+  color: var(--sky);
+}
+.tag-ok {
+  display: inline-block;
+  padding: 4px 4px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--emerald);
+  color: var(--emerald);
+  font-size: 11px;
+}
+.tag-gap {
+  display: inline-block;
+  padding: 4px 4px;
+  border-radius: 4px;
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid var(--rose);
+  color: var(--rose);
+  font-size: 11px;
+}
+.tag-part {
+  display: inline-block;
+  padding: 4px 4px;
+  border-radius: 4px;
+  background: rgba(255, 183, 0, 0.15);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-size: 11px;
+}
+</style>
+</head>
+<body>
+
+<nav class="a23-nav">
+  <div class="left">
+    <a href="../gallery/chart_grid.html">⬅ 回 A23 動態圖表型錄 (chart_grid.html)</a>
+    <a href="codex_plugins_warroom.html">🌐 CODEX 3D 星系戰情室</a>
+    <a href="yc_second_brain_warroom.html">🧠 YC Brain 6合1戰情室</a>
+    <span style="color:var(--dim);font-size:11px;">｜ Threads @prudencemhlanga20 (原圖 𝕏 @Ester_smart) 1:1 逆向還原</span>
+  </div>
+  <div class="right">
+    <button type="button" id="btnTogglePlay" class="badge-live">● LIVE TELEMETRY (點擊暫停)</button>
+    <button type="button" id="btnResetRot">🎯 重置 3D 視角</button>
+  </div>
+</nav>
+
+<main class="warroom-shell">
+  <!-- 1. HUD Header -->
+  <header class="hud-header">
+    <div class="hud-title-block">
+      <div class="eyebrow">STANFORD AI LAB / DISCOVERY ARCHITECTURE</div>
+      <div class="main-model">
+        <span>CLAUDE OPUS 3.5</span>
+        <span class="plus">+</span>
+        <span class="sol">GPT-4.1 SOL</span>
+        <span class="meta-tag">14,280 NODES · 86,420 EDGES · LIVING AUTOMATION GRAPH</span>
+      </div>
+    </div>
+    <div class="hud-right-meta">
+      <div>ENGINE: NEO4J CYPHER 5.18 // GRAPH RAG PIPELINE // SEED 0x7F3A</div>
+      <span class="cypher-pill">cypher://discovery.stanford.ai:7687 [CONNECTED]</span>
+    </div>
+  </header>
+
+  <!-- 2. Top 2-Row Execution DAG Pipeline -->
+  <section class="pipeline-box" aria-label="Execution Pipeline DAG">
+    <div class="pipeline-Canvas-wrap">
+      <canvas id="cvPipeline" data-w="1200" data-h="76"></canvas>
+    </div>
+    <div class="subsystems-bar">
+      <span>SUBSYSTEMS: <b>[01] QUERY_PARSER</b> · <b>[02] CYPHER_AST</b> · <b>[03] EVAL_HARNESS</b> · <b>[04] SANDBOX_EXEC</b> · <b>[05] GRAPH_COMMIT</b></span>
+      <span class="active-dot">● ALL 12 PIPELINE STAGES SYNCHRONIZED (LATENCY: 14.2ms)</span>
+    </div>
+  </section>
+
+  <!-- 3. Center Core Grid: Left 3D Toroidal Graph + Right 5 Stacked Charts -->
+  <section class="core-grid">
+    <!-- Center-Left Hero: 3D Toroidal Cortical Network -->
+    <div class="torus-stage">
+      <canvas id="cvTorus" data-w="760" data-h="460"></canvas>
+      <div class="torus-hud-tl">
+        <b>14K-NODE CORTICAL MANIFOLD // EDGE-BUNDLED GRAPH</b><br>
+        <span>拖拽旋轉 3D 流形 · 滾輪縮放 · 底部琥珀色極區為高價值收斂叢集</span>
+      </div>
+      <div class="torus-hud-tr">
+        <span>CLUSTER MODULARITY Q = 0.842</span><br>
+        <span style="color:var(--cyan);">ACTIVE PATHS: 1,420 / SEC</span>
+      </div>
+      <div class="torus-callout">
+        <div class="ct-hd">CANDIDATE HYPOTHESIS #042 // CROSS-TASK LINK</div>
+        <div class="ct-sub">node_cluster: <b>EXEC_VERIFY → MARKET_SIGNAL</b><br>confidence: <b style="color:var(--emerald);">0.948</b> · delta_yield: <b style="color:var(--amber);">+18.4%</b></div>
+      </div>
+      <div class="torus-legend-bl">
+        <span>● CYAN: CORTEX QUERY NODES (42%)　● VIOLET: MEMORY BRIDGE (31%)　● AMBER: VERIFIED SYNTHESIS HOTSPOT (27%)</span>
+        <span>RENDER: 60 FPS CANVAS 3D PROJECTION</span>
+      </div>
+    </div>
+
+    <!-- Right Column: 5 Stacked Micro-Charts -->
+    <div class="right-stack">
+      <!-- 4A. Digital Square-Wave Pulse Oscilloscope -->
+      <div class="t-card">
+        <div class="t-hd"><span>01 // SIGNAL PULSE OSCILLOSCOPE</span><b>98.4 HZ</b></div>
+        <canvas id="cvPulse" data-w="380" data-h="54"></canvas>
+      </div>
+
+      <!-- 4B. Horizontal Ranked Feature Bars -->
+      <div class="t-card">
+        <div class="t-hd"><span>02 // TOPOLOGY FEATURE WEIGHTS (RANKED)</span><b style="color:var(--cyan);">TOP 9</b></div>
+        <canvas id="cvHorizBars" data-w="380" data-h="96"></canvas>
+      </div>
+
+      <!-- 4C. Dual-Series Spike Barcode Histogram -->
+      <div class="t-card">
+        <div class="t-hd"><span>03 // EPOCH ACTIVATION SPIKE HISTOGRAM</span><b>AMBER vs VIOLET</b></div>
+        <canvas id="cvSpikeHist" data-w="380" data-h="68"></canvas>
+      </div>
+
+      <!-- 4D. Confidence Score Mini Progress Meters -->
+      <div class="t-card">
+        <div class="t-hd"><span>04 // CONFIDENCE &amp; CONVERGENCE GATES</span><b style="color:var(--emerald);">PASS</b></div>
+        <canvas id="cvConfMeters" data-w="380" data-h="56"></canvas>
+      </div>
+
+      <!-- 4E. Multi-Row Segmented State Strip Barcode -->
+      <div class="t-card">
+        <div class="t-hd"><span>05 // LAYER ATTENTION ALLOCATION STRIP</span><b>MARIMEKKO BARCODE</b></div>
+        <canvas id="cvBarcodeStrip" data-w="380" data-h="62"></canvas>
+        <div class="t-kpi-row">
+          <span style="color:var(--muted);">THROUGHPUT TELEMETRY</span>
+          <span class="big-rate">2.48 M TOK / SEC</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Full-Width Horizon Waveform Divider -->
+  <section class="horizon-strip">
+    <div class="h-hd">
+      <span>CROSS-NODE SYNCHRONIZATION HORIZON WAVE // REALTIME STREAM</span>
+      <span style="color:var(--cyan);">PHASE LOCK: Δφ = 0.003 rad</span>
+    </div>
+    <canvas id="cvHorizon" data-w="1200" data-h="36"></canvas>
+  </section>
+
+  <!-- 5. Bottom 3-Column Dock -->
+  <section class="bottom-dock">
+    <!-- 6A. Variable-Radius Segmented Rose Donut -->
+    <div class="dock-card">
+      <div class="d-hd">
+        <span>DISCOVERY NODES BY DOMAIN</span>
+        <span>ROSE-DONUT HYBRID</span>
+      </div>
+      <canvas id="cvRoseDonut" data-w="360" data-h="195"></canvas>
+      <div class="dock-foot">
+        <span>7 ACTIVE DOMAINS</span>
+        <span style="color:var(--amber);">DOMINANT: EXEC_CORE (26%)</span>
+      </div>
+    </div>
+
+    <!-- 6B. Multi-Axis Dumbbell / Before-After Slider Metrics -->
+    <div class="dock-card">
+      <div class="d-hd">
+        <span>BENCHMARK METRICS // BEFORE vs AFTER</span>
+        <span>DUMBBELL DELTA PLOT</span>
+      </div>
+      <canvas id="cvDumbbell" data-w="400" data-h="195"></canvas>
+      <div class="dock-foot">
+        <span>HOLLOW = BASELINE (BEFORE) · SOLID = OPTIMIZED (AFTER)</span>
+        <span style="color:var(--emerald);">AVG GAIN: +14.8%</span>
+      </div>
+    </div>
+
+    <!-- 6C. Evaluated Predictions / Profit Combo Bar + Growth Curve -->
+    <div class="dock-card">
+      <div class="d-hd">
+        <span>EVALUATED PREDICTIONS // YIELD CURVE</span>
+        <span>BAR + MONOTONIC LINE</span>
+      </div>
+      <canvas id="cvComboProfit" data-w="400" data-h="195"></canvas>
+      <div class="dock-foot">
+        <span>CYAN = VALIDATION EPOCHS · AMBER = OUT-OF-SAMPLE SURGE</span>
+        <span style="color:var(--amber);">𝕏 @Ester_smart (Reconstructed)</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Audit & Comparison Table -->
+<section class="audit-drawer">
+  <h2>🔍 Threads 貼文視覺組件 vs. A23 `chart_grid.html` 完整對照與缺口盤點</h2>
+  <table class="audit-table">
+    <thead>
+      <tr>
+        <th>區域</th>
+        <th>Threads 原圖視覺組件</th>
+        <th>A23 `chart_grid.html` 現有對應卡片</th>
+        <th>覆蓋狀態</th>
+        <th>差異與欠缺說明（本頁已 100% 逆向補齊）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>1. 頂部管線</b></td>
+        <td>雙層有向工作流管線圖<br>(2-Row DAG Capsule Pipeline)</td>
+        <td>#26 Timeline、#32 YC 02 放射貝茲樹</td>
+        <td><span class="tag-gap">欠缺獨立卡</span></td>
+        <td>現有 #26 為單軸時序、#32 為放射樹；欠缺<b>多列膠囊節點有向狀態機管線 (DAG Pipeline)</b>。</td>
+      </tr>
+      <tr>
+        <td><b>2. 中央主視覺</b></td>
+        <td>14K 節點 3D 腦皮層／環面邊捆綁網路<br>(3D Toroidal Edge-Bundled Graph)</td>
+        <td>#14 Network (2D)、#30 CODEX 3D 測地線星系 (正球體)、#31 YC 01 多星團圖譜</td>
+        <td><span class="tag-part">部分包含 (幾何不同)</span></td>
+        <td>#30 為正球面 Fibonacci 網格；原圖為 <b>3D C 型環面／腦皮層流形＋長程曲線光絲束 (Edge Bundling)＋底部琥珀熱點極區</b>。</td>
+      </tr>
+      <tr>
+        <td><b>3. 右上角 (01)</b></td>
+        <td>數位方波脈衝示波器<br>(Square-Wave Step Oscilloscope)</td>
+        <td>#2 Animated Line (平滑折線)、#34 YC 04 聲波</td>
+        <td><span class="tag-gap">欠缺方波變體</span></td>
+        <td>#2 為連續線性內插折線；原圖為<b>直角階梯數位方波 (Step-Function Clock Pulse)</b>。</td>
+      </tr>
+      <tr>
+        <td><b>4. 右側上中 (02)</b></td>
+        <td>極簡水平排名微長條圖<br>(Micro Horizontal Spark-Bars)</td>
+        <td>#1 Bar Chart Race、#40 INV 04 子彈牆</td>
+        <td><span class="tag-ok">已包含 (#1/#40)</span></td>
+        <td>與 #1 水平排名長條圖同源，僅視覺改為高密度細條 HUD 遙測樣式。</td>
+      </tr>
+      <tr>
+        <td><b>5. 右側中 (03)</b></td>
+        <td>雙色交替垂直脈衝直方圖<br>(Dual-Series Spike Histogram)</td>
+        <td>#5 Histogram (單色分佈直方圖)</td>
+        <td><span class="tag-part">部分包含 (#5)</span></td>
+        <td>#5 為單一變數鐘型組距直方圖；原圖為<b>琥珀×紫雙序列高密度時序脈衝柱 (Spike Barcode)</b>。</td>
+      </tr>
+      <tr>
+        <td><b>6. 右側中下 (04)</b></td>
+        <td>多軌閾值進度計量條<br>(Multi-Track Confidence Meters)</td>
+        <td>#24 Gauge / KPI、#35 YC 05 點陣計數條</td>
+        <td><span class="tag-ok">已包含 (#24/#35)</span></td>
+        <td>屬於 #24 KPI 單值進度條之水平多列組合。</td>
+      </tr>
+      <tr>
+        <td><b>7. 右下角 (05)</b></td>
+        <td>多列不等寬分段狀態色帶<br>(Multi-Row Marimekko State Strip)</td>
+        <td>#10 Heatmap、#36 Waffle 矩陣、#37 CCC 橫條</td>
+        <td><span class="tag-gap">欠缺多列不等寬色帶</span></td>
+        <td>#37 為單條方程式、#36 為等寬方格；原圖為<b>多列不等寬 Token/Layer 狀態配置條碼 (Marimekko Strip)</b>。</td>
+      </tr>
+      <tr>
+        <td><b>8. 中腰分隔帶</b></td>
+        <td>全寬地平線微幅波譜<br>(Full-Width Horizon Stream)</td>
+        <td>#3 Area / Streamgraph</td>
+        <td><span class="tag-ok">已包含 (#3)</span></td>
+        <td>即 #3 堆疊面積／地平線波形圖之極簡橫幅版。</td>
+      </tr>
+      <tr>
+        <td><b>9. 左下角</b></td>
+        <td>不等半徑多環玫瑰甜甜圈圖<br>(Variable-Radius Rose Donut)</td>
+        <td>#4 Pie / Donut、#16 Sunburst</td>
+        <td><span class="tag-part">部分包含 (#4/#16)</span></td>
+        <td>結合 #4 甜甜圈與<b>南丁格爾玫瑰圖 (Nightingale Rose，各扇區外徑隨數值伸縮)</b>。</td>
+      </tr>
+      <tr>
+        <td><b>10. 中下角</b></td>
+        <td>多軸前後對比啞鈴游標圖<br>(Before/After Dumbbell Slider Plot)</td>
+        <td>#17 Parallel Coordinates、#18 Box Plot</td>
+        <td><span class="tag-gap">欠缺啞鈴圖</span></td>
+        <td><b>關鍵缺口</b>：A23 尚無專門呈現「改善前(空心點)→改善後(實心點)＋增減幅度」之<b>水平啞鈴圖 (Dumbbell Plot)</b>。</td>
+      </tr>
+      <tr>
+        <td><b>11. 右下角</b></td>
+        <td>雙色柱狀＋單調遞增曲線複合圖<br>(Combo Bar + Growth Curve)</td>
+        <td>#38 INV 02 柏拉圖 (柱狀＋累積曲線，目前標示 ○ 待實作)</td>
+        <td><span class="tag-gap">待實作 (#38 未上線)</span></td>
+        <td><b>關鍵缺口</b>：`chart_grid.html` 中 #38 為未上線狀態（○），缺少<b>柱狀圖疊加平滑成長趨勢曲線與斜率箭頭</b>之複合圖。</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  var playing = true;
+  var tGlobal = 0;
+  var rotY = -0.38, rotX = 0.22, zoom = 1.0;
+  var dragging = false, lastX = 0, lastY = 0;
+
+  function fitCanvas(cv) {
+    var dpr = window.devicePixelRatio || 1;
+    var rect = cv.getBoundingClientRect();
+    var w = +cv.dataset.w || Math.max(1, Math.round(rect.width));
+    var h = +cv.dataset.h || Math.max(1, Math.round(rect.height));
+    if (cv.__w !== w || cv.__h !== h || cv.__d !== dpr) {
+      cv.width = w * dpr;
+      cv.height = h * dpr;
+      cv.__w = w; cv.__d = dpr;
+      cv.__h = h;
+    }
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  /* =====================================================================
+   * 1. Top 2-Row DAG Execution Pipeline
+   * ===================================================================== */
+  var ROW1_NODES = [
+    { id: "system_query", col: "#64748b", fill: "rgba(30,41,59,0.7)" },
+    { id: "extract_pipeline", col: "#f59e0b", fill: "rgba(245,158,11,0.22)" },
+    { id: "select_eval_fn", col: "#38bdf8", fill: "rgba(56,189,248,0.18)" },
+    { id: "act_propose", col: "#10b981", fill: "rgba(16,185,129,0.22)" },
+    { id: "eval_metric", col: "#ffb700", fill: "rgba(255,183,0,0.28)" },
+    { id: "act_verify", col: "#00f0ff", fill: "rgba(0,240,255,0.2)" }
+  ];
+  var ROW2_NODES = [
+    { id: "parse_ast_graph", col: "#475569", fill: "rgba(15,23,42,0.8)" },
+    { id: "cypher_traverse", col: "#38bdf8", fill: "rgba(56,189,248,0.15)" },
+    { id: "hypothesis_rank", col: "#a855f7", fill: "rgba(168,85,247,0.18)" },
+    { id: "sandbox_exec", col: "#10b981", fill: "rgba(16,185,129,0.18)" },
+    { id: "reward_backprop", col: "#f59e0b", fill: "rgba(245,158,11,0.2)" },
+    { id: "commit_node", col: "#38bdf8", fill: "rgba(56,189,248,0.22)" }
+  ];
+
+  function drawPipeline(t) {
+    var s = fitCanvas(document.getElementById("cvPipeline")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var n = ROW1_NODES.length;
+    var padX = 24, usableW = w - padX * 2;
+    var stepX = usableW / n;
+    var boxW = Math.min(142, stepX - 24), boxH = 22;
+    var y1 = 10, y2 = 44;
+
+    // Draw connecting edges and animated signal packets
+    for (var i = 0; i < n; i++) {
+      var x = padX + i * stepX + (stepX - boxW) / 2;
+      var cx = x + boxW / 2;
+
+      // Vertical cross-row links
+      ctx.strokeStyle = "rgba(56,189,248,0.22)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx, y1 + boxH);
+      ctx.lineTo(cx, y2);
+      ctx.stroke();
+
+      if (i < n - 1) {
+        var nx = padX + (i + 1) * stepX + (stepX - boxW) / 2;
+        // Row 1 horizontal arrow
+        ctx.strokeStyle = "rgba(148,163,184,0.35)";
+        ctx.beginPath();
+        ctx.moveTo(x + boxW, y1 + boxH / 2);
+        ctx.lineTo(nx, y1 + boxH / 2);
+        ctx.stroke();
+
+        // Row 2 horizontal arrow
+        ctx.strokeStyle = "rgba(100,116,139,0.28)";
+        ctx.beginPath();
+        ctx.moveTo(x + boxW, y2 + boxH / 2);
+        ctx.lineTo(nx, y2 + boxH / 2);
+        ctx.stroke();
+
+        // Animated packet on Row 1
+        var u = (t * 0.9 - i * 0.25) % 1;
+        if (u < 0) u += 1;
+        var px = x + boxW + u * (nx - (x + boxW));
+        ctx.fillStyle = "#00f0ff";
+        ctx.beginPath();
+        ctx.arc(px, y1 + boxH / 2, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Draw Row 1 & Row 2 capsules
+    var activeIdx = Math.floor(t * 1.5) % n;
+    [ROW1_NODES, ROW2_NODES].forEach(function (row, ri) {
+      var yy = ri === 0 ? y1 : y2;
+      row.forEach(function (nd, i) {
+        var x = padX + i * stepX + (stepX - boxW) / 2;
+        var isPulse = (i === activeIdx);
+        roundRect(ctx, x, yy, boxW, boxH, 4);
+        ctx.fillStyle = nd.fill;
+        ctx.fill();
+        ctx.lineWidth = isPulse ? 1.6 : 1;
+        ctx.strokeStyle = isPulse ? "#ffffff" : nd.col;
+        ctx.stroke();
+
+        ctx.fillStyle = isPulse ? "#ffffff" : "#e2e8f0";
+        ctx.font = (ri === 0 ? "700 " : "500 ") + "10px ui-monospace, monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(nd.id, x + boxW / 2, yy + boxH / 2);
+      });
+    });
+  }
+
+  /* =====================================================================
+   * 2. Center Hero: 3D Cortical Toroidal Manifold (14K-Node Style)
+   * ===================================================================== */
+  var TORUS_NODES = [];
+  var TORUS_EDGES = [];
+  var TORUS_PULSES = [];
+  (function initTorus() {
+    var seed = 42;
+    function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+
+    var N = 920;
+    for (var i = 0; i < N; i++) {
+      // C-shaped cortical torus parameterization (theta around C-arc, phi around tube)
+      var u = rnd();
+      // Concentrate density along C-manifold (-0.78*PI to +0.88*PI)
+      var theta = -Math.PI * 0.78 + u * Math.PI * 1.66;
+      var phi = rnd() * Math.PI * 2;
+      var R = 128 + 18 * Math.sin(theta * 1.5);
+      var rTube = (46 + 16 * Math.cos(theta * 0.9)) * (0.45 + 0.55 * Math.sqrt(rnd()));
+
+      // Indent inner fold to create organic brain/kidney C-torus shape
+      var x = (R + rTube * Math.cos(phi)) * Math.sin(theta) * 0.88;
+      var y = -(R + rTube * Math.cos(phi)) * Math.cos(theta) * 1.05;
+      var z = rTube * Math.sin(phi) * 1.15;
+
+      // Classify region: bottom pole (theta near 0) = Amber Hotspot; upper/left = Cyan/White; inner = Violet
+      var isHotspot = (Math.abs(theta) < 0.42 && y < -60);
+      var isInner = (Math.cos(phi) < -0.2);
+      var col = isHotspot
+        ? (rnd() < 0.5 ? "#ffb700" : "#fde047")
+        : (isInner ? "#a78bfa" : (rnd() < 0.65 ? "#7dd3fc" : "#e0f2fe"));
+
+      TORUS_NODES.push({
+        x: x, y: -y, z: z, // flip y so hotspot is at bottom (y > 0 in screen)
+        theta: theta, phi: phi,
+        col: col,
+        isHotspot: isHotspot,
+        sz: isHotspot ? (1.6 + rnd() * 2.0) : (0.9 + rnd() * 1.3)
+      });
+    }
+
+    // Build curved filament bundles connecting nodes along the manifold
+    for (var e = 0; e < 460; e++) {
+      var a = Math.floor(rnd() * N);
+      // Connect to a node within angular proximity or cross-bridge to hotspot
+      var b = Math.floor(rnd() * N);
+      var na = TORUS_NODES[a], nb = TORUS_NODES[b];
+      var dTheta = Math.abs(na.theta - nb.theta);
+      if (dTheta < 0.75 || na.isHotspot || nb.isHotspot) {
+        var hotEdge = (na.isHotspot || nb.isHotspot);
+        TORUS_EDGES.push({
+          a: a, b: b,
+          hot: hotEdge,
+          col: hotEdge ? "rgba(255,183,0,0.22)" : (rnd() < 0.4 ? "rgba(167,139,250,0.16)" : "rgba(125,211,252,0.16)")
+        });
+      }
+    }
+
+    for (var p = 0; p < 55; p++) {
+      TORUS_PULSES.push({
+        edgeIdx: Math.floor(rnd() * TORUS_EDGES.length),
+        pos: rnd(),
+        speed: 0.25 + rnd() * 0.55
+      });
+    }
+  })();
+
+  function project3D(x, y, z, cx, cy, scale) {
+    // Rotate Y
+    var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    var x1 = x * cosY - z * sinY;
+    var z1 = x * sinY + z * cosY;
+    // Rotate X
+    var cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    var y2 = y * cosX - z1 * sinX;
+    var z2 = y * sinX + z1 * cosX;
+
+    var fov = 520;
+    var persp = fov / (fov + z2 + 260);
+    return {
+      sx: cx + x1 * persp * scale,
+      sy: cy + y2 * persp * scale,
+      z: z2,
+      p: persp
+    };
+  }
+
+  function drawTorus(t) {
+    var cv = document.getElementById("cvTorus");
+    var s = fitCanvas(cv), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+
+    if (playing && !dragging) {
+      rotY = -0.38 + Math.sin(t * 0.28) * 0.22;
+    }
+
+    var cx = w * 0.48, cy = h * 0.49;
+    var scale = Math.min(w, h) / 315 * zoom;
+
+    // Background subtle coordinate crosshair
+    ctx.strokeStyle = "rgba(30,58,95,0.25)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 155 * scale, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Project all nodes
+    var proj = new Array(TORUS_NODES.length);
+    for (var i = 0; i < TORUS_NODES.length; i++) {
+      var n = TORUS_NODES[i];
+      proj[i] = project3D(n.x, n.y, n.z, cx, cy, scale);
+    }
+
+    // Draw bundled curved filament edges
+    ctx.lineWidth = 0.85;
+    for (var e = 0; e < TORUS_EDGES.length; e++) {
+      var ed = TORUS_EDGES[e];
+      var pa = proj[ed.a], pb = proj[ed.b];
+      // Control point pulled slightly toward torus spine for organic bundling
+      var mx = (pa.sx + pb.sx) * 0.5 + (cx - (pa.sx + pb.sx) * 0.5) * 0.22;
+      var my = (pa.sy + pb.sy) * 0.5 + (cy - (pa.sy + pb.sy) * 0.5) * 0.15;
+      ctx.strokeStyle = ed.col;
+      ctx.beginPath();
+      ctx.moveTo(pa.sx, pa.sy);
+      ctx.quadraticCurveTo(mx, my, pb.sx, pb.sy);
+      ctx.stroke();
+    }
+
+    // Draw golden starburst spikes at the bottom pole hotspot
+    var hotCenter = project3D(0, 132, 0, cx, cy, scale);
+    var grad = ctx.createRadialGradient(hotCenter.sx, hotCenter.sy, 2, hotCenter.sx, hotCenter.sy, 72 * scale);
+    grad.addColorStop(0, "rgba(255, 195, 0, 0.36)");
+    grad.addColorStop(0.5, "rgba(245, 158, 11, 0.12)");
+    grad.addColorStop(1, "rgba(245, 158, 11, 0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(hotCenter.sx, hotCenter.sy, 72 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Leader line from callout box to golden hotspot
+    ctx.strokeStyle = "rgba(255, 183, 0, 0.75)";
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(185, h - 75);
+    ctx.lineTo(hotCenter.sx - 18, hotCenter.sy + 6);
+    ctx.stroke();
+    ctx.fillStyle = "#ffb700";
+    ctx.beginPath();
+    ctx.arc(hotCenter.sx - 18, hotCenter.sy + 6, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw nodes sorted roughly or directly with additive-like glow
+    for (var j = 0; j < TORUS_NODES.length; j++) {
+      var nd = TORUS_NODES[j], pr = proj[j];
+      var alpha = Math.max(0.2, Math.min(0.95, (pr.p - 0.65) * 2.2));
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = nd.col;
+      ctx.beginPath();
+      ctx.arc(pr.sx, pr.sy, nd.sz * pr.p, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Draw traveling pulse particles
+    for (var k = 0; k < TORUS_PULSES.length; k++) {
+      var pl = TORUS_PULSES[k];
+      var edge = TORUS_EDGES[pl.edgeIdx];
+      var p1 = proj[edge.a], p2 = proj[edge.b];
+      var u = (pl.pos + t * pl.speed) % 1;
+      var qx = (1 - u) * p1.sx + u * p2.sx;
+      var qy = (1 - u) * p1.sy + u * p2.sy;
+      ctx.fillStyle = edge.hot ? "#fde047" : "#00f0ff";
+      ctx.beginPath();
+      ctx.arc(qx, qy, 2.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  /* Interactive drag & wheel zoom on Torus Canvas */
+  var cvTorusEl = document.getElementById("cvTorus");
+  cvTorusEl.addEventListener("mousedown", function (e) {
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+  });
+  window.addEventListener("mousemove", function (e) {
+    if (!dragging) return;
+    rotY += (e.clientX - lastX) * 0.007;
+    rotX = Math.max(-1.1, Math.min(1.1, rotX + (e.clientY - lastY) * 0.007));
+    lastX = e.clientX; lastY = e.clientY;
+  });
+  window.addEventListener("mouseup", function () { dragging = false; });
+  cvTorusEl.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    zoom = Math.max(0.65, Math.min(1.65, zoom * (e.deltaY < 0 ? 1.08 : 0.92)));
+  }, { passive: false });
+
+  /* =====================================================================
+   * 3. Right Stack (4A - 4E)
+   * ===================================================================== */
+  // 4A. Digital Square-Wave Pulse Oscilloscope
+  function drawPulse(t) {
+    var s = fitCanvas(document.getElementById("cvPulse")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+
+    // Baseline grid
+    ctx.strokeStyle = "rgba(168, 85, 247, 0.28)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.72);
+    ctx.lineTo(w, h * 0.72);
+    ctx.stroke();
+
+    // Square-wave step signal
+    ctx.strokeStyle = "#ffb700";
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    var segs = 22, segW = w / segs;
+    var phase = Math.floor(t * 6);
+    for (var i = 0; i < segs; i++) {
+      var v = ((i + phase) % 3 === 0) ? 0.22 : (((i * 7 + phase) % 5 === 0) ? 0.82 : 0.52);
+      var y = h * (1 - v);
+      var x0 = i * segW, x1 = (i + 1) * segW;
+      if (i === 0) ctx.moveTo(x0, y);
+      else ctx.lineTo(x0, y);
+      ctx.lineTo(x1, y);
+    }
+    ctx.stroke();
+  }
+
+  // 4B. Horizontal Ranked Feature Bars
+  var FEAT_BARS = [
+    { name: "cypher_hop_depth", val: 0.94 },
+    { name: "semantic_cosine", val: 0.88 },
+    { name: "reward_sharpe", val: 0.82 },
+    { name: "ast_branch_cov", val: 0.76 },
+    { name: "sandbox_pass_rt", val: 0.71 },
+    { name: "latency_budget", val: 0.64 },
+    { name: "degree_central", val: 0.58 },
+    { name: "token_compress", val: 0.49 },
+    { name: "drift_residual", val: 0.38 }
+  ];
+  function drawHorizBars(t) {
+    var s = fitCanvas(document.getElementById("cvHorizBars")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var rowH = h / FEAT_BARS.length;
+    var L = 98, R = 36, barMaxW = w - L - R;
+    FEAT_BARS.forEach(function (d, i) {
+      var y = i * rowH;
+      var wobble = Math.sin(t * 2.2 + i * 0.7) * 0.025;
+      var v = Math.min(1, Math.max(0.1, d.val + wobble));
+      ctx.fillStyle = "#64748b";
+      ctx.font = "9px ui-monospace, monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(d.name, 2, y + rowH / 2);
+
+      ctx.fillStyle = "rgba(30,41,59,0.65)";
+      ctx.fillRect(L, y + 2, barMaxW, rowH - 4);
+
+      ctx.fillStyle = i < 3 ? "#00f0ff" : "#38bdf8";
+      ctx.fillRect(L, y + 2, barMaxW * v, rowH - 4);
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.textAlign = "right";
+      ctx.fillText((v * 100).toFixed(1), w - 2, y + rowH / 2);
+    });
+  }
+
+  // 4C. Dual-Series Spike Barcode Histogram
+  function drawSpikeHist(t) {
+    var s = fitCanvas(document.getElementById("cvSpikeHist")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var bins = 36, bw = (w - 8) / bins;
+    for (var i = 0; i < bins; i++) {
+      var isAmber = (i % 5 < 2) || (i > 12 && i < 18);
+      var wave = 0.35 + 0.6 * Math.abs(Math.sin(i * 0.45 + t * 1.4) * Math.cos(i * 0.23 - t * 0.8));
+      var bh = Math.max(4, wave * (h - 10));
+      ctx.fillStyle = isAmber ? "#ffb700" : "#a855f7";
+      ctx.fillRect(4 + i * bw, h - 4 - bh, Math.max(2, bw - 2), bh);
+    }
+  }
+
+  // 4D. Confidence Score Mini Progress Meters
+  var CONF_GATES = [
+    { label: "HYPOTHESIS_VALID", val: 0.94, col: "#e2e8f0" },
+    { label: "SANDBOX_CONVERGE", val: 0.87, col: "#ffb700" },
+    { label: "INVARIANCE_CLAMP", val: 0.91, col: "#38bdf8" }
+  ];
+  function drawConfMeters(t) {
+    var s = fitCanvas(document.getElementById("cvConfMeters")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var rowH = h / CONF_GATES.length;
+    CONF_GATES.forEach(function (g, i) {
+      var y = i * rowH;
+      var v = Math.min(0.99, g.val + Math.sin(t * 1.8 + i) * 0.015);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "9px ui-monospace, monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(g.label, 2, y + rowH / 2);
+
+      var bx = 120, bw = 110;
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(bx, y + 5, bw, rowH - 10);
+      ctx.fillStyle = g.col;
+      ctx.fillRect(bx, y + 5, bw * v, rowH - 10);
+
+      ctx.fillStyle = "#e2e8f0";
+      ctx.textAlign = "right";
+      ctx.fillText((v * 100).toFixed(1) + "%", w - 4, y + rowH / 2);
+    });
+  }
+
+  // 4E. Multi-Row Segmented State Strip Barcode
+  var STRIP_ROWS = [
+    [0.24, 0.18, 0.28, 0.16, 0.14],
+    [0.15, 0.32, 0.19, 0.22, 0.12],
+    [0.30, 0.14, 0.24, 0.18, 0.14],
+    [0.18, 0.26, 0.22, 0.20, 0.14]
+  ];
+  var STRIP_COLS = ["#38bdf8", "#ffb700", "#a855f7", "#10b981", "#f43f5e"];
+  function drawBarcodeStrip(t) {
+    var s = fitCanvas(document.getElementById("cvBarcodeStrip")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var rows = STRIP_ROWS.length, rowH = (h - 4) / rows;
+    for (var r = 0; r < rows; r++) {
+      var x = 2, y = 2 + r * rowH;
+      var segs = STRIP_ROWS[r];
+      for (var c = 0; c < segs.length; c++) {
+        var shift = 1 + 0.06 * Math.sin(t * 2 + r + c);
+        var sw = (w - 16) * segs[c] * shift;
+        if (x + sw > w - 2) sw = Math.max(2, w - 2 - x);
+        ctx.fillStyle = STRIP_COLS[(c + r) % STRIP_COLS.length];
+        ctx.fillRect(x, y + 1, Math.max(2, sw - 2), rowH - 3);
+        x += sw;
+      }
+    }
+  }
+
+  /* =====================================================================
+   * 4. Full-Width Horizon Waveform Divider
+   * ===================================================================== */
+  function drawHorizon(t) {
+    var s = fitCanvas(document.getElementById("cvHorizon")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    ctx.beginPath();
+    ctx.moveTo(0, h - 2);
+    for (var x = 0; x <= w; x += 6) {
+      var u = x / w;
+      var env = Math.sin(u * Math.PI);
+      var y = h * 0.68 - env * (8 * Math.sin(x * 0.035 - t * 3.2) + 4 * Math.cos(x * 0.09 + t * 2.1));
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h - 2);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(0, 240, 255, 0.12)";
+    ctx.fill();
+
+    ctx.strokeStyle = "#00f0ff";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+
+  /* =====================================================================
+   * 5. Bottom Dock Charts (6A, 6B, 6C)
+   * ===================================================================== */
+  // 6A. Variable-Radius Segmented Rose Donut
+  var DOMAINS = [
+    { name: "EXEC_CORE", pct: 26, rScale: 1.00, col: "#ffb700" },
+    { name: "CYPHER_MEM", pct: 19, rScale: 0.88, col: "#38bdf8" },
+    { name: "MARKET_FEED", pct: 16, rScale: 0.82, col: "#1e40af" },
+    { name: "EVAL_SANDBOX", pct: 14, rScale: 0.76, col: "#0284c7" },
+    { name: "SYNTHESIS", pct: 11, rScale: 0.70, col: "#a855f7" },
+    { name: "RISK_GATE", pct: 8, rScale: 0.64, col: "#10b981" },
+    { name: "API_ROUTER", pct: 6, rScale: 0.58, col: "#475569" }
+  ];
+  function drawRoseDonut(t) {
+    var s = fitCanvas(document.getElementById("cvRoseDonut")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var cx = w * 0.48, cy = h * 0.52;
+    var rInner = 24, rMax = Math.min(w, h) * 0.39;
+    var ang = -Math.PI / 2;
+
+    DOMAINS.forEach(function (d, i) {
+      var span = (d.pct / 100) * Math.PI * 2;
+      var a0 = ang + 0.025, a1 = ang + span - 0.025;
+      var rOut = rInner + (rMax - rInner) * d.rScale * (0.97 + 0.03 * Math.sin(t * 2 + i));
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, rOut, a0, a1);
+      ctx.arc(cx, cy, rInner, a1, a0, true);
+      ctx.closePath();
+      ctx.fillStyle = d.col;
+      ctx.fill();
+
+      // Inner accent ring on dominant segments
+      if (i < 2) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, rInner + 10, a0, a1);
+        ctx.arc(cx, cy, rInner, a1, a0, true);
+        ctx.closePath();
+        ctx.fillStyle = "#fde047";
+        ctx.fill();
+      }
+
+      // Leader line & label
+      var mid = (a0 + a1) * 0.5;
+      var lx0 = cx + Math.cos(mid) * (rOut + 3);
+      var ly0 = cy + Math.sin(mid) * (rOut + 3);
+      var lx1 = cx + Math.cos(mid) * (rMax + 14);
+      var ly1 = cy + Math.sin(mid) * (rMax + 14);
+      var rightSide = Math.cos(mid) >= 0;
+      var lx2 = lx1 + (rightSide ? 10 : -10);
+
+      ctx.strokeStyle = "rgba(148,163,184,0.45)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(lx0, ly0);
+      ctx.lineTo(lx1, ly1);
+      ctx.lineTo(lx2, ly1);
+      ctx.stroke();
+
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "9px ui-monospace, monospace";
+      ctx.textAlign = rightSide ? "left" : "right";
+      ctx.textBaseline = "middle";
+      ctx.fillText(d.name + " " + d.pct + "%", lx2 + (rightSide ? 3 : -3), ly1);
+
+      ang += span;
+    });
+
+    // Center hole label
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "700 9px ui-monospace, monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("14.2K", cx, cy);
+  }
+
+  // 6B. Multi-Axis Dumbbell / Before-After Slider Metrics
+  var DUMBBELL_DATA = [
+    { metric: "sharpe_ratio", before: 0.34, after: 0.78, delta: "+28.4%", col: "#10b981" },
+    { metric: "node_recall", before: 0.42, after: 0.86, delta: "+24.1%", col: "#00f0ff" },
+    { metric: "verify_acc", before: 0.51, after: 0.89, delta: "+19.6%", col: "#10b981" },
+    { metric: "token_eff", before: 0.28, after: 0.68, delta: "+16.2%", col: "#ffb700" },
+    { metric: "latency_p99", before: 0.74, after: 0.32, delta: "-42.0%", col: "#38bdf8" },
+    { metric: "drawdown_cap", before: 0.66, after: 0.29, delta: "-31.5%", col: "#f43f5e" }
+  ];
+  function drawDumbbell(t) {
+    var s = fitCanvas(document.getElementById("cvDumbbell")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var rows = DUMBBELL_DATA.length, rowH = (h - 10) / rows;
+    var L = 92, R = 56, trackW = w - L - R;
+
+    DUMBBELL_DATA.forEach(function (d, i) {
+      var cy = 8 + i * rowH + rowH * 0.5;
+      // Label
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "9.5px ui-monospace, monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(d.metric, 4, cy);
+
+      // Horizontal baseline track
+      ctx.strokeStyle = "#1e293b";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(L, cy);
+      ctx.lineTo(L + trackW, cy);
+      ctx.stroke();
+
+      var bx = L + d.before * trackW;
+      var ax = L + (d.after + 0.015 * Math.sin(t * 2 + i)) * trackW;
+
+      // Active range connector segment
+      ctx.strokeStyle = d.col;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(bx, cy);
+      ctx.lineTo(ax, cy);
+      ctx.stroke();
+
+      // Before node (hollow circle)
+      ctx.fillStyle = "#070b12";
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(bx, cy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // After node (glowing solid circle)
+      ctx.fillStyle = d.col;
+      ctx.beginPath();
+      ctx.arc(ax, cy, 4.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Right delta percentage
+      ctx.fillStyle = d.col;
+      ctx.font = "700 9.5px ui-monospace, monospace";
+      ctx.textAlign = "right";
+      ctx.fillText(d.delta, w - 4, cy);
+    });
+  }
+
+  // 6C. Evaluated Predictions / Profit (Combo Bar + Monotonic Growth Curve)
+  var PROFIT_BARS = [0.78, 0.56, 0.42, 0.34, 0.28, 0.22, 0.36, 0.29, 0.16, 0.12];
+  var PROFIT_LINE = [0.18, 0.38, 0.54, 0.66, 0.75, 0.82, 0.87, 0.91, 0.94, 0.97];
+  function drawComboProfit(t) {
+    var s = fitCanvas(document.getElementById("cvComboProfit")), ctx = s.ctx, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    var padL = 28, padR = 14, padT = 16, padB = 22;
+    var cw = w - padL - padR, ch = h - padT - padB;
+    var n = PROFIT_BARS.length, step = cw / n;
+
+    // Grid lines
+    ctx.strokeStyle = "rgba(30,41,59,0.55)";
+    ctx.lineWidth = 1;
+    for (var g = 0; g <= 3; g++) {
+      var gy = padT + (ch / 3) * g;
+      ctx.beginPath();
+      ctx.moveTo(padL, gy);
+      ctx.lineTo(padL + cw, gy);
+      ctx.stroke();
+    }
+
+    // Bars (early slate/cyan, highlighted amber gold bars on right)
+    for (var i = 0; i < n; i++) {
+      var v = PROFIT_BARS[i] * (0.96 + 0.04 * Math.sin(t * 2.2 + i));
+      var bh = v * ch;
+      var bx = padL + i * step + 4;
+      var bw = Math.max(6, step - 8);
+      var by = padT + ch - bh;
+      var isHighlight = (i === 6 || i === 7);
+      ctx.fillStyle = isHighlight ? "#ffb700" : (i < 3 ? "#1e3a5f" : "#0e7490");
+      ctx.fillRect(bx, by, bw, bh);
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "8.5px ui-monospace, monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("E" + (i + 1), bx + bw / 2, h - 8);
+    }
+
+    // Monotonic concave growth curve + nodes
+    ctx.strokeStyle = "#e2e8f0";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    var pts = [];
+    for (var j = 0; j < n; j++) {
+      var px = padL + j * step + step * 0.5;
+      var py = padT + ch * (1 - PROFIT_LINE[j]);
+      pts.push({ x: px, y: py });
+      if (j === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    pts.forEach(function (p, idx) {
+      ctx.fillStyle = idx >= 6 ? "#ffb700" : "#ffffff";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  /* =====================================================================
+   * Master Animation Loop
+   * ===================================================================== */
+  var lastTs = 0;
+  function frame(ts) {
+    if (!lastTs) lastTs = ts;
+    var dt = (ts - lastTs) / 1000;
+    lastTs = ts;
+    if (playing) tGlobal += dt;
+
+    drawPipeline(tGlobal);
+    drawTorus(tGlobal);
+    drawPulse(tGlobal);
+    drawHorizBars(tGlobal);
+    drawSpikeHist(tGlobal);
+    drawConfMeters(tGlobal);
+    drawBarcodeStrip(tGlobal);
+    drawHorizon(tGlobal);
+    drawRoseDonut(tGlobal);
+    drawDumbbell(tGlobal);
+    drawComboProfit(tGlobal);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  document.getElementById("btnTogglePlay").addEventListener("click", function () {
+    playing = !playing;
+    this.textContent = playing ? "● LIVE TELEMETRY (點擊暫停)" : "⏸ PAUSED (點擊繼續)";
+    this.style.borderColor = playing ? "var(--emerald)" : "var(--amber)";
+    this.style.color = playing ? "var(--emerald)" : "var(--amber)";
+  });
+
+  document.getElementById("btnResetRot").addEventListener("click", function () {
+    rotY = -0.38; rotX = 0.22; zoom = 1.0;
+  });
+})();
+</script>
+</body>
+</html>

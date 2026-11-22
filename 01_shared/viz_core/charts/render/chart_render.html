@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A23 Chart Render</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #050912; color: #e2e8f0;
+    font-family: 'Microsoft JhengHei', system-ui, sans-serif;
+  }
+  .frame-root {
+    display: flex; flex-direction: column;
+    width: 100vw; height: 100vh;
+    padding: 12px 12px 12px;
+    background: #050912;
+  }
+  .top-bar {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 8px; padding-bottom: 8px;
+    border-bottom: 1px solid #1e293b;
+    flex-shrink: 0;
+  }
+  .title-wrap {
+    flex: 1 1 auto; min-width: 0;
+  }
+  .chart-title {
+    font-size: 19px; font-weight: 700; color: #f8fafc;
+    line-height: 1.25; word-break: break-word;
+  }
+  .chart-subtitle {
+    font-size: 12px; font-weight: 500; color: #94a3b8;
+    margin-top: 4px; line-height: 1.2;
+  }
+  .top-right {
+    display: flex; align-items: center; gap: 4px;
+    flex-shrink: 0; padding-top: 4px;
+  }
+  .demo-badge {
+    display: none; font-size: 10px; font-weight: 700;
+    color: #fbbf24; background: rgba(251, 191, 36, 0.14);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 4px; padding: 4px 4px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .time-label {
+    font-size: 12px; font-weight: 600; color: #38bdf8;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .canvas-wrap {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px 0;
+  }
+  canvas {
+    display: block; width: 100%; height: 100%;
+    background: #0b1220; border-radius: 8px;
+  }
+  .src-bar {
+    flex-shrink: 0; padding-top: 8px;
+    border-top: 1px solid #1e293b;
+    font-size: 11px; color: #94a3b8; line-height: 1.35;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden; word-break: break-word;
+  }
+</style>
+</head>
+<body>
+<div class="frame-root" id="root">
+  <div class="top-bar">
+    <div class="title-wrap">
+      <div class="chart-title" id="title">Loading...</div>
+      <div class="chart-subtitle" id="subtitle"></div>
+    </div>
+    <div class="top-right">
+      <div class="demo-badge" id="demoBadge">示意</div>
+      <div class="time-label" id="timeLabel"></div>
+    </div>
+  </div>
+  <div class="canvas-wrap">
+    <canvas id="cv"></canvas>
+  </div>
+  <div class="src-bar" id="srcBar"></div>
+</div>
+
+<script src="../demo/data_s02.js"></script>
+<script src="../demo/data_batch4.js"></script>
+<script src="../demo/data_batch5.js"></script>
+<script src="../demo/data_inv.js"></script>
+<script src="../a23_charts_tex.js"></script><script src="../a23_charts.js"></script>
+<script src="../a23_charts_inv.js"></script>
+<script src="../a23_charts_stanford.js"></script>
+<script src="../a23_charts_quant.js"></script>
+<script src="../a23_charts_swarm.js"></script>
+<script src="../a23_charts_loop.js"></script>
+<script src="../a23_charts_reader.js"></script>
+<script src="../a23_charts_orb.js"></script>
+<script src="../a23_charts_studio.js"></script>
+<script src="../a23_charts_monolith.js"></script>
+<script src="../a23_charts_hud.js"></script>
+<script src="../../../geo/tw_towns_2021_rings.js"></script>
+<script src="../gallery/chart_registry.js"></script>
+<script>
+(function () {
+  var qs = new URLSearchParams(location.search);
+  var chartKey = qs.get("chart") || "barRace";
+  var w = Math.max(100, parseInt(qs.get("w") || "360", 10));
+  var h = Math.max(100, parseInt(qs.get("h") || "640", 10));
+  var fps = Math.max(1, parseFloat(qs.get("fps") || "30"));
+  var sec = Math.max(0.1, parseFloat(qs.get("sec") || "20"));
+  var total = Math.max(1, Math.round(fps * sec));
+
+  var root = document.getElementById("root");
+  root.style.width = w + "px";
+  root.style.height = h + "px";
+
+  var R = window.A23_REGISTRY;
+  var id = R.BY_KEY[chartKey] || parseInt(chartKey, 10) || 1;
+  var builder = R.LIVE[id];
+
+  var typeName = R.T[id] || chartKey;
+  var rawSrc = (R.SRC[id] || "A23 Data Atlas").replace(/<[^>]+>/g, "");
+  var isDemo = rawSrc.indexOf("示意") >= 0;
+  if (isDemo) document.getElementById("demoBadge").style.display = "inline-block";
+
+  var zhTopic = (R.TITLE_ZH && R.TITLE_ZH[id]) || typeName;
+  document.getElementById("title").textContent = zhTopic;
+  document.getElementById("subtitle").textContent = typeName;
+
+  var cleanSrc = rawSrc.replace(/（示意）/g, "").replace(/^示意[:：]\s*/, "");
+  document.getElementById("srcBar").textContent = cleanSrc;
+
+  var cv = document.getElementById("cv");
+  var timeEl = document.getElementById("timeLabel");
+  var ctl = null;
+
+  var ready = (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () {
+    if (!builder) throw new Error("Unknown chart: " + chartKey);
+    var SANKEY_ZH = { campus: "校園", cbd: "商業核心", commercial: "商圈", hub: "轉運", residential: "住宅" };
+    ctl = builder(cv, {
+      labels: true,
+      labelBg: true,
+      rightPad: 165,
+      labelWrap: true,
+      labelFit: true,
+      labelMap: function (k) {
+        return String(k).replace(/\b(campus|cbd|commercial|hub|residential)\b/g, function (m) { return SANKEY_ZH[m] || m; });
+      },
+      onTick: function (t, n, label) {
+        if (label) timeEl.textContent = label;
+        else timeEl.textContent = Math.round(t + 1) + " / " + n;
+      }
+    });
+    if (ctl && typeof ctl.stop === "function") ctl.stop();
+    if (ctl && typeof ctl.seek === "function") ctl.seek(0);
+  });
+
+  window.__a23 = {
+    ready: ready,
+    total: total,
+    frame: function (i) {
+      if (!ctl) return;
+      var n = ctl.n || 1;
+      var t = (total <= 1 || n <= 1) ? 0 : (i / (total - 1)) * (n - 1);
+      ctl.seek(t);
+    }
+  };
+})();
+</script>
+</body>
+</html>

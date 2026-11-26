@@ -1,21 +1,21 @@
 // Auto-generated Zero-CORS Feed
 window.A23_FEED = {
-  "captured_at": "2026-11-26 17:00:44",
+  "captured_at": "2026-11-26 18:00:42",
   "date_key": "20261126",
   "source_mode": "live",
-  "total_articles": 288,
+  "total_articles": 280,
   "update_interval_min": 30,
   "region_counts": {
-    "tw": 121,
-    "tech": 56,
+    "tw": 114,
+    "tech": 55,
     "intl": 111
   },
   "zh_stats": {
-    "orig": 51,
+    "orig": 50,
     "cache": 8,
     "ollama": 0,
-    "cut": 69,
-    "none": 160,
+    "cut": 64,
+    "none": 158,
     "model": null
   },
   "sources": [
@@ -23,7 +23,6 @@ window.A23_FEED = {
     "Bloomberg",
     "CNBC",
     "GitHub",
-    "Google新聞",
     "HackerNews",
     "HuggingFace",
     "MarketWatch",
@@ -257,8 +256,140 @@ window.A23_FEED = {
   ],
   "articles": [
     {
+      "ts": "2026-11-26T09:11:34+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "渢妙二號目標明年6月底完成千億融資　攜手東元拚2030年併網",
+      "url": "https://www.cna.com.tw/news/afe/202611260214.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "渢妙二號目標明年6月底完成千億融資　攜手東元拚2…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:09:28+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "財部：無人繼承遺產　前10月賸餘現金繳庫逾1.1億元",
+      "url": "https://www.cna.com.tw/news/afe/202611260211.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "財部：無人繼承遺產　前10月賸餘現金繳庫逾1.1…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:06:21+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "傳美光暫緩在台兆元投資　經長盼勞資協商解決、由企業說明",
+      "url": "https://www.cna.com.tw/news/afe/202611260208.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "傳美光暫緩在台兆元投資　經長盼勞資協商解決、由企…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:03:15+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "信驊擬買回100張庫藏股　維護公司信用及股東權益",
+      "url": "https://www.cna.com.tw/news/afe/202611260205.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "信驊擬買回100張庫藏股　維護公司信用及股東權益",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T08:58:13+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "馬斯克宣布送SpaceX股票　美國每名孩童有望獲2股",
+      "url": "https://www.cna.com.tw/news/aopl/202611260204.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "馬斯克宣布送SpaceX股票　美國每名孩童有望獲…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T08:53:04+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "伊雲谷旗下雲爍數位科技成立　搶攻企業數位轉型商機",
+      "url": "https://www.cna.com.tw/news/afe/202611260200.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "伊雲谷旗下雲爍數位科技成立　搶攻企業數位轉型商機",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T08:48:58+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "美擬加徵301關稅  中國商務部：嚴重破壞國際經濟秩序",
+      "url": "https://www.cna.com.tw/news/acn/202611260197.aspx",
+      "cluster_id": 4,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "美擬加徵301關稅  中國商務部：嚴重破壞國際經…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T08:36:49+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "美301調查台灣獲15%不疊加　經長：達到FTA效果",
+      "url": "https://www.cna.com.tw/news/afe/202611260193.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "美301調查台灣獲15%不疊加　經長：達到FTA…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T08:34:47+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "美提關稅上限18%　泰國：符合預期盼爭取降低",
+      "url": "https://www.cna.com.tw/news/afe/202611260192.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "美提關稅上限18%　泰國：符合預期盼爭取降低",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T08:16:38+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "神達：美301調查影響輕微　明年成長毫無懸念",
+      "url": "https://www.cna.com.tw/news/afe/202611260188.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "神達：美301調查影響輕微　明年成長毫無懸念",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T08:07:32+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "新台幣強升1.79角　收32.947元",
+      "url": "https://www.cna.com.tw/news/afe/202611260185.aspx",
+      "cluster_id": 3,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "新台幣強升1.79角　收32.947元",
+      "zh_by": "orig"
+    },
+    {
       "ts": "2026-11-26T07:57:23+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "盧超群：AI是第4次革命　籲台灣創建主權AI",
       "url": "https://www.cna.com.tw/news/afe/202611260181.aspx",
@@ -270,7 +401,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:16:57+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "三大法人賣超台股132.65億元",
       "url": "https://www.cna.com.tw/news/afe/202611260169.aspx",
@@ -282,7 +413,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:14:55+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "新光三越百貨週年慶壓軸登場　看旺買氣至農曆年",
       "url": "https://www.cna.com.tw/news/afe/202611260168.aspx",
@@ -294,7 +425,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:58:35+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "AI、半導體類股強彈　日股收漲",
       "url": "https://www.cna.com.tw/news/afe/202611260159.aspx",
@@ -306,7 +437,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:57:33+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "路易莎難扛人力成本　黃銘賢：明年評估調漲3%到5%",
       "url": "https://www.cna.com.tw/news/afe/202611260158.aspx",
@@ -318,7 +449,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:54:29+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "一銀攜手VASP業者　點數經濟跨足美元穩定幣",
       "url": "https://www.cna.com.tw/news/afe/202611260156.aspx",
@@ -330,7 +461,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:40:22+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "美擬對14經濟體加徵新關稅　主要貿易夥伴紛表不滿",
       "url": "https://www.cna.com.tw/news/aopl/202611260153.aspx",
@@ -342,7 +473,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:27:13+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "和泰車日本辦公室啟用　攜手日野經銷商攻商用車商機",
       "url": "https://www.cna.com.tw/news/afe/202611260149.aspx",
@@ -354,7 +485,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:13:03+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "台股收漲956點站回39000點　法人：短線年線震盪",
       "url": "https://www.cna.com.tw/news/afe/202611260144.aspx",
@@ -365,140 +496,56 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T05:54:49+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:34:04+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
-      "title": "12月台股期指漲1332點",
-      "url": "https://www.cna.com.tw/news/afe/202611260138.aspx",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "12月台股期指漲1332點",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:53:47+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "12月電子期金融期齊漲",
-      "url": "https://www.cna.com.tw/news/afe/202611260137.aspx",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "12月電子期金融期齊漲",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:52:45+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "台股上漲956點收39151點　PCB散熱族群反彈",
-      "url": "https://www.cna.com.tw/news/afe/202611260136.aspx",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "台股上漲956點收39151點　PCB散熱族群反彈",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:45:39+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "台股漲956.38點",
-      "url": "https://www.cna.com.tw/news/afe/202611260133.aspx",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T05:35:32+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "美擬加徵新關稅　日稱「令人遺憾」否認產能過剩",
-      "url": "https://www.cna.com.tw/news/aopl/202611260130.aspx",
+      "title": "2027年橫濱國際園藝博覽會　隈研吾打造主題館搶先曝光",
+      "url": "https://www.cna.com.tw/news/aopl/202611260206.aspx",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "美擬加徵新關稅　日稱「令人遺憾」否認產能過剩",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:33:24+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "和泰車物流轉型　斥資10億打造楊梅智慧物流新倉",
-      "url": "https://www.cna.com.tw/news/afe/202611260127.aspx",
-      "cluster_id": 0,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "和泰車物流轉型　斥資10億打造楊梅智慧物流新倉",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:27:17+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "調查：歐洲半數工企陷財務壓力　370萬職位恐不保",
-      "url": "https://www.cna.com.tw/news/aopl/202611260124.aspx",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "調查：歐洲半數工企陷財務壓力　370萬職位恐不保",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:20:13+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "穎崴：AI需求續強明年業績訂單看增　產能擴充供不應求",
-      "url": "https://www.cna.com.tw/news/afe/202611260122.aspx",
-      "cluster_id": 0,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "穎崴：AI需求續強明年業績訂單看增　產能擴充供不…",
+      "title_zh": "2027年橫濱國際園藝博覽會　隈研吾打造主題館搶…",
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T05:05:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:34:04+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
-      "title": "泰柬衝突波及零售　柬埔寨7-Eleven門市12/25全關",
-      "url": "https://www.cna.com.tw/news/aopl/202611260116.aspx",
+      "title": "陳吉寧落馬　陸委會：不特別評論但保持高度關注",
+      "url": "https://www.cna.com.tw/news/acn/202611260213.aspx",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "泰柬衝突波及零售　柬埔寨7-Eleven門市12…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T04:37:44+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "韓國央行升息至2年高點　AI出口帶動上修經濟預測",
-      "url": "https://www.cna.com.tw/news/aopl/202611260109.aspx",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "韓國央行升息至2年高點　AI出口帶動上修經濟預測",
+      "title_zh": "陳吉寧落馬　陸委會：不特別評論但保持高度關注",
       "zh_by": "orig"
     },
     {
-      "ts": "2026-11-26T04:30:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:34:04+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
-      "title": "TEL擴大南台灣布局　高雄新辦公室明年啟用",
-      "url": "https://www.cna.com.tw/news/afe/202611260104.aspx",
+      "title": "地方選舉將至  梁文傑：中共對台網路侵擾每天達258萬次",
+      "url": "https://www.cna.com.tw/news/acn/202611260228.aspx",
+      "cluster_id": 4,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "地方選舉將至  梁文傑：中共對台網路侵擾每天達2…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:04:04+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "泰國曼谷油庫爆炸濃煙竄天　當局籲居民撤離[影]",
+      "url": "https://www.cna.com.tw/news/aopl/202611260195.aspx",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "TEL擴大南台灣布局　高雄新辦公室明年啟用",
+      "title_zh": "泰國曼谷油庫爆炸濃煙竄天　當局籲居民撤離[影]",
       "zh_by": "orig"
     },
     {
       "ts": "2026-11-26T08:04:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "新加坡日本深化防務合作  聚焦海上安全重申區域穩定重要",
       "url": "https://www.cna.com.tw/news/aopl/202611260173.aspx",
@@ -510,7 +557,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:04:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "澳洲弗林德島野火燒毀民宅　野生動物逃竄",
       "url": "https://www.cna.com.tw/news/aopl/202611260178.aspx",
@@ -522,7 +569,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:04:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "陳吉寧落馬  沈有忠：中共21大人事布局未明料仍有震動",
       "url": "https://www.cna.com.tw/news/acn/202611260179.aspx",
@@ -534,7 +581,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:34:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "香港宏福苑大火一週年　災民在不甘不忿不捨中帶著傷痛前行",
       "url": "https://www.cna.com.tw/news/acn/202611260097.aspx",
@@ -546,7 +593,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:34:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "美智庫學者：北京強化美中關係　防範川普卸任後對中鷹派反撲",
       "url": "https://www.cna.com.tw/news/acn/202611260160.aspx",
@@ -558,7 +605,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:04:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "川普會晤北約秘書長　籲俄勿擴大烏克蘭戰爭",
       "url": "https://www.cna.com.tw/news/aopl/202611260148.aspx",
@@ -570,7 +617,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:34:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "國際法院裁定緬甸犯種族滅絕　敏昂萊：不遵從不適當要求",
       "url": "https://www.cna.com.tw/news/aopl/202611260140.aspx",
@@ -582,7 +629,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:34:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "阿根廷學童以歌聲訴農藥憂慮　紀錄片喚起環境關注",
       "url": "https://www.cna.com.tw/news/aopl/202611260143.aspx",
@@ -594,7 +641,19 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:04:03+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "調查：歐洲半數工企陷財務壓力　370萬職位恐不保",
+      "url": "https://www.cna.com.tw/news/aopl/202611260124.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "調查：歐洲半數工企陷財務壓力　370萬職位恐不保",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T06:04:03+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "歐盟中國制裁企業「一換一」 艾司摩爾供應商有望解除管制",
       "url": "https://www.cna.com.tw/news/acn/202611260126.aspx",
@@ -606,7 +665,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:04:03+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "新加坡對美301關稅20%表達失望　強調將續接洽美方",
       "url": "https://www.cna.com.tw/news/aopl/202611260128.aspx",
@@ -617,8 +676,32 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
+      "ts": "2026-11-26T06:04:03+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "美擬加徵新關稅　日稱「令人遺憾」否認產能過剩",
+      "url": "https://www.cna.com.tw/news/aopl/202611260130.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "美擬加徵新關稅　日稱「令人遺憾」否認產能過剩",
+      "zh_by": "orig"
+    },
+    {
       "ts": "2026-11-26T05:34:03+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "中央社",
+      "title": "泰柬衝突波及零售　柬埔寨7-Eleven門市12/25全關",
+      "url": "https://www.cna.com.tw/news/aopl/202611260116.aspx",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "泰柬衝突波及零售　柬埔寨7-Eleven門市12…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T05:34:03+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "2艘中國海警船接近日漁船　日方指違反國際法",
       "url": "https://www.cna.com.tw/news/aopl/202611260121.aspx",
@@ -630,7 +713,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T05:04:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "埃及油罐車撞車爆炸引發大火　至少31死、21傷",
       "url": "https://www.cna.com.tw/news/aopl/202611260105.aspx",
@@ -641,44 +724,8 @@ window.A23_FEED = {
       "zh_by": "orig"
     },
     {
-      "ts": "2026-11-26T04:34:03+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "邁阿密機場貨機雨中衝出跑道　感恩節疏運僅剩一跑道",
-      "url": "https://www.cna.com.tw/news/aopl/202611260087.aspx",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "邁阿密機場貨機雨中衝出跑道　感恩節疏運僅剩一跑道",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T04:04:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "美經濟持續溫和成長　聯準會褐皮書示警通膨居高不下",
-      "url": "https://www.cna.com.tw/news/aopl/202611260027.aspx",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "美經濟持續溫和成長　聯準會褐皮書示警通膨居高不下",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T04:04:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "中央社",
-      "title": "中國快時尚希音Q3營收年減5.9%　歐洲收入承壓",
-      "url": "https://www.cna.com.tw/news/acn/202611260066.aspx",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "中國快時尚希音Q3營收年減5.9%　歐洲收入承壓",
-      "zh_by": "orig"
-    },
-    {
       "ts": "2026-11-26T08:01:08+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "假追劇APP藏盜轉網銀惡意程式 避免帳戶遭入侵方法一次看",
       "url": "https://news.pts.org.tw/article/837477",
@@ -690,7 +737,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:34:46+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "新北前議員蔡明堂涉為兒賄選遭聲押 檢方查扣2715萬現金",
       "url": "https://news.pts.org.tw/article/837476",
@@ -702,7 +749,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:36:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "青年參選為何議員占比最高？從4屆地方選舉看青年參政門檻",
       "url": "https://news.pts.org.tw/article/837475",
@@ -713,8 +760,8 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T06:18:53+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:46:41+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "沈伯洋取消仁愛路選前造勢 蔣萬安：願釋出市府路權",
       "url": "https://news.pts.org.tw/article/837474",
@@ -726,7 +773,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:18:12+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "賴瑞隆宣布改「隆洋之夜」挺沈 柯志恩邀王金平、管中閔輔選",
       "url": "https://news.pts.org.tw/article/837473",
@@ -737,8 +784,8 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T06:17:38+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:22:51+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "新北選戰蘇巧慧一天車掃7區 李四川請朱立倫、侯友宜陪掃街",
       "url": "https://news.pts.org.tw/article/837472",
@@ -750,7 +797,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:16:59+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "廢核團體重申反對核電重啟 擁核團體：AI需大量用電",
       "url": "https://news.pts.org.tw/article/837471",
@@ -762,7 +809,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:16:29+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "美公布產能過剩301調查 擬對台課稅15%不疊加MFN",
       "url": "https://news.pts.org.tw/article/837469",
@@ -774,7 +821,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:15:55+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "謝宜容貪污案判刑4年6月定讞 勞動部：收受判決書後將免職",
       "url": "https://news.pts.org.tw/article/837468",
@@ -786,7 +833,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:15:23+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "國1彰化路段4車連環撞 造成3死16傷",
       "url": "https://news.pts.org.tw/article/837467",
@@ -798,7 +845,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:48:46+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "埃及油罐車翻覆爆炸起火 波及27車、釀31死21傷",
       "url": "https://news.pts.org.tw/article/837466",
@@ -810,7 +857,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:14:49+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "警追查網銀盜轉案受害者共通點 部分手機皆下載追劇App",
       "url": "https://news.pts.org.tw/article/837464",
@@ -822,7 +869,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:14:19+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "氣象署估聖嬰影響今年暖冬 不排除仍有寒流、短時強降雨",
       "url": "https://news.pts.org.tw/article/837463",
@@ -834,7 +881,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:48:17+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "家長控托育人員不當對待1歲童 雲林縣府明開會處理裁罰",
       "url": "https://news.pts.org.tw/article/837462",
@@ -846,7 +893,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:47:47+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "台南訂教師非出勤時間聯繫指引 下班後非緊急訊息不需馬上回",
       "url": "https://news.pts.org.tw/article/837461",
@@ -858,7 +905,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:47:19+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "蘇澳慶安重劃延宕8年 宜縣府：禁建半年、拚明年配地",
       "url": "https://news.pts.org.tw/article/837460",
@@ -870,7 +917,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:46:49+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "台東池上鄉調降路燈認養費 每盞每年500元、可任寫文字",
       "url": "https://news.pts.org.tw/article/837459",
@@ -882,7 +929,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:46:23+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "雲林舊元長鄉公所被評定危樓 擬拆除新建運動館",
       "url": "https://news.pts.org.tw/article/837458",
@@ -894,7 +941,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:45:56+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "花蓮美崙泳池年久失修 縣府花2億重建全民運動館",
       "url": "https://news.pts.org.tw/article/837457",
@@ -906,7 +953,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:33:18+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "公視",
       "title": "涉虛遷人頭戶籍妨害投票 高雄市議員候選人100萬元交保",
       "url": "https://news.pts.org.tw/article/837455",
@@ -918,7 +965,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:23:43+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "蔡英文晚間8時陪沈伯洋直播　預告準備小禮物",
       "url": "https://www.cna.com.tw/news/aipl/202611260190.aspx",
@@ -930,7 +977,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:01:25+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "賴總統11/28回台南　籲民眾一起返鄉投票",
       "url": "https://www.cna.com.tw/news/aipl/202611260182.aspx",
@@ -942,7 +989,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:55:21+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "吳乃仁欠台糖近1.8億　龔明鑫：已提新清償方案檢視中",
       "url": "https://www.cna.com.tw/news/aipl/202611260180.aspx",
@@ -954,7 +1001,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:46:12+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "境外拜票來電恐有詐　打詐中心：不接聽、打165",
       "url": "https://www.cna.com.tw/news/aipl/202611260176.aspx",
@@ -966,7 +1013,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:32:01+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "選前衝刺李四川百場市場掃街達陣　蘇巧慧單日衝7區",
       "url": "https://www.cna.com.tw/news/aipl/202611260171.aspx",
@@ -978,7 +1025,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:25:59+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "立委指托嬰中心疑爆不當對待　雲林社會處：已啟動調查",
       "url": "https://www.cna.com.tw/news/aipl/202611260170.aspx",
@@ -990,7 +1037,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:04:46+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "柯志恩成立律師顧問團　防範選前奧步與開票爭議",
       "url": "https://www.cna.com.tw/news/aipl/202611260164.aspx",
@@ -1002,7 +1049,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:59:39+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "陳其邁陪賴瑞隆車掃　象徵高雄市政「一棒接一棒」",
       "url": "https://www.cna.com.tw/news/aipl/202611260161.aspx",
@@ -1014,7 +1061,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:56:31+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "藍指涉猥褻女童犯假釋關說　蘇巧慧：從未關心、勿抹黑",
       "url": "https://www.cna.com.tw/news/aipl/202611260157.aspx",
@@ -1026,7 +1073,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:18:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "徐欣瑩絕食送醫未恢復　鄭麗文楊文科代掃街拜票",
       "url": "https://www.cna.com.tw/news/aipl/202611260146.aspx",
@@ -1038,7 +1085,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T05:44:37+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "民眾黨：因應投開票日可能狀況　成立選務聯防小組",
       "url": "https://www.cna.com.tw/news/aipl/202611260132.aspx",
@@ -1050,7 +1097,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T05:16:08+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "特指部下士澎湖操練受傷　家屬：無疑慮盼勿揣測",
       "url": "https://www.cna.com.tw/news/aipl/202611260120.aspx",
@@ -1062,7 +1109,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T04:35:40+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "運動部擴大全民運動建設經費　新增多種運動場館",
       "url": "https://www.cna.com.tw/news/aipl/202611260107.aspx",
@@ -1074,7 +1121,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T04:28:31+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "陳明祺訪加拿大：中國電動車涉國安　民主陣營應警覺",
       "url": "https://www.cna.com.tw/news/aipl/202611260103.aspx",
@@ -1086,7 +1133,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T04:26:29+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "中央社",
       "title": "115年地方特考、離島特考12/5登場　增649需用名額",
       "url": "https://www.cna.com.tw/news/aipl/202611260102.aspx",
@@ -1097,8 +1144,200 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
+      "ts": "2026-11-26T09:48:35+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "選前2天火力全開！王惠美發短影音幫魏平政拉票  明合體全彰化車掃",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654499",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "選前2天火力全開！王惠美發短影音幫魏平政拉票  …",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:47:58+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "被點名卡沈伯洋北平東路場地 藍營候選人林杏兒喊告",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654512",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "被點名卡沈伯洋北平東路場地 藍營候選人林杏兒喊告",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T09:44:12+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "民眾黨候選人涉反滲透法 梁文傑：「政黨要有態度」開除黨籍",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654506",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "民眾黨候選人涉反滲透法 梁文傑：「政黨要有態度」…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:37:19+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "車掃秒認夏莉絲家長！沈伯洋暖喊「這句」  網感動：他真的放心上",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654399",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "車掃秒認夏莉絲家長！沈伯洋暖喊「這句」  網感動…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:36:32+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "雙城論壇改「首都對首都」？梁文傑：不要把重要性看得太高",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654488",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "雙城論壇改「首都對首都」？梁文傑：不要把重要性看…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:34:42+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "自由說新聞》投藍是為了練習原諒？脫口秀「酸爆蔣」點閱狂飆全網瘋傳",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654498",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "自由說新聞》投藍是為了練習原諒？脫口秀「酸爆蔣」…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:31:20+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "寶實們有收到嗎？ 蔡英文、沈伯洋LINE預告今夜直播有驚喜",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654437",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "寶實們有收到嗎？ 蔡英文、沈伯洋LINE預告今夜…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:29:09+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "沈伯洋選前之夜無處辦取消！黃暐瀚提「2建議」：未來就不會混亂",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654425",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "沈伯洋選前之夜無處辦取消！黃暐瀚提「2建議」：未…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:27:58+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "急診遭爆耍特權還催促！郭昭巖急赴醫院道歉：只是怕司機太累",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654461",
+      "cluster_id": 6,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "急診遭爆耍特權還催促！郭昭巖急赴醫院道歉：只是怕…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:23:18+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "「代夫出征」一起被抓！台東里長席開2桌幫妻拜票 雙雙收押起訴",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654444",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "「代夫出征」一起被抓！台東里長席開2桌幫妻拜票 …",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:22:29+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "送何欣純「可頌+包子」 林楚茵：送進市府、包中",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654449",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "送何欣純「可頌+包子」 林楚茵：送進市府、包中",
+      "zh_by": "orig"
+    },
+    {
+      "ts": "2026-11-26T09:21:18+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "村里長及議員助理補助費調增溯自7/1生效  1萬1109人受惠",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654457",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "村里長及議員助理補助費調增溯自7/1生效  1萬…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:12:38+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "選前之夜被迫停辦照樣當選！陳致中分享爸爸阿扁經歷鼓勵沈伯洋",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654171",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "選前之夜被迫停辦照樣當選！陳致中分享爸爸阿扁經歷…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:09:57+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "中國對台資安攻擊每天258萬次 梁文傑：希望開票系統保持正常運作",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654439",
+      "cluster_id": 4,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "中國對台資安攻擊每天258萬次 梁文傑：希望開票…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T09:07:21+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "明晚踩街嘉年華 周春米：屏東選前之夜也是沈伯洋選前之夜",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654438",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "明晚踩街嘉年華 周春米：屏東選前之夜也是沈伯洋選…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T08:56:36+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "自由時報",
+      "title": "吳中源推「甲安埔八大政見」 聚焦捷運延伸與設青年發展",
+      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654427",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "吳中源推「甲安埔八大政見」 聚焦捷運延伸與設青年…",
+      "zh_by": "cut"
+    },
+    {
       "ts": "2026-11-26T08:51:37+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "自由時報",
       "title": "花蓮市「藍白合」再傳破局？ 蔣萬安拍片支持  魏嘉彥說話了",
       "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654238",
@@ -1110,7 +1349,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:49:49+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "自由時報",
       "title": "陳吉寧落馬  沈有忠：中共21大前仍會有人事震動",
       "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654353",
@@ -1122,7 +1361,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:49:42+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "自由時報",
       "title": "酸沈伯洋拿索羅斯補助法院認證 傅崐萁：法律人卻沒有法律基本常識",
       "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654407",
@@ -1134,7 +1373,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:49:01+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "自由時報",
       "title": "沈伯洋選前之夜取消不孤單 林楚茵：全台候選人晚會都是他的晚會",
       "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654381",
@@ -1145,200 +1384,104 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T08:44:32+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "放寬讓中國女間諜來台？梁文傑：新加坡已禁止黃樂入境",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654405",
-      "cluster_id": 4,
+      "ts": "2026-11-26T09:21:59+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "李安妮專訪》沈伯洋選前之夜取消讓她氣憤　今早帶著洋流圍巾、5本書現身車掃打氣",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073925",
+      "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "放寬讓中國女間諜來台？梁文傑：新加坡已禁止黃樂入境",
+      "title_zh": "李安妮專訪》沈伯洋選前之夜取消讓她氣憤　今早帶著…",
+      "zh_by": "cut"
+    },
+    {
+      "ts": "2026-11-26T08:52:02+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "車掃中支持者遭追打    蘇清泉競總譴責暴力行為",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073917",
+      "cluster_id": 7,
+      "region": "tw",
+      "paywall": null,
+      "title_zh": "車掃中支持者遭追打    蘇清泉競總譴責暴力行為",
       "zh_by": "orig"
     },
     {
-      "ts": "2026-11-26T08:44:17+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "網瘋傳台中缺「監票人力」 台中市選委會澄清：不實傳言",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654413",
+      "ts": "2026-11-26T08:51:30+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "調增村里長及議員助理補助費溯自7/1生效　明年再調增4％",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073916",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "網瘋傳台中缺「監票人力」 台中市選委會澄清：不實…",
+      "title_zh": "調增村里長及議員助理補助費溯自7/1生效　明年再…",
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T08:39:46+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "蔣萬安質疑封路4天太久 沈伯洋：可能彩排、安全對對手比較不重要",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654377",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "蔣萬安質疑封路4天太久 沈伯洋：可能彩排、安全對…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:39:16+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "沈伯洋取消選前之夜！陳水扁曬船員證：會當選不需要靠晚會證明",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654378",
+      "ts": "2026-11-26T08:51:19+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "不滿媒體影射自肥　前高市農業局長按鈴申告捍衛清白",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073909",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "沈伯洋取消選前之夜！陳水扁曬船員證：會當選不需要…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:36:52+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "沈伯洋選前之夜被迫喊卡！作家驚曝將見「三骨牌效應」：講完了",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654330",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "沈伯洋選前之夜被迫喊卡！作家驚曝將見「三骨牌效應…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:35:28+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "選前之夜熱門場地被秒搶下  新工處： 與往年無差異",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654376",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "選前之夜熱門場地被秒搶下  新工處： 與往年無差異",
+      "title_zh": "不滿媒體影射自肥　前高市農業局長按鈴申告捍衛清白",
       "zh_by": "orig"
     },
     {
-      "ts": "2026-11-26T08:32:27+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "吳思瑤稱封路天數尊重市府 蔣萬安：沈陣營的規劃市府敢不同意？",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654369",
+      "ts": "2026-11-26T08:50:15+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "選前屏東民進黨員頻傳違反黨紀     徐富癸呼籲自律團結勝選",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073900",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "吳思瑤稱封路天數尊重市府 蔣萬安：沈陣營的規劃市…",
+      "title_zh": "選前屏東民進黨員頻傳違反黨紀     徐富癸呼籲…",
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T08:31:55+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "蔣萬安團隊手速嚇壞ibon發明人！ 網酸爆：蔣bon&gt;ibon",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654365",
+      "ts": "2026-11-26T08:46:58+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "沈伯洋市民之夜改線上 潘孟安憶2024大選北平東路也被借走：實在荒謬",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073918",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "蔣萬安團隊手速嚇壞ibon發明人！ 網酸爆：蔣b…",
+      "title_zh": "沈伯洋市民之夜改線上 潘孟安憶2024大選北平東…",
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T08:31:15+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "百人暖心拍片挺林國漳 選前之夜徒步催票時間曝光",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654375",
+      "ts": "2026-11-26T08:45:06+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "內湖南港車掃遇民眾倒地　蔣萬安、韓國瑜下車關心",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073913",
       "cluster_id": 7,
       "region": "tw",
       "paywall": null,
-      "title_zh": "百人暖心拍片挺林國漳 選前之夜徒步催票時間曝光",
+      "title_zh": "內湖南港車掃遇民眾倒地　蔣萬安、韓國瑜下車關心",
       "zh_by": "orig"
     },
     {
-      "ts": "2026-11-26T08:30:29+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "全家總動員買票！嘉市議員支持者父子3人涉賄 2人收押",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654230",
-      "cluster_id": 7,
+      "ts": "2026-11-26T08:31:56+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Newtalk",
+      "title": "傅崐萁夫婦急開記者會 控光電黑金大舉入侵花蓮",
+      "url": "https://newtalk.tw/news/view/2026-11-26/1073914",
+      "cluster_id": 5,
       "region": "tw",
       "paywall": null,
-      "title_zh": "全家總動員買票！嘉市議員支持者父子3人涉賄 2人…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:28:52+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "共諜「標會」躲查緝！賄款轉會錢滲透海巡未遂 海軍退伍中士判6年",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654351",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "共諜「標會」躲查緝！賄款轉會錢滲透海巡未遂 海軍…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:27:59+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "呂孫綾、王義川力挺曾聖凱  攜手中央延續竹北市政建設",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654361",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "呂孫綾、王義川力挺曾聖凱  攜手中央延續竹北市政…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:26:49+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "「前老闆」板橋輔選鄧凱勛 許宇甄肯定：歷練豐富議會即戰力",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654343",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "「前老闆」板橋輔選鄧凱勛 許宇甄肯定：歷練豐富議…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:24:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "虎尾車掃！劉建國拋醫療產業園區政見 承諾當選第1年交成績單",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654379",
-      "cluster_id": 6,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "虎尾車掃！劉建國拋醫療產業園區政見 承諾當選第1…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:23:51+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "蔡易餘合體活力團隊鄉鎮市長候選人催票 邀明晚朴子、民雄踩街",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654355",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "蔡易餘合體活力團隊鄉鎮市長候選人催票 邀明晚朴子…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T08:17:02+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "自由時報",
-      "title": "王美惠車掃催票   選前之夜號召支持者中央噴水圓環集結",
-      "url": "https://news.ltn.com.tw/news/politics/breakingnews/5654364",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "王美惠車掃催票   選前之夜號召支持者中央噴水圓…",
-      "zh_by": "cut"
+      "title_zh": "傅崐萁夫婦急開記者會 控光電黑金大舉入侵花蓮",
+      "zh_by": "orig"
     },
     {
       "ts": "2026-11-26T08:15:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "要沈伯洋面對法院判決 傅崐萁：境外資金要清楚交代",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073906",
@@ -1349,8 +1492,8 @@ window.A23_FEED = {
       "zh_by": "orig"
     },
     {
-      "ts": "2026-11-26T08:11:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T08:38:22+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "直擊》小水滴都被激出來了！沈伯洋：謝謝大家體諒、28日投下重要一票",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073905",
@@ -1362,7 +1505,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:00:28+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "守護民主聖火！    柯志恩組律師團備戰選前奧步與開票爭議",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073901",
@@ -1374,7 +1517,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:53:02+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "選前猛打水庫光電 謝龍介按鈴告發台南市府、經濟部、綠能公司",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073902",
@@ -1386,7 +1529,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:34:53+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "稱封路是沈陣營規劃「市府敢不同意？」　蔣萬安被問北平東路誰借走：還在了解",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073892",
@@ -1397,8 +1540,8 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T07:33:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T08:34:57+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "現場直擊》「沒市民之夜還有勝選之夜！」 沈伯洋中山大同車掃沿路人潮塞爆",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073879",
@@ -1410,7 +1553,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:26:40+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "蔣萬安質疑封路四天比較少見 沈伯洋：可能彩排跟安全對蔣還好",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073895",
@@ -1422,7 +1565,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:25:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "賴瑞隆宣布辦隆洋之夜 藍委也感動：上次成背板NPC仍送暖",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073896",
@@ -1434,7 +1577,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:56:09+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "去投票、一定贏！蘇巧慧連衝7行政區 預告明日與陳其邁板橋車掃",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073881",
@@ -1446,7 +1589,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:41:54+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "拆除舞台影片曝光！吳思瑤、幕僚痛哭 沈伯洋：擋在路上的最後變成路",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073880",
@@ -1458,7 +1601,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:29:21+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "蔣萬安陣營「路權黃牛」之亂延燒！杜奕瑾舉一例：市政府明知違規行為存在卻不處置",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073859",
@@ -1470,7 +1613,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:15:17+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Newtalk",
       "title": "美再祭301調查 許宇甄：台產業政策還要考慮美國是否滿意？",
       "url": "https://newtalk.tw/news/view/2026-11-26/1073874",
@@ -1481,236 +1624,8 @@ window.A23_FEED = {
       "zh_by": "cut"
     },
     {
-      "ts": "2026-11-26T06:51:32+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "直播》倒數2天！ 沈伯洋下午士林、北投台北大車掃",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073776",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "直播》倒數2天！ 沈伯洋下午士林、北投台北大車掃",
-      "zh_by": "orig"
-    },
-    {
-      "ts": "2026-11-26T05:45:19+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "揭何欣純夫股市成交金破8.3億 國民黨提疑點：防火牆設在哪？",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073867",
-      "cluster_id": 3,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "揭何欣純夫股市成交金破8.3億 國民黨提疑點：防…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T05:28:31+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "沈伯洋不辦選前之夜「39分鐘決策」曝光！石明謹揭蔣萬安陣營陷阱卡",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073865",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "沈伯洋不辦選前之夜「39分鐘決策」曝光！石明謹揭…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T04:57:23+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "九合一選舉將至  卓揆提醒：資安攻擊預期仍會持續發生",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073860",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "九合一選舉將至  卓揆提醒：資安攻擊預期仍會持續…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T04:27:14+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "公投倒數兩日！廢核平台集結凱道籲人民出門投「不同意」",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073841",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "公投倒數兩日！廢核平台集結凱道籲人民出門投「不同…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T04:26:17+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "緊盯蘇巧慧涉關說性侵假釋犯 國民黨團：蘇跟矯正署到底誰說謊",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073855",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "緊盯蘇巧慧涉關說性侵假釋犯 國民黨團：蘇跟矯正署…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T04:25:45+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "談台大校長遴選案力挺柯志恩　管中閔 ：她為正義挺身而出",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073835",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "談台大校長遴選案力挺柯志恩　管中閔 ：她為正義挺…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T04:20:38+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Newtalk",
-      "title": "手拿洋流海報驚喜現身！李安妮與沈伯洋握手喊：太棒了、加油",
-      "url": "https://newtalk.tw/news/view/2026-11-26/1073850",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "手拿洋流海報驚喜現身！李安妮與沈伯洋握手喊：太棒…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T05:26:01+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "整理包／九合一選舉藍白合作地圖：5縣市共推人選開票結果受矚目| 百里侯選戰焦點| 要聞",
-      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE4ySnBuUEQtSndpNDVjX2hwOHBrb25ELWc1N3IzaVZTMzRZTUlIQXlrdWVtOV90Ykx6aXBQblp3VVU5MkFtaDJaVTJGUjdoQUE5aGtz?oc=5",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "整理包／九合一選舉藍白合作地圖：5縣市共推人選開…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-25T12:00:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "聚焦台海 - 台灣九合一大選｜台北市長候選人沈伯洋掀起的「洋流」效應是否有助綠營翻轉既有版圖？",
-      "url": "https://news.google.com/rss/articles/CBMi5wRBVV95cUxNaGpQQ2l2YVJDM1lXQ1hTQjQ1MDFfRTE2b0RKLXVYZHZjWUxqOUxFbEJtYk5yR09VMy1pM2o5b0JzOHpwR2JzOVo3bDZRaGRBN0Y5dHZ0Q3FXWEJYT0hJeVRKRU54eFF6T2pyc0JYZUUtYnVoemFnQTR2MklfbjIzWXpEU1Z4TjBqUU5mZWFaZTJhaGhnUWxMei1vbWxadUliaG1VZ01jZmlZTHVfamlLdFVhYjVJeUw2Tnh4UXdheExxUXFUaHNLckNGQmprTG05ZmtoQlBzN2tGYjNKd3NydWdVaG1DelVTcW5mUTY4Z2I5SGdOR281YXAtUWhFVFJiT1ZfeVY0ZDM3SWRGdC13a2phdnA3ejM4SzZoQU1WQkNMcjcwVlI5cElOV0xOV0p2N3RhYllGTjl6RG96dENmQkdBMTEtQ0JHRmlHTG45VmNqcDhqN0owZ04tUV9abFJ1MFctZE0tc1MxR0QyVWt5VFFydFF0LTdxS3Jaa2huc1RvQjloY3BLTV9TcnEyeWUxMjN5NTdGaV9xbFlXOUgza0FSUmlybGhXZGFJWUdpdWVfWjh1UXRCcXhLTlh0OElqUWRqbHhXQnFKTk1sUDJGZVV3c3BvVUVkUmdCM2hqRlctRTZVNUE3NzdpTzFyOG5IMDNfUVh5bDlnZjRjM2p3QTQyMUg2Xy1wSE1HXzV2aXhIMUhhRE1ON1VydEJIS3FYYVhGUG55eGlWa05ENV9kNjVVZ25wM1ZxNVh6ZXd0cHNNd2VqODZKUW8tYWc3RGFoRXRMd0FXV25XZmRfTUNJSXo4R3g4UTg?oc=5",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "聚焦台海 - 台灣九合一大選｜台北市長候選人沈伯…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-25T10:33:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "九合一大選誰最愛投票？ 偏鄉投票率屢超全國平均、返鄉不是阻力？",
-      "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE9mWVY4ZjNfN1FBZ2VlSm1VT1ZKQUZNSVAxaVlyMXBXT1A2QmliUXNqNUdlR1FPZDBhclNWakVXZXg2c3JGUVBidjlFS0VYbW8?oc=5",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "九合一大選誰最愛投票？ 偏鄉投票率屢超全國平均、…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-24T12:12:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "中選會公告 6都、縣市長選舉人數1957萬6028人",
-      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9JVG5oNUp2RGpQUzRNM19Kd3ZPLUcyWE5WYjhDS2R1MV8tREFESXNUZE93U1FZNGlnaEtNaEl3WjVQNFF2Sjl2Ty0xaUR3WUhJSFRQZXJwaUg?oc=5",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "中選會公告 6都、縣市長選舉人數1957萬602…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T07:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "1128九合一選舉開票鎖定《聯合新聞網》！ AI查詢戰況、即時開票數據一站掌握",
-      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9WS0V1U0dpc3IyNE1OeU5SQWpMam51b1ZSVnFFT04ycFZMMFM2cER5V1p1SHdsUjdaMzgwVVdfTjlSb21nMlUxTjlGLUpjRHVOZE1F0gFYQVVfeXFMTkNPUUxoYlJvLUlYd083bk5LWEdSRHJNWDlXVGNjbTdTNG96QVNwaS1VRnJXRGJIWkUzQ0tUY21WaUdSZjI3QmN5Z2hGRktYdG16U2RiRENtSw?oc=5",
-      "cluster_id": 0,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "1128九合一選舉開票鎖定《聯合新聞網》！ AI…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-25T07:15:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "縣市長選舉人數確定1957萬6028人 11/28投票所開放查詢",
-      "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFAyeGY2X3ZEQjlPX1ZWTjFvNXJBbnktbXQ0S0NBdDl1d0hWZjNtU29ydWRGcjFESy1Rck5WeTh0dUNZeXFlMGxJOUFzOVRCc0JFN0E?oc=5",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "縣市長選舉人數確定1957萬6028人 11/2…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-24T09:55:18+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "11/28九合一、公投選舉人數出爐！1957萬人可投縣市長 新北343萬最多",
-      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9iZlNISHR2Q3JnejNEX1lBcEFCSzhWVjlmUWh0aUZ6aUM1R0dvcFIxMG0wNEppVmRwY3lZSVBWeU1EQjJxVlF0eDlIdnU1TjJkTzNV?oc=5",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "11/28九合一、公投選舉人數出爐！1957萬人…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-26T01:01:56+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "藍營嘉義首次無縣市長候選人催票鄭麗文黃國昌晚間合體張啓楷| 2026九合一選舉",
-      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE51OGFPdjFFMFVoVWU2ZEoxU2VrcVlRTmQzMWdmd2RVV1VwWGRISGY5dll3S1BQYlNIa3d3V3lNY1NBVXRsVjNKQ1JCY1ZIYVUwS3pVNGp5bGw?oc=5",
-      "cluster_id": 4,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "藍營嘉義首次無縣市長候選人催票鄭麗文黃國昌晚間合…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-25T07:00:10+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "投票筆記本／2026縣市長候選人完整名單！8位現任首長拚連任、金門7人參選最競爭",
-      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTFBVbFEwMW0wblVrU2NfWWhNaVN1ZlN5cE95Zm42eVB1cHdHSU41ZWl3VVU4UVhUT2RRYjBIQ3JlTDlZMl9EcmhUSXROczlISzhfQkxF?oc=5",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "投票筆記本／2026縣市長候選人完整名單！8位現…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-24T09:46:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "2026縣市長選民高達1957萬人 游盈隆：開票最遲不超過凌晨",
-      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE5vYk9rN2xiQW44ZnU4MDVHMzRkQ2VIbDZFSTRWajA4dEdmSW94enJ2d0NXNm13Um41VnBlckdtN3ctRXNKQ0tpUVdLaVFXcThQZ0Jn?oc=5",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "2026縣市長選民高達1957萬人 游盈隆：開票…",
-      "zh_by": "cut"
-    },
-    {
-      "ts": "2026-11-25T01:25:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Google新聞",
-      "title": "2026誰與爭鋒／逾半數百里侯任期屆滿 誰來接班？",
-      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9JZDcwV1hiWUV6cm9LMFRJd2FGVktXMkhFRXJXYXFJTmJWLUNqOXJJbVNDZ1BGN2U3Q1VKckx3RlF2NjVyQ3lXc1hkdFZtUDZZNGln?oc=5",
-      "cluster_id": 7,
-      "region": "tw",
-      "paywall": null,
-      "title_zh": "2026誰與爭鋒／逾半數百里侯任期屆滿 誰來接班？",
-      "zh_by": "orig"
-    },
-    {
       "ts": "2026-11-25T18:59:57+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Spectrum Adaptation of AI-Native Autoencoder Communications with Transfer Learning",
       "url": "http://arxiv.org/abs/2611.34942v1",
@@ -1722,7 +1637,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:59:38+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Tokenisation is not in APX",
       "url": "http://arxiv.org/abs/2611.34938v1",
@@ -1734,7 +1649,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:59:31+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Can image generation help visual reasoning? An empirical study",
       "url": "http://arxiv.org/abs/2611.34935v1",
@@ -1746,7 +1661,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:59:28+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Attack Policy Selection can Mislead Monitor Evaluators",
       "url": "http://arxiv.org/abs/2611.34934v1",
@@ -1758,7 +1673,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:59:11+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Diverse Alternative Reasoning Traces for Hard Math Problems",
       "url": "http://arxiv.org/abs/2611.34928v1",
@@ -1770,7 +1685,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:58:53+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Mixture-of-Loops Transformer",
       "url": "http://arxiv.org/abs/2611.34923v1",
@@ -1782,7 +1697,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:58:42+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "$μ$-Bench: Benchmarking Multi-User Task Completion in Shared Interaction Voice Agents",
       "url": "http://arxiv.org/abs/2611.34920v1",
@@ -1794,7 +1709,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:51:36+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Enhancing Maritime Domain Awareness using Latent Space Representations",
       "url": "http://arxiv.org/abs/2611.34899v1",
@@ -1806,7 +1721,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:45:35+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Interpretable and Accurate Hybrid Decision Trees with Selective Case-Based Splits",
       "url": "http://arxiv.org/abs/2611.34887v1",
@@ -1818,7 +1733,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:37:06+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "How Much Do Coding Agents Over-Edit, and Why? An Empirical Study of Unneeded Edits in Repository-Level Agent Patches",
       "url": "http://arxiv.org/abs/2611.34875v1",
@@ -1830,7 +1745,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:34:46+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "Shape-Aware Three-Way Merge for RDF Knowledge Graphs: The schema defines the conflict: an implementation and evaluation",
       "url": "http://arxiv.org/abs/2611.34870v1",
@@ -1842,7 +1757,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:33:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "A Survey of Security, Privacy, and Ethics of Large Language Models in Telecom",
       "url": "http://arxiv.org/abs/2611.34868v1",
@@ -1854,7 +1769,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:30:43+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "RePace: Reasoning about Demonstration Speedup for Faster Vision-Language-Action Policies",
       "url": "http://arxiv.org/abs/2611.34864v1",
@@ -1866,7 +1781,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:29:36+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "BOP-Refer: Benchmark for Monocular 3D and 2D Object Grounding",
       "url": "http://arxiv.org/abs/2611.34862v1",
@@ -1878,7 +1793,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:27:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "arXiv",
       "title": "From Prediction to Decision: Decision-Focused Fine-Tuning of Autoregressive Tabular Transformers for Cost-Sensitive Financial Events",
       "url": "http://arxiv.org/abs/2611.34858v1",
@@ -1889,8 +1804,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T08:58:27+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:31:44+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "rea: Reverse engineer anything with agents, from app behavior down to native binaries.",
       "url": "https://github.com/morluto/rea",
@@ -1902,7 +1817,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T06:57:36+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "freeCodeCamp: freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming, and computer science for ",
       "url": "https://github.com/freeCodeCamp/freeCodeCamp",
@@ -1914,7 +1829,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T16:23:45+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "free-programming-books: :books: Freely available programming books",
       "url": "https://github.com/EbookFoundation/free-programming-books",
@@ -1925,8 +1840,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T09:00:33+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:59:57+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "openclaw: The AI that really does things. Any OS. Any Platform. The lobster way. 🦞 ",
       "url": "https://github.com/openclaw/openclaw",
@@ -1937,8 +1852,8 @@ window.A23_FEED = {
       "zh_by": "cache"
     },
     {
-      "ts": "2026-11-26T08:55:58+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:39:47+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "developer-roadmap: Interactive roadmaps, guides and other educational content to help developers grow in their careers.",
       "url": "https://github.com/nilbuild/developer-roadmap",
@@ -1950,7 +1865,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:13:27+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "awesome-selfhosted: A list of Free Software network services and web applications which can be hosted on your own server",
       "url": "https://github.com/awesome-selfhosted/awesome-selfhosted",
@@ -1962,7 +1877,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T12:09:27+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "skills: Skills for Real Engineers. Straight from my .agents directory.",
       "url": "https://github.com/mattpocock/skills",
@@ -1974,7 +1889,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:47:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "GitHub",
       "title": "superpowers: An agentic skills framework & software development methodology that works.",
       "url": "https://github.com/obra/superpowers",
@@ -1986,7 +1901,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: thinkingmachines/Inkling-2-Mini",
       "url": "https://huggingface.co/thinkingmachines/Inkling-2-Mini",
@@ -1998,7 +1913,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: unsloth/Inkling-2-Mini-GGUF",
       "url": "https://huggingface.co/unsloth/Inkling-2-Mini-GGUF",
@@ -2010,7 +1925,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: inworld/voice-isolator",
       "url": "https://huggingface.co/inworld/voice-isolator",
@@ -2022,7 +1937,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: AtomicChat/Inkling-2-Mini-Uncensored-GGUF",
       "url": "https://huggingface.co/AtomicChat/Inkling-2-Mini-Uncensored-GGUF",
@@ -2034,7 +1949,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: SulphurAI/Sulphur-3",
       "url": "https://huggingface.co/SulphurAI/Sulphur-3",
@@ -2046,7 +1961,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: prism-ml/Ternary-Bonsai-2.5-27B-GGUF",
       "url": "https://huggingface.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF",
@@ -2058,7 +1973,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: Lightricks/LTX-2.5",
       "url": "https://huggingface.co/Lightricks/LTX-2.5",
@@ -2070,7 +1985,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: apple/DepthPro2",
       "url": "https://huggingface.co/apple/DepthPro2",
@@ -2082,7 +1997,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: llamaindex/OCRia-nano-1",
       "url": "https://huggingface.co/llamaindex/OCRia-nano-1",
@@ -2094,7 +2009,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: inclusionAI/Ling-3.2-air",
       "url": "https://huggingface.co/inclusionAI/Ling-3.2-air",
@@ -2106,7 +2021,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: nvidia/Nemotron-Labs-Image-30B-A3B",
       "url": "https://huggingface.co/nvidia/Nemotron-Labs-Image-30B-A3B",
@@ -2118,7 +2033,7 @@ window.A23_FEED = {
     },
     {
       "ts": null,
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HuggingFace",
       "title": "Trending Model: harness-hub/Qwen3.8-27B-pi-adapted",
       "url": "https://huggingface.co/harness-hub/Qwen3.8-27B-pi-adapted",
@@ -2129,10 +2044,10 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T07:40:04+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:59:14+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
-      "title": "New UK-EU treaty has 10-year termination clause, BBC understands",
+      "title": "New UK-EU treaty has 10-year termination clause",
       "url": "https://www.bbc.co.uk/news/articles/c98r7p65edvgo?at_medium=RSS&at_campaign=rss",
       "cluster_id": 7,
       "region": "intl",
@@ -2141,8 +2056,32 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T09:39:50+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "BBC",
+      "title": "Car finance compensation payments explained",
+      "url": "https://www.bbc.co.uk/news/articles/c2l9vvj097lo?at_medium=RSS&at_campaign=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:23:46+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "BBC",
+      "title": "UK signs £8bn deal to ensure submarines are 'warfighting ready'",
+      "url": "https://www.bbc.co.uk/news/articles/cq39gz99l1pyo?at_medium=RSS&at_campaign=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T08:24:29+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "Poundland collapses putting 11,000 jobs at risk",
       "url": "https://www.bbc.co.uk/news/articles/cm3vgdn037z4o?at_medium=RSS&at_campaign=rss",
@@ -2154,7 +2093,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T17:00:32+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "What's gone wrong at Poundland?",
       "url": "https://www.bbc.co.uk/news/articles/cm4g10p2r0g9o?at_medium=RSS&at_campaign=rss",
@@ -2165,44 +2104,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T04:10:58+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "BBC",
-      "title": "US announces new tariffs on host of countries including China",
-      "url": "https://www.bbc.co.uk/news/articles/c893r9ke5p97o?at_medium=RSS&at_campaign=rss",
-      "cluster_id": 4,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T00:07:51+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "BBC",
-      "title": "US approves SpaceX plan to send a million data satellites to space",
-      "url": "https://www.bbc.co.uk/news/articles/cwp836l8n1jgo?at_medium=RSS&at_campaign=rss",
-      "cluster_id": 4,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-25T21:43:18+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "BBC",
-      "title": "US stocks fall further as fears over AI intensify",
-      "url": "https://www.bbc.co.uk/news/articles/cq0md8g14zryo?at_medium=RSS&at_campaign=rss",
-      "cluster_id": 0,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T00:01:37+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "Guitar wars - the transatlantic battle over the Stratocaster",
       "url": "https://www.bbc.co.uk/news/articles/cqd01l9x8k48o?at_medium=RSS&at_campaign=rss",
@@ -2213,8 +2116,44 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T04:10:58+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "BBC",
+      "title": "US announces new tariffs on host of countries including China",
+      "url": "https://www.bbc.co.uk/news/articles/c893r9ke5p97o?at_medium=RSS&at_campaign=rss",
+      "cluster_id": 4,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:27:44+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "BBC",
+      "title": "Musk's plan to send a million SpaceX data satellites into space approved",
+      "url": "https://www.bbc.co.uk/news/articles/cwp836l8n1jgo?at_medium=RSS&at_campaign=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-25T21:43:18+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "BBC",
+      "title": "US stocks fall further as fears over AI intensify",
+      "url": "https://www.bbc.co.uk/news/articles/cq0md8g14zryo?at_medium=RSS&at_campaign=rss",
+      "cluster_id": 0,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-25T13:42:08+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "Energy bills to rise by 26% from January after gas prices surge",
       "url": "https://www.bbc.co.uk/news/articles/cm20qnq33e90o?at_medium=RSS&at_campaign=rss",
@@ -2226,7 +2165,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T16:42:11+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "Trump's accounts traded Nvidia shares 44 times this year, records show",
       "url": "https://www.bbc.co.uk/news/articles/cq772vk664yvo?at_medium=RSS&at_campaign=rss",
@@ -2238,7 +2177,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T10:42:20+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "Energy bills will soar - here's how you can ease the pain",
       "url": "https://www.bbc.co.uk/news/articles/crm4rygl4m3o?at_medium=RSS&at_campaign=rss",
@@ -2250,7 +2189,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T12:12:11+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "'I only use the washing machine on a Sunday' - how we're keeping our energy bills down",
       "url": "https://www.bbc.co.uk/news/articles/c820qnznkrn4o?at_medium=RSS&at_campaign=rss",
@@ -2262,7 +2201,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T09:54:32+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "What will the energy cap changes mean for my bills?",
       "url": "https://www.bbc.co.uk/news/articles/cdd29v8mp9jo?at_medium=RSS&at_campaign=rss",
@@ -2274,7 +2213,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T10:03:12+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "BBC",
       "title": "Zoe Kleinman: Nobody is irreplaceable - unless you're Jensen Huang",
       "url": "https://www.bbc.co.uk/news/articles/c3rrgqj2zx5yo?at_medium=RSS&at_campaign=rss",
@@ -2285,32 +2224,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-25T01:03:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "BBC",
-      "title": "Trump's rescue of Nvidia's Huang brings political risks",
-      "url": "https://www.bbc.co.uk/news/articles/ckj05m2zdyryo?at_medium=RSS&at_campaign=rss",
-      "cluster_id": 2,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-24T18:21:43+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "BBC",
-      "title": "Faisal Islam: Fears over the AI boom haven't gone away",
-      "url": "https://www.bbc.co.uk/news/articles/c6894evgpel5o?at_medium=RSS&at_campaign=rss",
-      "cluster_id": 0,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T06:39:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "SpaceX, Musk pledge to donate a share each to active Trump Accounts",
       "url": "https://www.cnbc.com/2026/11/25/spacex-musk-trump-account-stock.html",
@@ -2321,44 +2236,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T03:19:44+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "CNBC",
-      "title": "S&P warns Nvidia credit rating could be cut over 'rising' management and governance risk",
-      "url": "https://www.cnbc.com/2026/11/26/nvidia-market-governance-risk.html",
-      "cluster_id": 2,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T08:42:26+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "CNBC",
-      "title": "Global stocks rally as investors shrug off U.S. tariffs and AI jitters",
-      "url": "https://www.cnbc.com/2026/11/26/stock-markets-today-.html",
-      "cluster_id": 0,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T07:23:42+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "CNBC",
-      "title": "Wealthy Europeans look beyond stocks amid AI selloff. Here’s where they’re investing",
-      "url": "https://www.cnbc.com/2026/11/26/wealthy-europeans-alternative-investments-ai.html",
-      "cluster_id": 0,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T08:09:39+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "U.S. tariff-hike threats pile pressure on partners to sign trade deals",
       "url": "https://www.cnbc.com/2026/11/26/us-tariffs-hike-trade-agreement.html",
@@ -2369,8 +2248,68 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T09:51:40+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "CNBC",
+      "title": "Global stocks rally as investors shrug off U.S. tariffs and AI jitters to 'fish for bargains'",
+      "url": "https://www.cnbc.com/2026/11/26/stock-markets-today-.html",
+      "cluster_id": 0,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:02:30+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "CNBC",
+      "title": "Norse Atlantic suspends all flights, warns it may file for bankruptcy after share price collapse",
+      "url": "https://www.cnbc.com/2026/11/26/norse-airline-finance-business.html",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T07:23:42+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "CNBC",
+      "title": "Wealthy Europeans look beyond stocks amid AI selloff. Here’s where they’re investing",
+      "url": "https://www.cnbc.com/2026/11/26/wealthy-europeans-alternative-investments-ai.html",
+      "cluster_id": 0,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T03:19:44+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "CNBC",
+      "title": "S&P warns Nvidia credit rating could be cut over 'rising' management and governance risk",
+      "url": "https://www.cnbc.com/2026/11/26/nvidia-market-governance-risk.html",
+      "cluster_id": 2,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T08:59:11+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "CNBC",
+      "title": "Latin America has the copper and energy the AI build-out needs. Infrastructure is the test",
+      "url": "https://www.cnbc.com/2026/11/26/latin-america-copper-energy-ai-investment.html",
+      "cluster_id": 0,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T07:45:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Taking on Starlink: Europe’s largest satellite factory opens in push to rival Musk",
       "url": "https://www.cnbc.com/2026/11/26/starlink-satellites-aerospacelab-factory-belgium.html",
@@ -2382,7 +2321,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T16:02:52+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "U.S. proposes new tariffs on 14 trading partners, including China and the EU",
       "url": "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html",
@@ -2393,32 +2332,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-25T21:00:08+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "CNBC",
-      "title": "Vance says he was assured Jensen Huang was not under DOJ investigation",
-      "url": "https://www.cnbc.com/2026/11/25/vance-jensen-huang-nvidia-doj-investigation.html",
-      "cluster_id": 7,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T04:12:18+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "CNBC",
-      "title": "How Trump’s latest tariff moves hand India an edge over rival Asian exporters",
-      "url": "https://www.cnbc.com/2026/11/26/trump-us-tariff-india-trade.html",
-      "cluster_id": 4,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-25T14:17:01+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Secondhand shopping is going mainstream this holiday season as consumers seek value",
       "url": "https://www.cnbc.com/2026/11/25/secondhand-holiday-shopping-grows-as-shoppers-seek-value.html",
@@ -2430,7 +2345,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:13:43+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "‘Your booth is waiting’: Denny’s welcomes Jensen Huang back as Nvidia CEO",
       "url": "https://www.cnbc.com/2026/11/26/dennys-jensen-huang-nvidia.html",
@@ -2442,7 +2357,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T17:28:24+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Nvidia sellers seek new buyers as U.S. curbs China AI chip access, sources tell CNBC",
       "url": "https://www.cnbc.com/2026/11/25/nvidia-china-ai-chip-remote-access.html",
@@ -2454,7 +2369,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T22:26:56+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Macy's postpones Thanksgiving Day Parade due to severe weather",
       "url": "https://www.cnbc.com/2026/11/25/macys-thanksgiving-day-parade-postponed.html",
@@ -2466,7 +2381,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T19:26:39+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Retail turnarounds are taking hold just in time for the holiday season",
       "url": "https://www.cnbc.com/2026/11/24/retail-turnarounds-holiday-season.html",
@@ -2478,7 +2393,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T14:51:58+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Best Buy reports comparable sales growth of 6.1%, highest in five years",
       "url": "https://www.cnbc.com/2026/11/24/best-buy-bby-q3-2027-earnings.html",
@@ -2490,7 +2405,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T12:00:01+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "CNBC",
       "title": "Some U.S. food banks see demand top pandemic levels",
       "url": "https://www.cnbc.com/2026/11/24/us-food-banks-demand-snap.html",
@@ -2501,8 +2416,68 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T09:52:36+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "半島電視台",
+      "title": "Ex-Cricket Australia boss James Sutherland defends ‘Sandpapergate’ probe",
+      "url": "https://www.aljazeera.com/sports/2026/11/26/sandpapergate-cricket-australia-ceo-sutherland-david-warner-ball-tampering-2018?traffic_source=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:40:59+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "半島電視台",
+      "title": "Iqbal in space: Urdu poet’s verses unite India, Pakistan beyond Earth",
+      "url": "https://www.aljazeera.com/news/2026/11/26/iqbal-in-space-urdu-poets-verses-unite-india-pakistan-beyond-earth?traffic_source=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:30:24+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "半島電視台",
+      "title": "Explosion rocks Bangkok oil depot",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/11/26/explosion-rocks-bangkok-oil-depot?traffic_source=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:00:06+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "半島電視台",
+      "title": "Israeli attacks on Gaza kill senior education official, seven other people",
+      "url": "https://www.aljazeera.com/news/2026/11/26/israeli-attacks-on-gaza-kill-senior-education-official-seven-other-people?traffic_source=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T08:54:49+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "半島電視台",
+      "title": "Why has North Korea expelled a Swiss diplomat from Pyongyang?",
+      "url": "https://www.aljazeera.com/news/2026/11/26/why-has-north-korea-expelled-a-swiss-diplomat-from-pyongyang?traffic_source=rss",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "free",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T08:49:20+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "Explosion occurs at oil facility in Thailand’s Bangkok",
       "url": "https://www.aljazeera.com/news/2026/11/26/explosion-occurs-at-oil-facility-in-thailands-bangkok?traffic_source=rss",
@@ -2514,7 +2489,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:33:51+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "Thanksgiving and National Day of Mourning: What is the history?",
       "url": "https://www.aljazeera.com/news/2026/11/26/thanksgiving-and-national-day-of-mourning-what-is-the-history?traffic_source=rss",
@@ -2526,7 +2501,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:29:53+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "Ms Rachel on Gaza: ‘everybody should speak out’",
       "url": "https://www.aljazeera.com/video/newsfeed/2026/11/26/ms-rachel-on-gaza-everybody-should-speak?traffic_source=rss",
@@ -2538,7 +2513,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:23:51+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "Rescuers recover bodies after flood at illegal Indonesia gold mine",
       "url": "https://www.aljazeera.com/video/newsfeed/2026/11/26/rescuers-recover-bodies-after-flood-at-illegal-indonesia-gold-mine?traffic_source=rss",
@@ -2550,7 +2525,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:43:14+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "Photos: Rallies around the world denounce violence against women",
       "url": "https://www.aljazeera.com/gallery/2026/11/26/photos-rallies-around-the-world-denounce-violence-against-women?traffic_source=rss",
@@ -2562,7 +2537,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:41:30+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "DR Congo Ebola cases surpass 12,000 as fighting disrupts response in east",
       "url": "https://www.aljazeera.com/news/2026/11/26/dr-congo-ebola-cases-surpass-12000-as-fighting-disrupts-response-in-east?traffic_source=rss",
@@ -2574,7 +2549,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:38:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "半島電視台",
       "title": "At least 13 dead in Indonesia gold mine flood as rescue efforts intensify",
       "url": "https://www.aljazeera.com/news/2026/11/26/at-least-13-dead-in-indonesia-gold-mine-flood-as-rescue-efforts-intensify?traffic_source=rss",
@@ -2585,68 +2560,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T07:15:39+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "半島電視台",
-      "title": "French navy intercepts suspected drug-smuggling semi-submersible",
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/11/26/french-navy-intercepts-suspected-drug-smuggling-semi-submersible?traffic_source=rss",
-      "cluster_id": 7,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T06:56:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "半島電視台",
-      "title": "War and drought threaten livelihoods of Sudan’s farmers",
-      "url": "https://www.aljazeera.com/features/2026/11/26/war-and-drought-threaten-livelihoods-of-sudans-farmers?traffic_source=rss",
-      "cluster_id": 4,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T06:53:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "半島電視台",
-      "title": "The world must choose between nuclear abolition and nuclear catastrophe",
-      "url": "https://www.aljazeera.com/opinions/2026/11/26/the-world-must-choose-between-nuclear-abolition-and-nuclear-catastrophe?traffic_source=rss",
-      "cluster_id": 7,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T06:36:25+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "半島電視台",
-      "title": "Who really wants Pedro Sanchez out of power?",
-      "url": "https://www.aljazeera.com/opinions/2026/11/26/who-really-wants-pedro-sanchez-out-of-power?traffic_source=rss",
-      "cluster_id": 5,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T06:32:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "半島電視台",
-      "title": "Jannik Sinner ruled out of 2027 Australian Open after knee surgery",
-      "url": "https://www.aljazeera.com/sports/2026/11/26/jannik-sinner-australian-open-2027-knee-injury-surgery-tennis?traffic_source=rss",
-      "cluster_id": 7,
-      "region": "intl",
-      "paywall": "free",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T07:16:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "Is the stock market open for Thanksgiving? The answer might surprise you.",
       "url": "https://www.marketwatch.com/story/is-the-stock-market-open-for-thanksgiving-the-answer-might-surprise-you-e68114d4?mod=mw_rss_topstories",
@@ -2658,7 +2573,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T01:15:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "We are living in perilous times if Nvidia’s Jensen Huang dictates your 401(k) balance",
       "url": "https://www.marketwatch.com/story/we-are-living-in-perilous-times-if-nvidias-jensen-huang-dictates-your-401-k-balance-e0942d1e?mod=mw_rss_topstories",
@@ -2670,7 +2585,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T00:33:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "Why this stock-market selloff is probably going to get worse before it gets better",
       "url": "https://www.marketwatch.com/story/why-this-stock-market-selloff-is-probably-going-to-get-worse-before-it-gets-better-fce63a89?mod=mw_rss_topstories",
@@ -2682,7 +2597,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T23:30:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "A 66-year-old nurse is facing down retirement with just $500 saved. Who’s to blame?",
       "url": "https://www.marketwatch.com/story/a-66-year-old-nurse-faces-retirement-with-just-500-saved-whos-to-blame-4249a0fd?mod=mw_rss_topstories",
@@ -2694,7 +2609,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T23:30:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "I’m in my 70s and buying a new BMW X1. Should I put my only son on the title?",
       "url": "https://www.marketwatch.com/story/im-in-my-70s-and-buying-a-new-bmw-x1-should-i-put-my-only-son-on-the-title-25731040?mod=mw_rss_topstories",
@@ -2706,7 +2621,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T23:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "I’ve been married for 58 years. It’s ‘our’ money, not ‘his’ and ‘hers.’ Why do so many couples keep their finances separate?",
       "url": "https://www.marketwatch.com/story/ive-been-married-for-58-years-its-our-money-not-his-and-hers-why-dont-others-feel-the-same-c5745889?mod=mw_rss_topstories",
@@ -2718,7 +2633,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T22:45:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "I hate that Jensen Huang is back at Nvidia, but I love what it’s done for my 401(k). Am I a hypocrite?",
       "url": "https://www.marketwatch.com/story/i-hate-that-jensen-huang-is-back-at-nvidia-but-i-love-what-its-done-for-my-401-k-am-i-a-hypocrite-f63c0303?mod=mw_rss_topstories",
@@ -2730,7 +2645,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T22:16:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "Oracle, CoreWeave and other tech stocks bounce back after selloff",
       "url": "https://www.marketwatch.com/story/oracles-stock-sinks-toward-a-3-year-low-as-the-ai-trade-continues-to-unravel-d4698d77?mod=mw_rss_topstories",
@@ -2742,7 +2657,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T22:11:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "Nvidia’s stock has given back a big chunk of Monday’s rally as dip buyers cash in",
       "url": "https://www.marketwatch.com/story/nvidias-stock-is-giving-back-more-than-half-of-mondays-rally-as-dip-buyers-cash-in-ee4fa52c?mod=mw_rss_topstories",
@@ -2754,7 +2669,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:50:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "MarketWatch",
       "title": "Elon Musk and SpaceX to donate roughly $17.8 billion to ‘Trump accounts’",
       "url": "https://www.marketwatch.com/story/elon-musk-and-spacex-to-donate-roughly-17-8-billion-to-trump-accounts-071c12e1?mod=mw_rss_topstories",
@@ -2766,7 +2681,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T09:56:46+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Stock Market News, Nov. 25, 2026: Stocks Pare Losses as Tech Selloff Eases",
       "url": "https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-11-25-2026?mod=rss_markets_main",
@@ -2778,7 +2693,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T02:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "The Other Nvidia Romance With an Executive at a Company Linked to China",
       "url": "https://www.wsj.com/finance/stocks/nvidia-china-executive-affair-jay-puri-cenly-chen-a42d733b?mod=rss_markets_main",
@@ -2790,7 +2705,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T01:04:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Aschenbrenner’s Situational Awareness Tells Investors It Lost 65% in Third Quarter",
       "url": "https://www.wsj.com/finance/investing/aschenbrenners-situational-awareness-tells-investors-it-lost-65-in-third-quarter-de8e9797?mod=rss_markets_main",
@@ -2802,7 +2717,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T22:27:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Jensen Huang, Trump and the 11 Days That Rocked Nvidia",
       "url": "https://www.wsj.com/finance/stocks/jensen-huang-trump-and-the-11-days-that-rocked-nvidia-604fff0b?mod=rss_markets_main",
@@ -2814,7 +2729,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:48:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Wall Street Can’t Seem to Find Its Footing in the Chaos of the New AI Trade",
       "url": "https://www.wsj.com/finance/stocks/wall-street-cant-seem-to-find-its-footing-in-the-chaos-of-the-new-ai-trade-b64564e0?mod=rss_markets_main",
@@ -2826,7 +2741,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:23:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Stocks Finish Lower After Wild Session",
       "url": "https://www.wsj.com/finance/stocks/stocks-finish-lower-after-wild-session-df50cdeb?mod=rss_markets_main",
@@ -2838,7 +2753,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T19:33:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Dan Loeb’s Hedge Fund Returns to Startup Investing Years After FTX Loss",
       "url": "https://www.wsj.com/finance/investing/dan-loebs-hedge-fund-returns-to-startup-investing-years-after-ftx-loss-46f36108?mod=rss_markets_main",
@@ -2850,7 +2765,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T10:30:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Where to Find Bargains After the AI Power Boom Reality Check",
       "url": "https://www.wsj.com/finance/where-to-find-bargains-after-the-ai-power-boom-reality-check-a6be0739?mod=rss_markets_main",
@@ -2862,7 +2777,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T10:30:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "For Better or Worse, the Fate of the AI Boom Is in Nvidia’s Hands",
       "url": "https://www.wsj.com/tech/ai/for-better-or-worse-the-fate-of-the-ai-boom-is-in-nvidias-hands-d0f88970?mod=rss_markets_main",
@@ -2874,7 +2789,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:24:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Jamie Dimon Loved Britain—Until It Raised Taxes on JPMorgan",
       "url": "https://www.wsj.com/finance/banking/jamie-dimon-loved-britainuntil-it-raised-taxes-on-jpmorgan-3462d7b6?mod=rss_markets_main",
@@ -2886,9 +2801,9 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:42:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
-      "title": "New Tariffs on China Could Undermine Trade Truce With U.S.",
+      "title": "New Tariffs on China Risk Undermining Trade Truce With U.S.",
       "url": "https://www.wsj.com/world/new-tariffs-on-china-could-undermine-trade-truce-with-u-s-bf43adcf?mod=rss_worldnews",
       "cluster_id": 3,
       "region": "intl",
@@ -2898,7 +2813,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:49:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Wife of Japanese Reporter Held in Russia Appeals for His Release",
       "url": "https://www.wsj.com/world/wife-of-japanese-reporter-held-in-russia-appeals-for-his-release-74bb1712?mod=rss_worldnews",
@@ -2910,7 +2825,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Behind France’s Unrest Lies a Historic Decline in Spending Power",
       "url": "https://www.wsj.com/world/europe/behind-frances-unrest-lies-a-historic-decline-in-spending-power-ab0c7d65?mod=rss_worldnews",
@@ -2922,7 +2837,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "A ‘Silent War’ Grips Iran as Its Economy Strains Under U.S. Blockade",
       "url": "https://www.wsj.com/world/middle-east/a-silent-war-grips-iran-as-its-economy-strains-under-u-s-blockade-36bfa5d4?mod=rss_worldnews",
@@ -2934,7 +2849,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T18:52:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Inside the Scramble to Avert Conflict With Russia in the Baltic",
       "url": "https://www.wsj.com/world/europe/inside-the-scramble-to-avert-conflict-with-russia-in-the-baltic-4ec51b82?mod=rss_worldnews",
@@ -2946,7 +2861,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T03:13:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "China Takes Down Shanghai Party Boss Once Seen as Potential Leader",
       "url": "https://www.wsj.com/world/china/china-takes-down-shanghai-party-boss-once-seen-as-potential-leader-5d6d06e0?mod=rss_worldnews",
@@ -2958,7 +2873,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:07:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Oil Futures Pick Up as Middle East Tensions Persist",
       "url": "https://www.wsj.com/world/middle-east/oil-prices-fall-as-traders-weigh-supply-outlook-renewed-middle-east-tensions-182b1198?mod=rss_worldnews",
@@ -2970,7 +2885,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T01:43:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Yemen’s Houthis Take Second Swipe at Tallest Tower in Saudi Capital",
       "url": "https://www.wsj.com/world/middle-east/yemens-houthis-take-second-swipe-at-tallest-tower-in-saudi-capital-11cc288c?mod=rss_worldnews",
@@ -2982,7 +2897,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T21:28:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Oil Prices Rebound as Shipping Risks Persist",
       "url": "https://www.wsj.com/business/energy-oil/oil-prices-fall-as-traders-weigh-supply-outlook-shipping-risks-7225885e?mod=rss_worldnews",
@@ -2994,7 +2909,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T10:12:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Tiny Bahrain Is Paying a Big Price for Its Ties to the U.S.",
       "url": "https://www.wsj.com/world/middle-east/tiny-bahrain-is-paying-a-big-price-for-its-ties-to-the-u-s-77f0717a?mod=rss_worldnews",
@@ -3006,7 +2921,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T02:44:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "China’s Military Ambitions in the Pacific Suffer Setback",
       "url": "https://www.wsj.com/world/asia/chinas-military-ambitions-in-the-pacific-suffer-setback-ef5a2d30?mod=rss_worldnews",
@@ -3018,7 +2933,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T20:09:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Huang Tells Staff He Is in Therapy, Apologizes in Nvidia Town Hall",
       "url": "https://www.wsj.com/tech/huang-tells-staff-he-is-in-therapy-apologizes-in-nvidia-town-hall-b79647f0?mod=rss_worldnews",
@@ -3030,7 +2945,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T12:36:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "The Morning Risk Report: U.S. Chip Restrictions Amplify Shell Company Headaches in AI Ecosystem",
       "url": "https://www.wsj.com/risk-compliance-journal/the-morning-risk-report-u-s-chip-restrictions-amplify-shell-company-headaches-in-ai-ecosystem-fd7a749d?mod=rss_worldnews",
@@ -3042,7 +2957,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T12:23:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "WSJ",
       "title": "Russian Warplanes Trigger Alarm Among U.S. Partners in Asia",
       "url": "https://www.wsj.com/world/russian-warplanes-trigger-alarm-among-u-s-partners-in-asia-8c2a2157?mod=rss_worldnews",
@@ -3053,8 +2968,32 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-25T22:10:42+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Bloomberg",
+      "title": "Global Stocks Climb as AI Trade Mounts a Comeback: Markets Wrap",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-25/stock-market-today-dow-s-p-live-updates",
+      "cluster_id": 3,
+      "region": "intl",
+      "paywall": "paywall",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
+      "ts": "2026-11-26T09:09:16+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Bloomberg",
+      "title": "Can Trump Gain Any Leverage Over China With the 40% Tariff Threat?",
+      "url": "https://www.bloomberg.com/news/videos/2026-11-26/insight-with-haslinda-amin-11-26-2026-video",
+      "cluster_id": 4,
+      "region": "intl",
+      "paywall": "paywall",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T09:00:22+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Marc Levinson on How UPS Created Modern Logistics",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/marc-levinson-on-how-ups-created-modern-logistics",
@@ -3065,8 +3004,20 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T09:00:01+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Bloomberg",
+      "title": "Turkey’s Defense Chief to Meet Hegseth to Discuss Russian S-400s",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/turkey-s-defense-chief-to-meet-hegseth-to-discuss-russian-s-400s",
+      "cluster_id": 4,
+      "region": "intl",
+      "paywall": "paywall",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T09:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Odd Lots: Levinson on How UPS Created Modern Logistics (Podcast)",
       "url": "https://www.bloomberg.com/news/audio/2026-11-26/odd-lots-levinson-on-how-ups-created-modern-logistics-podcast",
@@ -3078,7 +3029,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:50:20+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "UniCredit Clears Final Hurdle to Take Over Commerzbank",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/unicredit-clears-final-hurdle-to-take-over-commerzbank-video",
@@ -3090,7 +3041,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:05:24+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Trump’s Tariffs Blunt Appeal of Moving Production Out of China",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/trump-riles-trade-partners-with-tariffs-that-undercut-china-1",
@@ -3101,20 +3052,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-25T22:10:42+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Bloomberg",
-      "title": "Global Stocks Climb as AI Trade Mounts a Comeback: Markets Wrap",
-      "url": "https://www.bloomberg.com/news/articles/2026-11-25/stock-market-today-dow-s-p-live-updates",
-      "cluster_id": 3,
-      "region": "intl",
-      "paywall": "paywall",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-25T23:03:15+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Latest Oil Market News and Analysis for Nov. 26",
       "url": "https://www.bloomberg.com/news/articles/2026-11-25/latest-oil-market-news-and-analysis-for-nov-26",
@@ -3126,7 +3065,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:29:51+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Asian Stock Markets Are Cheap Enough Now: Market Analysis",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/asian-stock-markets-are-cheap-enough-now-3-minutes-mliv-video",
@@ -3138,7 +3077,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:36:45+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Japan’s Insurers Have ‘Given Up’ on Yen With Record-Low Hedging",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/japan-life-insurers-complicate-yen-fight-with-record-low-hedging",
@@ -3150,7 +3089,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:41:56+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Houthis Target Jeddah and Jazan Ports as Attacks on Saudi Arabia Intensify",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/horizons-middle-east-africa-11-26-2026-video",
@@ -3162,7 +3101,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:37:50+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "FTSE 100 Eyes Rebound as Shift to UK Gilts Pauses",
       "url": "https://www.bloomberg.com/news/newsletters/2026-11-26/ftse-100-eyes-rebound-as-shift-to-uk-gilts-pauses",
@@ -3173,11 +3112,11 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T07:24:28+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:38:12+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
-      "title": "Diesel-Carrying Ship Sinks Off Spanish Island of Ibiza, One Dead",
-      "url": "https://www.bloomberg.com/news/articles/2026-11-26/diesel-carrying-ship-sinks-off-spanish-island-of-ibiza-one-dead",
+      "title": "UK Migration at Lowest Level Since at Least 2012 Outside Covid",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/uk-migration-at-lowest-level-since-at-least-2012-outside-covid",
       "cluster_id": 7,
       "region": "intl",
       "paywall": "paywall",
@@ -3185,11 +3124,11 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T07:16:06+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T09:07:17+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
-      "title": "China Tech Stocks Rebound From Record Slump",
-      "url": "https://www.bloomberg.com/news/videos/2026-11-26/the-china-show-11-26-2026-video",
+      "title": "BOJ’s Paper Gains From ETFs Surge as Takaichi Seeks Funding",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/boj-s-paper-gains-from-etfs-surge-as-takaichi-seeks-funding",
       "cluster_id": 3,
       "region": "intl",
       "paywall": "paywall",
@@ -3198,7 +3137,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:55:36+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Midcaps Hiding 'Historic' AI Bargain: JPMorgan's Leccubarri",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/midcaps-hiding-historic-ai-bargain-jpm-s-leccubarri-video",
@@ -3210,7 +3149,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:45:09+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "China Vows to Defend Interests as Trump Threatens 40% Tariff",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/trump-s-china-tariffs-raise-threat-of-new-test-for-trade-truce",
@@ -3222,7 +3161,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:31:19+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Zambia Inflation Edges Up on Eve of Interest-Rate Verdict",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/zambia-inflation-edges-up-on-eve-of-interest-rate-verdict",
@@ -3234,7 +3173,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T08:26:30+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Rwanda Hikes Key Rate for Fourth Time in Row to Cool Inflation",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/rwanda-hikes-key-rate-for-fourth-time-in-row-to-cool-inflation",
@@ -3246,7 +3185,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T02:28:30+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Hawkish Bank of Japan Member Seeks Quick Rate Hikes on Inflation",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/hawkish-bank-of-japan-member-seeks-quick-rate-hikes-on-inflation",
@@ -3258,7 +3197,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T05:28:06+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Indonesia Must Grow Faster as Its Population Ages, OECD Says",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/indonesia-must-grow-faster-as-its-population-ages-oecd-says",
@@ -3270,7 +3209,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T05:00:22+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Poland’s $1 Trillion Economy Shows Weak Spots as Tusk-Nawrocki Feud Play Out",
       "url": "https://www.bloomberg.com/news/features/2026-11-26/poland-s-1-trillion-economy-shows-weak-spots-as-tusk-nawrocki-feud-play-out",
@@ -3282,7 +3221,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T05:00:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Stephanomics Podcast: How AI Could Rewrite the Holiday Shopping Season",
       "url": "https://www.bloomberg.com/news/audio/2026-11-26/stephanomics-podcast-how-ai-could-rewrite-the-holiday-shopping-season",
@@ -3294,7 +3233,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T00:50:53+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "BOK Hikes Rate While Sharply Revising Up Growth View on AI Boom",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/bok-hikes-rate-on-stubborn-inflation-as-ai-boom-drives-growth",
@@ -3306,7 +3245,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T04:30:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Australia Firms See Inflation Holding Over 4% for Next 12 Months",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/australia-firms-see-inflation-holding-over-4-for-next-12-months",
@@ -3317,32 +3256,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T04:19:44+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Bloomberg",
-      "title": "Japan Protests New US Tariff Rate, Allegation of Excess Capacity",
-      "url": "https://www.bloomberg.com/news/articles/2026-11-26/japan-protests-new-us-tariff-rate-allegation-of-excess-capacity",
-      "cluster_id": 4,
-      "region": "intl",
-      "paywall": "paywall",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T03:39:18+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Bloomberg",
-      "title": "Dry Bulk Shipping Rates Climb as Capesize Vessel Supply Tightens",
-      "url": "https://www.bloomberg.com/news/articles/2026-11-26/dry-bulk-shipping-rates-climb-as-capesize-vessel-supply-tightens",
-      "cluster_id": 7,
-      "region": "intl",
-      "paywall": "paywall",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T07:02:03+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "US Partners Respond to Tariffs With Anger, Protest and Diplomacy",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/us-partners-respond-to-tariffs-with-anger-protest-and-diplomacy",
@@ -3353,8 +3268,20 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T08:05:27+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Bloomberg",
+      "title": "Madagascar Names New Speaker as Parties Realign Before Election",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/madagascar-names-new-speaker-as-parties-realign-before-election",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "paywall",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T08:02:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Trump Aims to Keep Leverage Over Xi With 40% Tariff Threat",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/daybreak-europe-11-26-2026-video",
@@ -3366,7 +3293,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T23:00:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Hong Kong Fire Shows Accountability Under Beijing’s Shadow",
       "url": "https://www.bloomberg.com/news/articles/2026-11-25/hong-kong-fire-shows-accountability-under-beijing-s-shadow",
@@ -3377,8 +3304,20 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-26T07:48:05+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "Bloomberg",
+      "title": "Higher Wages, Lower Tax Pledged to Stem Montenegrins’ Exit to EU",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/higher-wages-lower-tax-pledged-to-stem-montenegrins-exit-to-eu",
+      "cluster_id": 7,
+      "region": "intl",
+      "paywall": "paywall",
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-26T07:45:33+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "How Are US Trading Partners Responding to Tariffs?",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/how-are-us-trading-partners-responding-to-tariffs-video",
@@ -3390,7 +3329,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T07:05:20+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Ukraine Says It Downed Jet Drone With Laser For First Time",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/ukraine-says-it-downed-jet-drone-with-laser-for-first-time",
@@ -3402,7 +3341,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:35:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Singapore Is ‘Very Disappointed’ by Trump’s Proposed Tariff Hike",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/singapore-is-very-disappointed-by-trump-s-proposed-tariff-hike",
@@ -3414,7 +3353,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T02:52:22+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Kim Jong Un Makes Rare Show of Nuclear Warheads After Snubbing Trump Talks",
       "url": "https://www.bloomberg.com/news/articles/2026-11-26/kim-jong-un-makes-rare-show-of-nuclear-warheads-after-snubbing-trump-talks",
@@ -3426,7 +3365,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T01:17:56+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "Bloomberg",
       "title": "Breaking Down US Plans For New Tariffs",
       "url": "https://www.bloomberg.com/news/videos/2026-11-26/breaking-down-us-plans-for-new-tariffs-video",
@@ -3437,32 +3376,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T01:17:07+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Bloomberg",
-      "title": "Brazil Lashes Out at New US Tariffs, Saying It Will ‘Not Yield’",
-      "url": "https://www.bloomberg.com/news/articles/2026-11-26/brazil-lashes-out-at-new-us-tariffs-saying-it-will-not-yield",
-      "cluster_id": 4,
-      "region": "intl",
-      "paywall": "paywall",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
-      "ts": "2026-11-26T01:07:45+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "Bloomberg",
-      "title": "Lula Sounds Out Bradesco’s Luiz Trabuco to Join His Government",
-      "url": "https://www.bloomberg.com/news/articles/2026-11-26/lula-sounds-out-bradesco-s-luiz-trabuco-to-join-his-government",
-      "cluster_id": 7,
-      "region": "intl",
-      "paywall": "paywall",
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-25T19:11:27+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Holy shit holy shit holy shit holy shit: The magnitude of what’s now happening",
       "url": "https://scottaaronson.blog/?p=10379",
@@ -3474,7 +3389,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T17:18:26+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "1Password Security Incident",
       "url": "https://1password.com/blog/update-on-nov-2026-security-incident",
@@ -3486,7 +3401,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:48:10+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Much shorter version of GRH Lean verification from Anthropic",
       "url": "https://github.com/lsernau/grh-lean",
@@ -3498,7 +3413,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T21:18:02+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "The New York Times warns photographers not to update Photoshop over AI features",
       "url": "https://www.theverge.com/ai-artificial-intelligence/1041227/the-new-york-times-warns-photographers-not-to-update-photoshop-over-ai-features",
@@ -3510,7 +3425,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T20:38:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Slow Ubuntu security response times",
       "url": "https://www.openwall.com/lists/oss-security/2026/11/25/9",
@@ -3522,7 +3437,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T00:43:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Tell HN: Lots of Ask HNs again",
       "url": "https://news.ycombinator.com/item?id=50649864",
@@ -3533,20 +3448,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-25T14:56:52+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "HackerNews",
-      "title": "I checked Clojure's core with Lean and found unreported bugs",
-      "url": "https://s.conao3.com/blog/2026/e4f733",
-      "cluster_id": 4,
-      "region": "tech",
-      "paywall": null,
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T03:36:58+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "OpenAI cuts GPT-6.2 usage: Astra hits limits 40% faster, Sol 25% faster",
       "url": "https://twitter.com/thsottiaux/status/2125784147889393806",
@@ -3558,7 +3461,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T00:40:00+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Collection of preserved UI style guides",
       "url": "https://aresluna.org/ui-style-guides/",
@@ -3570,7 +3473,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T17:34:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "The polynomial Hirsch conjecture is false [pdf]",
       "url": "https://github.com/openai/math/blob/main/preprints/Superpolynomial-graph-diameter-of-simple-polytopes-November-24-2026/paper.pdf",
@@ -3582,7 +3485,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T22:15:34+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Bare Metal Qwen",
       "url": "https://github.com/alesha-pro/llm.asm/tree/main/02-baremetal-os",
@@ -3594,7 +3497,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T20:35:50+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Nfs2root: A 12-year-old pre-auth remote root in the Linux kernel's NFS server",
       "url": "https://opensec.in/blog/nfs2root-cve-2026-99362",
@@ -3606,7 +3509,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T10:56:56+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "What VP ≠ VNP Means (In 3 Minutes)",
       "url": "https://www.friedgil.com/vpvnp",
@@ -3618,7 +3521,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-26T03:00:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Minipg: PostgreSQL as a Single Executable",
       "url": "https://progrium.github.io/minipg/",
@@ -3629,20 +3532,8 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-25T22:12:25+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
-      "source": "HackerNews",
-      "title": "Deploying a payphone on a tiny Pacific Island for fun and zero profit",
-      "url": "https://nickvsnetworking.com/deploying-a-payphone-on-a-tiny-pacific-island-for-fun-and-zero-profit/",
-      "cluster_id": 4,
-      "region": "tech",
-      "paywall": null,
-      "title_zh": null,
-      "zh_by": "none"
-    },
-    {
       "ts": "2026-11-26T05:12:59+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Lions' Commentary on Unix: Why It Was Secretly Copied for 20 Years",
       "url": "https://fosscomics.com/posts/17.%20Lions%27%20Commentary%20on%20Unix/",
@@ -3653,8 +3544,20 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
+      "ts": "2026-11-25T22:12:25+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
+      "source": "HackerNews",
+      "title": "Deploying a payphone on a tiny Pacific Island for fun and zero profit",
+      "url": "https://nickvsnetworking.com/deploying-a-payphone-on-a-tiny-pacific-island-for-fun-and-zero-profit/",
+      "cluster_id": 4,
+      "region": "tech",
+      "paywall": null,
+      "title_zh": null,
+      "zh_by": "none"
+    },
+    {
       "ts": "2026-11-25T17:18:15+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "Deriving Black-Scholes",
       "url": "https://david.alvarezrosa.com/posts/deriving-black-scholes/",
@@ -3666,7 +3569,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-25T02:00:08+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "How did pinwheel calculators work?",
       "url": "https://blog.coredump.cx/p/how-did-pinwheel-calculators-work",
@@ -3678,7 +3581,7 @@ window.A23_FEED = {
     },
     {
       "ts": "2026-11-24T13:00:05+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
       "title": "XKCD and Fourier",
       "url": "https://leancrew.com/all-this/2026/10/xkcd-and-fourier/",
@@ -3689,11 +3592,11 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T03:43:24+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T06:32:48+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
-      "title": "Qualcomm's Oryon 3 Reaches the Top",
-      "url": "https://chipsandcheese.com/p/qualcomms-oryon-3-reaches-the-top",
+      "title": "Moat: Your OpenRouter Replacement",
+      "url": "https://commandcode.ai/moat",
       "cluster_id": 4,
       "region": "tech",
       "paywall": null,
@@ -3701,11 +3604,11 @@ window.A23_FEED = {
       "zh_by": "none"
     },
     {
-      "ts": "2026-11-26T06:32:48+00:00",
-      "fetched_at": "2026-11-26T09:00:44.696472+00:00",
+      "ts": "2026-11-26T03:43:24+00:00",
+      "fetched_at": "2026-11-26T10:00:42.792468+00:00",
       "source": "HackerNews",
-      "title": "Moat: Your OpenRouter Replacement",
-      "url": "https://commandcode.ai/moat",
+      "title": "Qualcomm's Oryon 3 Reaches the Top",
+      "url": "https://chipsandcheese.com/p/qualcomms-oryon-3-reaches-the-top",
       "cluster_id": 4,
       "region": "tech",
       "paywall": null,

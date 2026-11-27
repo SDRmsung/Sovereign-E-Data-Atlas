@@ -1,6 +1,6 @@
 // Auto-generated 24h Rolling Stream Timeline
 window.A23_TIMELINE = {
-  "updated_at": "2026-11-28 03:00:41",
+  "updated_at": "2026-11-28 04:00:45",
   "topics": [
     {
       "id": 0,
@@ -223,21 +223,6 @@ window.A23_TIMELINE = {
   ],
   "frame_count": 24,
   "frames": [
-    {
-      "timestamp": "2026-11-27 04:00",
-      "missing": false,
-      "total": 287,
-      "cluster_counts": [
-        43,
-        9,
-        8,
-        15,
-        52,
-        3,
-        5,
-        152
-      ]
-    },
     {
       "timestamp": "2026-11-27 05:00",
       "missing": false,
@@ -581,6 +566,21 @@ window.A23_TIMELINE = {
         3,
         2,
         143
+      ]
+    },
+    {
+      "timestamp": "2026-11-28 04:00",
+      "missing": false,
+      "total": 262,
+      "cluster_counts": [
+        35,
+        10,
+        4,
+        25,
+        40,
+        4,
+        3,
+        141
       ]
     }
   ]
